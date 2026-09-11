@@ -1,0 +1,84 @@
+# ============================================================================
+# BOMLLM — Validated Thai sampling recipe ("the receipt")
+# Every value below survived an A/B or a gate. Evidence cited per block.
+# Bench harness: scripts/bench_thai.py · Results: benchmarks/thai-quality.csv
+# ============================================================================
+
+recipe_version: 1.0.0
+validated_on:
+  hardware: Mac Mini M4 Pro 48GB
+  runtime: Ollama 0.33.3 (MLX backend)
+  weights: 27B-class Qwen fine-tune, nvfp4 (TURBO-Fable series, DavidAU)
+  dates: 2026-09-09 .. 2026-09-11
+
+# ---------------------------------------------------------------------------
+# LAYER 0 — COMPLETION SAFETY FLOOR (apply FIRST, before any prompt work)
+# ---------------------------------------------------------------------------
+# Finding (300/300 completions, 2026-09-11): historical thai_ratio swings
+# of 0.72-0.92 were caused by truncation/empty replies from small
+# num_predict colliding with hidden thinking tokens — NOT by prompts.
+# At this floor, all prompt styles land in a 0.036-wide thai_ratio band.
+completion_floor:
+  num_ctx: 32768
+  num_predict: 8192        # long-form / writer route
+  num_predict_chat: 2048   # interactive chat route
+  num_predict_bot: 1024    # LINE/Telegram route (30s UX budget)
+  think: false             # for bot routes — see docs/thai.md "thinking trap"
+
+# ---------------------------------------------------------------------------
+# LAYER 1 — SAMPLING (production incumbent, gate-passed)
+# ---------------------------------------------------------------------------
+# Source: 4-config microtest, 28 Thai prompts x4 configs, 112/112 ok.
+# This config ("A_bom_nothink") was the ONLY one to pass the 0.78 gate.
+sampling:
+  temperature: 0.7
+  top_p: 0.8
+  top_k: 20
+  presence_penalty: 1.5    # see note: no measurable Thai effect; kept for style
+  repeat_penalty: 1.0      # at THIS layer; route layer uses 1.05 — do not stack
+  measured:
+    thai_median: 0.7821    # gate 0.78 — PASS (+0.0021, within noise)
+    han_total: 12          # Chinese-char leaks across 28 replies
+    tok_s_median: 17.92
+    refuted_hypotheses:
+      - "presence_penalty=1.5 suppresses Thai — REFUTED (isolated A/B, n=23, delta +0.0015)"
+      - "DavidAU thinking-general sampling (t1.0/p0.95/pp0) beats incumbent — REFUTED (0.7500 vs 0.7821)"
+
+# ---------------------------------------------------------------------------
+# LAYER 2 — SYSTEM PROMPT ("Config G": Thai-only + Han ban + few-shot)
+# ---------------------------------------------------------------------------
+# Effect (60-bank, paired bootstrap 10k, 95% CI excludes zero):
+#   +0.0286 thai_ratio vs mirror prompt; Han events halve (35 -> 15 per 100).
+# Structure below is exact; the verbatim 4,101-char production text is
+# attached to the HF repo (bomllm/turbo-thai-config) as system_prompt.th.txt
+# [BENCH_DATA_PENDING: paste verbatim Config G text from locked artifact]
+system_prompt_config_g:
+  structure:
+    - "1. Identity + persona (Thai, polite, domain: finance/tech assistant)"
+    - "2. LANGUAGE RULE: answer in Thai unless the user writes another language; NEVER emit Chinese characters (Han ban, explicit)"
+    - "3. Style rules: answer-first, no filler, no fabricated numbers"
+    - "4. Two few-shot exemplars (Thai Q->A, one general + one report-style)"
+  few_shot_count: 2
+  length_chars: 4101
+  notes:
+    - "The Han-ban line itself containing Han characters did NOT increase leakage (priming hypothesis REFUTED: V1 with Han in ban line leaked 6, CJK-free variant leaked 8)"
+    - "Keep rule 2 worded to your audience: routing English technical questions to English flipped our Thai-purity gates (owner reverted)"
+
+# ---------------------------------------------------------------------------
+# ALTERNATE — simpler equal (measured, CI includes zero vs Config G)
+# ---------------------------------------------------------------------------
+alternate_simple:
+  description: "mirror/minimal system prompt + temperature 0.6, no few-shot"
+  sampling: { temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05 }
+  measured: { thai_ratio_mean: 0.7955, vs_config_g_delta: -0.0019, ci_excludes_zero: false }
+  when_to_use: "you don't want a persona floor; bank- and domain-specific result"
+
+# ---------------------------------------------------------------------------
+# HARD DON'Ts (each one measured, each one cost us time)
+# ---------------------------------------------------------------------------
+donts:
+  - "repeat_penalty 8.0 (typo probe) — output destroyed; provider passthrough is real"
+  - "num_predict 64/900 with think enabled — empty replies, done_reason=length"
+  - "two 27B models resident on 48GB — swap thrash, TTFT 28-60s"
+  - "baking persona into per-alias Modelfiles on MLX — 1.2s reload per alias switch"
+  - "judging Thai quality by eye — use the scorer + paired bootstrap (scripts/bench_thai.py)"

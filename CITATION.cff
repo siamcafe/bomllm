@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: If you use BOMLLM in your research or writing, please cite it as below.
+title: "BOMLLM: a production-proven self-hosted LLM platform on Apple Silicon"
+type: software
+authors:
+  - family-names: BOMLLM contributors
+    name: BOMLLM contributors
+repository-code: https://github.com/bomllm/bomllm
+url: https://github.com/bomllm/bomllm
+license: MIT
+version: 1.0.0
+date-released: "2026-10-07"
+keywords:
+  - self-hosted
+  - llm
+  - apple-silicon
+  - mlx
+  - ollama
+  - litellm
+  - open-webui
+  - thai
+  - inference
+abstract: >-
+  BOMLLM is an open-source operations kit for running a production
+  multi-channel LLM platform on a Mac Mini, replacing per-token cloud
+  API spend with fixed-cost local inference. It ships the configs,
+  sampling recipes, benchmark harness, and cost methodology measured
+  in production since August 2026.

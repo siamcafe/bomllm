@@ -122,7 +122,7 @@ Every number above is reproducible with [benchmarks/README.md](benchmarks/README
 ## Quickstart
 
 ```bash
-git clone https://github.com/bomllm/bomllm.git
+git clone https://github.com/siamcafe/bomllm.git
 cd bomllm
 cp configs/.env.example .env        # fill in YOUR values (all CHANGE_ME)
 ./scripts/bootstrap.sh              # VPS layer: LiteLLM + WebUI + SearXNG + DBs

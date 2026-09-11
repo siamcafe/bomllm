@@ -1,5 +1,7 @@
 # BOMLLM
 
+![BOMLLM](images/hero_banner.png)
+
 **I replaced $50/day of cloud LLM bills with a $3.50/day Mac Mini on my desk.**
 It has served **5 production channels** — a LINE bot, a Telegram bot, a read-only MT5 EA, web chat, and n8n content pipelines — **24/7 since August 2026**, in Thai and English.
 One **Mac Mini M4 Pro 48GB** runs a 27B MLX model at **~30 tok/s** (measured, not marketing).
@@ -15,6 +17,8 @@ Thai-first and proud of it — but the architecture works for any language.
 ---
 
 ## Architecture
+
+![Architecture](images/architecture.png)
 
 ```mermaid
 flowchart TB
@@ -92,6 +96,10 @@ flowchart TB
 | **Total** | **~$1,500/month** | **~$140/month** (~฿5,000) all-in |
 
 Methodology — no hand-waving: electricity is measured at the wall per machine (kWh × provincial tariff), cloud spend is exported from LiteLLM's `SpendLogs` table, and the before figure comes from actual invoices. Full breakdown, watt-draw table, and the scripts that produce it: **[docs/cost.md](docs/cost.md)**. Raw structure: [benchmarks/cost-comparison.csv](benchmarks/cost-comparison.csv).
+
+## Benchmark
+
+![Benchmark](images/benchmark.png)
 
 ## The benchmark receipt
 

@@ -1,0 +1,54 @@
+# ============================================================================
+# BOMLLM — Ollama Modelfile (SANITIZED EXAMPLE)
+# Build:   ollama create qwen38-chat -f configs/ollama-modelfile.example
+# Verify:  ollama show qwen38-chat --modelfile
+#
+# Design notes:
+#  * ONE manifest per model, shared by all aliases (ollama cp for aliases).
+#    [PROD LESSON] MLX reloads ~1.2s when switching aliases whose manifests
+#    DIFFER; identical manifests switch free. So: floor here, behavior on
+#    the LiteLLM route.
+#  * Weights are NOT redistributed. Pull the base from the original
+#    author's Hugging Face repo and point FROM at your local tag.
+#  * The SYSTEM floor below is a PLACEHOLDER persona. The validated Thai
+#    system prompt (Config G) ships in configs/sampling-recipe.yaml —
+#    apply it per-route, not baked in, so raw callers and WebUI users can
+#    each get the right persona.
+# ============================================================================
+
+# Base weights: a 27B-class Qwen fine-tune (TURBO-Fable series by DavidAU),
+# MLX nvfp4 quant. Replace with the tag YOU pulled.
+#   Example: ollama pull hf.co/<author>/<repo>:<tag>   then FROM that tag.
+FROM turbo-fable-nvfp4   # CHANGE_ME — your local tag for the 27B MLX weights
+
+# Context floor for every alias.
+# [PROD LESSON] post-swap we lost the Modelfile floor and raw callers
+# silently dropped to num_ctx 8192. Set it here; routes can raise it.
+PARAMETER num_ctx 32768
+
+# Keep sampling minimal here — route-level params in litellm.yaml win
+# per-request and are easier to A/B. These are only safe defaults for
+# raw callers that bypass the proxy.
+PARAMETER temperature 0.7
+PARAMETER top_p 0.8
+PARAMETER top_k 20
+PARAMETER repeat_penalty 1.05
+
+# Minimal safety floor persona (REPLACE with your own; the full validated
+# Thai recipe with few-shots is in configs/sampling-recipe.yaml).
+SYSTEM """
+You are a helpful assistant. Answer in the language of the user's most
+recent message unless instructed otherwise. Never emit Chinese characters
+unless the user asks about Chinese. Be concise; admit uncertainty.
+"""
+
+# ---------------------------------------------------------------------------
+# Alias pattern (free switching on MLX — identical manifests):
+#   ollama create qwen38-chat -f thisfile
+#   ollama cp qwen38-chat qwen38-think
+#   ollama cp qwen38-chat qwen38-code
+#   ollama cp qwen38-chat qwen38-deep
+#   ollama cp qwen38-chat qwen38-fast
+# Then differentiate behavior in litellm.yaml routes (temperature,
+# num_predict, think on/off) — NOT in separate Modelfiles.
+# ---------------------------------------------------------------------------

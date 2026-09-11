@@ -1,0 +1,11 @@
+date,ledger,item,quantity,unit,unit_cost_usd,cost_usd,source,note
+2026-09-04,cloud_fallback,litellm_spendlogs,1370,calls,,1.0967,litellm_postgres,"tier-3 fallback only; typical day"
+2026-09-05,cloud_fallback,litellm_spendlogs,1470,calls,,0.6638,litellm_postgres,"typical day"
+2026-09-06,cloud_fallback,litellm_spendlogs,3448,calls,,2.7595,litellm_postgres,"peak day; 55% of $5/day cap"
+2026-09-07,cloud_fallback,litellm_spendlogs,494,calls,,0.3063,litellm_postgres,"partial day"
+[BENCH_DATA_PENDING],cloud_before,zai_invoice_avg,1,day,,50.00,provider_invoices,"final 30-day average before cutover"
+[BENCH_DATA_PENDING],electricity,mac_mini_m4pro,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"idle-heavy; ~65W load bursts"
+[BENCH_DATA_PENDING],electricity,i9_2x5060ti,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"image/voice bursts only"
+[BENCH_DATA_PENDING],electricity,nas_ds725,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"near-constant draw"
+[BENCH_DATA_PENDING],electricity,network_share,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"router/ONT/switch allocated share"
+[BENCH_DATA_PENDING],electricity,fleet_total,[BENCH_DATA_PENDING],kwh_day,0.125,3.50,derived,"the headline number; sum of device rows"

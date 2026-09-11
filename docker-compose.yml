@@ -1,0 +1,136 @@
+# ============================================================================
+# BOMLLM — VPS layer (the "front of house")
+# Target host: any Linux VPS. Reference: Debian 12, 12 vCPU, 47 GB RAM,
+# Docker 29.x + compose v2. Runs fine on much smaller (4 vCPU / 8 GB).
+#
+# This compose is the VPS half of the architecture. The LLM itself runs on
+# your Mac (Ollama, see configs/ollama-modelfile.example) and is reached
+# over Tailscale. See docs/architecture.md before booting.
+#
+# EVERY secret in this file comes from .env — copy configs/.env.example.
+# Nothing in this file is a real credential. Do not paste real values here.
+# ============================================================================
+
+name: bomllm
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-litellm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-litellm}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-litellm}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [bomllm]
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    restart: unless-stopped
+    command: ["valkey-server", "--appendonly", "yes"]
+    volumes:
+      - valkeydata:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [bomllm]
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    restart: unless-stopped
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    # Bind localhost only. Reach it over Tailscale via a socat forward
+    # if a remote node needs it (see docs/security.md).
+    ports:
+      - "127.0.0.1:6333:6333"
+    networks: [bomllm]
+
+  searxng:
+    # Pin a dated tag; "latest" has bitten us. See docs/upgrade.md.
+    image: searxng/searxng:2026.9.5-c7f3080aa
+    restart: unless-stopped
+    environment:
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://localhost:8888/}
+    volumes:
+      - ./volumes/searxng:/etc/searxng:rw
+    ports:
+      - "127.0.0.1:8888:8080"   # localhost only — Open WebUI reaches it container-to-container
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETGID, SETUID]
+    logging:
+      driver: json-file
+      options: { max-size: "1m", max-file: "1" }
+    networks: [bomllm]
+
+  litellm:
+    # We run a lightly patched image in production (PIL patch for image
+    # passthrough). The stock image works for the kit; see docs/upgrade.md.
+    image: ghcr.io/berriai/litellm:main-stable
+    restart: unless-stopped
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "1"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-litellm}
+      STORE_MODEL_IN_DB: "True"
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?set in .env, format sk-...}
+      UI_USERNAME: ${LITELLM_UI_USERNAME:-admin}
+      UI_PASSWORD: ${LITELLM_UI_PASSWORD:?set in .env}
+      # Mac Ollama over Tailscale — NEVER a public IP.
+      MAC_OLLAMA_BASE_URL: ${MAC_OLLAMA_BASE_URL:?e.g. http://100.x.y.z:11434}
+    volumes:
+      - ./configs/litellm.yaml:/app/config.yaml:ro   # real config, gitignored
+    ports:
+      - "127.0.0.1:4000:4000"   # front with Cloudflare Tunnel; do not publish
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4000/health/liveliness || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks: [bomllm]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.3
+    restart: unless-stopped
+    environment:
+      OPENAI_API_BASE_URLS: "http://litellm:4000/v1"
+      OPENAI_API_KEYS: ${LITELLM_MASTER_KEY:?}
+      OLLAMA_BASE_URLS: ""            # empty on purpose: WebUI must not bypass the proxy
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:?set in .env}
+      ENABLE_OLLAMA_API: "false"
+      # Web search via local SearXNG (AGPL, unmodified, internal use)
+      ENABLE_WEB_SEARCH: "true"
+      WEB_SEARCH_ENGINE: "searxng"
+      SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
+      # RAG
+      RAG_EMBEDDING_ENGINE: ollama
+      RAG_EMBEDDING_MODEL: bge-m3
+      RAG_OLLAMA_BASE_URL: ${MAC_OLLAMA_BASE_URL:?}
+    volumes:
+      - open-webui-data:/app/backend/data
+    ports:
+      - "127.0.0.1:3000:8080"   # front with Cloudflare Tunnel; do not publish
+    depends_on:
+      litellm: { condition: service_healthy }
+      searxng: { condition: service_started }
+    networks: [bomllm]
+
+volumes:
+  pgdata:
+  valkeydata:
+  qdrant_storage:
+  open-webui-data:
+
+networks:
+  bomllm:
+    driver: bridge

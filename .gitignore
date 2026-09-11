@@ -1,0 +1,128 @@
+# ============================================================================
+# BOMLLM .gitignore — the secret-hygiene backbone of this repo.
+# If you add a new credential-bearing file, add it here FIRST, commit the
+# ignore rule, and only then create the file. Never the other way around.
+# ============================================================================
+
+# --- Secrets: NEVER commit anything below ---------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+id_rsa*
+id_ed25519*
+*.secret
+*.secrets
+secrets/
+secrets.*
+credentials/
+credentials.*
+.config/
+config.local.*
+*.local.yaml
+*.local.yml
+*.local.json
+*.local.toml
+litellm.yaml          # real LiteLLM config carries keys; only .example ships
+config.yaml           # same — real mounted config never leaves the host
+!configs/*.example
+*token*
+!*token*.example
+*apikey*
+*api_key*
+webhook_urls.*
+*.webhook
+
+# --- Cloud / provider credential helpers -----------------------------------
+.gcp/
+*.gcp.json
+gcp_*_key.json
+.aws/
+.azure/
+
+# --- Runtime data, dumps, backups -------------------------------------------
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.pgdump
+backups/
+backup/
+dumps/
+pgdata/
+qdrant_storage/
+valkeydata/
+open-webui-data/
+data/
+volumes/
+
+# --- Benchmark raw output (may contain user prompts) -------------------------
+benchmarks/raw/
+benchmarks/results/
+benchmarks/*.jsonl
+!benchmarks/*.csv
+*_results.json
+raw_results.*
+
+# --- Logs --------------------------------------------------------------------
+*.log
+logs/
+log/
+
+# --- Screenshots under review (only curated files in assets/ ship) -----------
+screenshots_inbox/
+captures/
+
+# --- Model weights (never in git; pull from Hugging Face) --------------------
+models/
+*.gguf
+*.safetensors
+*.bin
+*.mlx
+*.ckpt
+ollama-models/
+
+# --- OS / editor noise ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+!.vscode/extensions.json
+.idea/
+.cursor/
+.claude/
+.zcode/
+
+# --- Python ---------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node (if you extend the UI) -------------------------------------------------
+node_modules/
+dist/
+.next/
+
+# --- Misc ------------------------------------------------------------------------
+tmp/
+tmp_*/
+_scratch/
+*.bak
+*.legacy.bak
+*.orig
+nul
+NUL

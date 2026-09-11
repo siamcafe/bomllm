@@ -1,0 +1,100 @@
+BOMLLM
+Copyright (c) 2026 BOMLLM contributors
+
+This repository is licensed under the MIT License (see LICENSE).
+
+BOMLLM is an integration and operations kit. It orchestrates third-party
+open-source projects which remain under their own licenses. Installing or
+running any component means you accept that component's license. The
+license matrix below is provided for convenience; the upstream LICENSE
+files are authoritative.
+
+========================================================================
+THIRD-PARTY COMPONENTS AND THEIR LICENSES
+========================================================================
+
+Open WebUI
+  License: Custom (BSD-3-Clause derived, with additional branding and
+           trademark terms added by upstream in 2024-2025).
+  Notes:   Read the upstream LICENSE before redistribution or SaaS use.
+           Keep required attribution/branding intact where mandated.
+  URL:     https://github.com/open-webui/open-webui
+
+n8n
+  License: Sustainable Use License ("fair-code") + n8n Enterprise License.
+  Notes:   NOT OSI-approved open source. Internal business use is allowed;
+           offering n8n as a hosted service to third parties is restricted.
+           BOMLLM uses n8n only as an internal workflow router.
+  URL:     https://github.com/n8n-io/n8n
+
+SearXNG
+  License: GNU Affero General Public License v3.0 (AGPL-3.0).
+  Notes:   Network use triggers source-offer obligations if you modify
+           SearXNG and expose it to users over a network. BOMLLM runs
+           SearXNG unmodified, bound to localhost, as an internal search
+           backend for Open WebUI.
+  URL:     https://github.com/searxng/searxng
+
+ComfyUI
+  License: GNU General Public License v3.0 (GPL-3.0).
+  Notes:   BOMLLM talks to ComfyUI over its HTTP API and does not
+           distribute or modify ComfyUI. If you distribute modified
+           ComfyUI code, GPL-3.0 applies to that code.
+  URL:     https://github.com/comfyanonymous/ComfyUI
+
+LiteLLM
+  License: MIT (proxy core). Some enterprise features require a
+           commercial license from BerriAI.
+  URL:     https://github.com/BerriAI/litellm
+
+Ollama
+  License: MIT.
+  URL:     https://github.com/ollama/ollama
+
+Qdrant
+  License: Apache-2.0.
+  URL:     https://github.com/qdrant/qdrant
+
+PostgreSQL
+  License: PostgreSQL License (similar to MIT/BSD).
+  URL:     https://www.postgresql.org/about/licence/
+
+Valkey
+  License: BSD-3-Clause.
+  URL:     https://github.com/valkey-io/valkey
+
+Tailscale (client)
+  License: BSD-3-Clause (client). The hosted coordination server is a
+           proprietary service; Headscale (BSD-3) is a self-hosted
+           alternative.
+  URL:     https://github.com/tailscale/tailscale
+
+Cloudflare Tunnel (cloudflared)
+  License: Apache-2.0 (daemon). The Cloudflare edge service is
+           proprietary and governed by Cloudflare's ToS.
+  URL:     https://github.com/cloudflare/cloudflared
+
+========================================================================
+MODEL WEIGHTS
+========================================================================
+
+BOMLLM does NOT redistribute model weights.
+
+The production reference build uses a community fine-tune published by
+DavidAU on Hugging Face (a TURBO-series Fable merge based on a Qwen
+27B-class model, NVFP4/MLX quant). Model weights are subject to the
+upstream model licenses (Qwen license + the fine-tune author's terms).
+Pull weights from the original author's Hugging Face repository and read
+its model card and license before use.
+
+Qwen model license: https://huggingface.co/Qwen (Apache-2.0 for most
+Qwen3-series weights; verify the exact model you pull).
+
+========================================================================
+TRADEMARKS
+========================================================================
+
+"BOMLLM" is the project name used by the authors. All other product and
+company names mentioned (Open WebUI, n8n, SearXNG, ComfyUI, Ollama,
+Tailscale, Cloudflare, Apple, Synology, NVIDIA, MetaTrader) are trademarks
+of their respective owners and are used for identification only.

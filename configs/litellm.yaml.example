@@ -1,0 +1,134 @@
+# ============================================================================
+# BOMLLM — LiteLLM proxy config (SANITIZED EXAMPLE)
+# Copy to configs/litellm.yaml (gitignored) and replace every CHANGE_ME.
+# Derived from the production config; all endpoints, keys, and hostnames
+# are placeholders. Comments marked [PROD LESSON] are bugs we actually hit.
+# ============================================================================
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_model_in_db: True
+  # Global circuit breaker for cloud spend. Never breached in prod.
+  # [PROD LESSON] peak observed day was $2.76 of a $5.00 cap (3,448 calls).
+  max_budget: 5.0
+  budget_duration: 1d
+
+litellm_settings:
+  # [PROD LESSON] drop_params=true silently DROPS presence_penalty instead
+  # of erroring — we proved this behaviorally (a repeat_penalty=8.0 probe
+  # passed through while presence_penalty vanished). Know what your proxy
+  # forwards: see benchmarks/README.md section "chain passthrough".
+  drop_params: True
+  num_retries: 2
+  request_timeout: 60
+  fallbacks: [{ "thai-chat": ["thai-chat-cpu", "thai-chat-cloud"] }]
+
+model_list:
+  # ------------------------------------------------------------------
+  # TIER 1 — Mac Mini M4 Pro, Ollama MLX (free, primary)
+  # ------------------------------------------------------------------
+  - model_name: thai-chat
+    litellm_params:
+      model: ollama_chat/qwen38-chat
+      api_base: os.environ/MAC_OLLAMA_BASE_URL   # http://100.x.y.z:11434 — Tailscale ONLY
+      # Sampling lives on the route, not the Modelfile.
+      # [PROD LESSON] MLX does not share a runner across different
+      # manifests of the same weights (~1.2s reload per alias switch).
+      # One manifest + route-level params = free alias switching.
+      temperature: 0.7
+      top_p: 0.8
+      top_k: 20
+      repeat_penalty: 1.05
+      num_ctx: 32768
+      num_predict: 2048
+
+  # Bot route: reasoning OFF, tight predict budget.
+  # [PROD LESSON] with think enabled and small num_predict, the model
+  # burns the whole budget on hidden reasoning and returns EMPTY content
+  # (done_reason=length). Our LINE bot hit this. Pin think:false here.
+  - model_name: thai-chat-rt
+    litellm_params:
+      model: ollama_chat/qwen38-chat
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+      extra_body: { "think": false }
+      num_predict: 1024
+      timeout: 51
+
+  - model_name: thai-think
+    litellm_params:
+      model: ollama_chat/qwen38-think
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+      temperature: 0.6
+      top_p: 0.95
+      num_predict: 6144
+
+  - model_name: thai-deep
+    litellm_params:
+      model: ollama_chat/qwen38-deep
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+      temperature: 0.6
+      top_p: 0.95
+      num_predict: 16384
+
+  - model_name: thai-code
+    litellm_params:
+      model: ollama_chat/qwen38-code
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+      temperature: 1.0
+      top_p: 0.95
+      num_predict: 8192
+
+  # Long-form writer route (n8n content pipelines).
+  # [PROD LESSON] num_predict floor 8192 = completion safety. Below that,
+  # hidden thinking + long Thai reports truncate; thai_ratio swings
+  # 0.72-0.92. At 8192 the swing collapses to a 0.036 band (300/300 clean).
+  - model_name: bom-writer
+    litellm_params:
+      model: ollama_chat/qwen38-chat
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+      num_ctx: 32768
+      num_predict: 8192
+
+  # Vision alias (same weights, vision-capable manifest)
+  - model_name: bom-read-image
+    litellm_params:
+      model: ollama_chat/bom-read-image
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+
+  # Embeddings on the Mac (free RAG)
+  - model_name: local-embed
+    litellm_params:
+      model: ollama/bge-m3
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+
+  # ------------------------------------------------------------------
+  # TIER 2 — VPS CPU fallback (free, small, always warm)
+  # ------------------------------------------------------------------
+  - model_name: thai-chat-cpu
+    litellm_params:
+      model: ollama_chat/qwen3:4b
+      api_base: http://127.0.0.1:11435   # small ollama on the VPS itself
+
+  # ------------------------------------------------------------------
+  # TIER 3 — Cloud fallback (PAID — last resort, budget-capped globally)
+  # Delete this block for a hard-local deployment.
+  # ------------------------------------------------------------------
+  - model_name: thai-chat-cloud
+    litellm_params:
+      model: openai/CHANGE_ME_CLOUD_MODEL
+      api_base: https://CHANGE_ME_CLOUD_PROVIDER.example/v1
+      api_key: os.environ/CLOUD_FALLBACK_API_KEY   # CHANGE_ME
+
+  # ------------------------------------------------------------------
+  # Cold routes: keep health checks from loading them.
+  # [PROD LESSON] a full /health sweep re-loaded an evicted 16GB model
+  # for ~24h and caused swap thrash. Disable background checks on any
+  # route you don't want resident.
+  # ------------------------------------------------------------------
+  - model_name: experimental-huge
+    litellm_params:
+      model: ollama_chat/CHANGE_ME_EXPERIMENTAL
+      api_base: os.environ/MAC_OLLAMA_BASE_URL
+    model_info:
+      disable_background_health_check: true

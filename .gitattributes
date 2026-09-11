@@ -1,0 +1,23 @@
+# Line endings: shell scripts must stay LF or they break inside containers.
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.py        text eol=lf
+*.yaml      text eol=lf
+*.yml       text eol=lf
+*.md        text eol=lf
+*.csv       text eol=lf
+*.example   text eol=lf
+Dockerfile* text eol=lf
+
+# Binary assets
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.webp      binary
+*.gif       binary
+*.mp4       binary
+*.woff2     binary
+
+# GitHub linguist: keep docs from skewing the language bar
+docs/**     linguist-documentation
+assets/**   linguist-vendored

@@ -86,6 +86,10 @@ flowchart TB
 
 **Request path (chat):** channel → Cloudflare Tunnel → LiteLLM (auth, budget, route) → Tailscale → Ollama MLX on the Mac → streamed back. Web search and RAG stay on the VPS; images go through the FastAPI comfy-router on the NAS to 3 GPU workers (i9 GPU0/GPU1 + AMD, GPULAW render window 17:30–19:30 ICT); voice goes to the i9.
 
+**Intent routing:** every message first passes `bom_intent_filter` v2 (context-aware, valve-gated via `enable_context_v2`) and is classed image / web-search / deep-think before any model sees it. v2 fixed three production bugs: a COLOR_WHITELIST (37 entries) stops color+metal words being misrouted as finance intent, FINANCE_POSITIVE (15 entries) forces web_search for finance queries, and dual-feature mutual exclusion resolves in-session image requests against outside-session searches. Every decision is logged as one `[bom_intent]` JSON line to container stdout.
+
+**Monitoring:** Beszel v0.19.0 (hub on the NAS, agents on Mac + NAS + VPS) joins Uptime Kuma on the NAS — 10 Telegram alerts live.
+
 **3-tier fallback** (configured in LiteLLM, measured in production):
 🟢 Tier 1 Mac (free, ~80–85% of traffic) → 🟡 Tier 2 small CPU model on the VPS (free) → 🔴 Tier 3 cloud API (paid, used only when both local tiers are down — our actual cloud spend after cutover: **$0.31–$2.76/day**, see `docs/cost.md`).
 
@@ -213,6 +217,8 @@ This repo (glue, configs, scripts, docs) is **MIT**. Bundled components keep the
 **สิ่งที่ต้องรู้ก่อนใช้:** นี่ไม่ใช่บอทเทรด ไม่ใช่คำแนะนำการลงทุน และไม่ใช่ของเล่นที่กดปุ่มเดียวแล้วจบ — คุณต้องดูแลระบบเอง แต่เราแถม runbook ที่ใช้จริงทุกฉบับ
 
 **ลิขสิทธิ์:** โค้ดของโปรเจกต์นี้เป็น MIT ส่วนโปรแกรมที่เอามาประกอบ (Open WebUI, n8n, SearXNG, ComfyUI ฯลฯ) อยู่ภายใต้ลิขสิทธิ์ของเจ้าของแต่ละตัว — อ่านไฟล์ [NOTICE](NOTICE) ก่อนนำไปใช้ต่อ
+
+**อัปเดตล่าสุด:** ระบบ intent filter v2 แยก intent อัตโนมัติ (ภาพ/ค้นเว็บ/คิดลึก) พร้อม logging ทุกข้อความ
 
 ---
 

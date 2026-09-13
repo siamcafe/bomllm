@@ -23,6 +23,19 @@ licenses (Qwen: Apache-2.0; fine-tune: author's terms).
 
 Full platform (repo, docs, cost receipts): **https://github.com/siamcafe/bomllm**
 
+## Latest changes (2026-09-13)
+
+- **Parameters pinned on all 6 aliases** — `temperature 0.6 · top_p 0.95 ·
+  top_k 20 · repeat_penalty 1.05 · presence_penalty 0.0` baked into every
+  Modelfile via explicit `PARAMETER` lines (turbo + 5 task names).
+- **Intent filter v2 deployed** — color-whitelist guard (37 entries) +
+  finance-positive forcing (15 entries) + dual-feature mutual exclusion,
+  with per-message `[bom_intent]` logging.
+- **comfy-router Phase 2 LIVE** — FastAPI render router on the NAS replaces
+  the old n8n webhook path.
+- **AMD GPU added to the render pool** — 3rd oven at 15% weight alongside
+  the i9's 85%.
+
 ## What's in this repo
 
 | File | Purpose |

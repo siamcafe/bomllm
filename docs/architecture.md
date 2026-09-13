@@ -126,6 +126,19 @@ trades; it is an analysis panel. Details in `docs/channels.md`.
 n8n cron → LiteLLM (`bom-writer` route, long `num_predict`) → draft
 articles to a staging folder. A human publishes. Nothing auto-publishes.
 
+## Image & Intent Routing
+
+- **comfy-router** — FastAPI on the NAS, port :8788, fronting 3 ComfyUI
+  workers: i9 GPU0 :8188, i9 GPU1 :8190, and the AMD box :8188 (3rd oven).
+- **Pool weights** — AMD 15% / i9 85% (configurable).
+- **PuLID face-ID** — pinned to GPU1 :8190 so the identity pipeline stays
+  warm on one card.
+- **GPULAW** — during the 17:30–19:30 ICT peak-power window the router
+  returns 503 instead of queueing render work.
+- **bom_intent_filter v2** — classifies every message image / web-search /
+  deep-think before dispatch; each decision is logged as `[bom_intent]`
+  JSON to container stdout.
+
 ## Fallback ladder
 
 Configured per-route in LiteLLM:
@@ -136,6 +149,12 @@ Configured per-route in LiteLLM:
 3. **Tier 3 — cloud API** (paid): only when both local tiers fail health
    checks. Real measured spend after cutover: **$0.31–$2.76/day** across
    ~1,400–3,400 calls/day (LiteLLM `SpendLogs`, Sept 2026).
+
+## Monitoring
+
+- **Beszel v0.19.0** — hub on the NAS, agents on Mac + NAS + VPS.
+- **Netdata** — on the Mac, bound to localhost + Tailscale only.
+- **Uptime Kuma 2.5.3** — on the NAS, 5-min probes, Telegram alerts.
 
 ## Failure modes we designed around (the honest list)
 

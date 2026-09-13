@@ -2,7 +2,7 @@
 
 ![BOMLLM](images/hero_banner.png)
 
-**I replaced $50/day of cloud LLM bills with a $3.50/day Mac Mini on my desk.**
+**I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.**
 It has served **5 production channels** — a LINE bot, a Telegram bot, a read-only MT5 EA, web chat, and n8n content pipelines — **24/7 since August 2026**, in Thai and English.
 One **Mac Mini M4 Pro 48GB** runs a 27B MLX model at **~30 tok/s** (measured, not marketing).
 A small VPS fronts it with **LiteLLM + Open WebUI + SearXNG**; an i9 with 2× RTX 5060 Ti renders images and voice; a Synology NAS runs n8n and monitoring.
@@ -10,7 +10,7 @@ Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; ev
 This repo is the full receipt: configs, sampling recipes, benchmark harness, and the cost meter.
 Not a demo. Not a toy. The exact stack that answers my customers every day.
 MIT licensed — clone, run `./scripts/bootstrap.sh`, and you have the VPS layer up.
-The one number that matters: **$3.50/day all-in electricity vs $50/day cloud API** — methodology inside, reproducible.
+The one number that matters: **$0.54/day measured whole-fleet electricity vs $50/day cloud API** — methodology inside, reproducible.
 Thai-first and proud of it — but the architecture works for any language.
 ⬇️ คำอธิบายภาษาไทยอยู่ด้านล่าง
 
@@ -50,35 +50,41 @@ flowchart TB
     end
 
     subgraph I9["i9 Windows 128GB · 2× RTX 5060 Ti"]
-        CU["ComfyUI (image gen)"]
+        CU0["ComfyUI worker — GPU0 :8188"]
+        CU1["ComfyUI worker — GPU1 :8190<br/>(PuLID face pin via /generate_pulid)"]
         TTS["VoxCPM2 (Thai TTS)"]
         RR["Reranker (qwen3-reranker-4b)"]
     end
 
+    subgraph AMD["AMD render box · RTX 5060 Ti"]
+        CUA["ComfyUI worker — 3rd oven"]
+    end
+
     subgraph NAS["Synology DS725+"]
-        N8N["n8n workflow router"]
+        CR["comfy-router (FastAPI :8788)<br/>image render router"]
         MON["Uptime Kuma + hub joblog"]
         BAK["Backups + Vaultwarden"]
     end
 
     LINE & TG & MT5 & WEB --> CF
-    N8NP --> N8N
+    N8NP --> CR
     CF --> OW & LL
     OW --> LL
     LL --> PG & VY
     OW --> SX
     OW --> QD
     LL <-->|"OpenAI-compatible, /v1"| TS
-    N8N <-->|"webhook router"| TS
+    CR <-->|"render API :8788"| TS
     TS --> OL
-    TS --> CU
+    TS --> CU0
     OL --> M1 & EMB
-    OW -->|image gen| CU
+    OW -->|"image gen · images.py"| CR
+    CR -->|"least-busy worker"| CU0 & CU1 & CUA
     OW -->|TTS| TTS
     OW -->|RAG rerank| RR
 ```
 
-**Request path (chat):** channel → Cloudflare Tunnel → LiteLLM (auth, budget, route) → Tailscale → Ollama MLX on the Mac → streamed back. Web search and RAG stay on the VPS; images and voice go to the i9; n8n on the NAS routes bot webhooks.
+**Request path (chat):** channel → Cloudflare Tunnel → LiteLLM (auth, budget, route) → Tailscale → Ollama MLX on the Mac → streamed back. Web search and RAG stay on the VPS; images go through the FastAPI comfy-router on the NAS to 3 GPU workers (i9 GPU0/GPU1 + AMD, GPULAW render window 17:30–19:30 ICT); voice goes to the i9.
 
 **3-tier fallback** (configured in LiteLLM, measured in production):
 🟢 Tier 1 Mac (free, ~80–85% of traffic) → 🟡 Tier 2 small CPU model on the VPS (free) → 🔴 Tier 3 cloud API (paid, used only when both local tiers are down — our actual cloud spend after cutover: **$0.31–$2.76/day**, see `docs/cost.md`).
@@ -90,10 +96,19 @@ flowchart TB
 | | Before (cloud API) | After (BOMLLM) |
 |---|---|---|
 | LLM inference | ~$50.00/day (z.ai GLM, metered per token) | **$0.31–$2.76/day** actual fallback spend (LiteLLM spend logs) |
-| Electricity | — | **~$3.50/day** whole fleet (Mac + i9 + NAS + network) |
+| Electricity | — | **~$0.54/day** measured whole fleet (Mac + i9 + NAS + network) |
 | Rate limits | yes | none |
 | Data residency | third-party cloud | 100% our hardware |
-| **Total** | **~$1,500/month** | **~$140/month** (~฿5,000) all-in |
+| **Total** | **~$1,500/month** | **~$36–114/month** marginal (electricity + fallback + VPS) |
+
+Cost breakdown (what the $0.54 headline does and does not include):
+
+| Component | Cost | Basis |
+|---|---|---|
+| Electricity, whole fleet | **$0.54/day** | measured: wall meters + `powermetrics`/`nvidia-smi` × MEA tariff — full table in [docs/cost.md](docs/cost.md) |
+| VPS (LiteLLM + Open WebUI + SearXNG front) | $10–15/month | predates BOMLLM, hosts other things — counted as sunk, not marginal per-token cost |
+| z.ai fallback (tier 3, both local tiers down) | $0.31–2.76/day | LiteLLM `SpendLogs` export, first week of September 2026 |
+| Hardware depreciation | separate | not in the daily number: Mac ~$2,000, payback ~6 weeks at $46.50/day saved |
 
 Methodology — no hand-waving: electricity is measured at the wall per machine (kWh × provincial tariff), cloud spend is exported from LiteLLM's `SpendLogs` table, and the before figure comes from actual invoices. Full breakdown, watt-draw table, and the scripts that produce it: **[docs/cost.md](docs/cost.md)**. Raw structure: [benchmarks/cost-comparison.csv](benchmarks/cost-comparison.csv).
 
@@ -182,7 +197,7 @@ This repo (glue, configs, scripts, docs) is **MIT**. Bundled components keep the
 
 ## คำอธิบายภาษาไทย (Thai summary)
 
-**BOMLLM คืออะไร?** ระบบ AI ที่รันเองบนเครื่องตัวเอง 100% — ผมเลิกจ่ายค่า cloud LLM วันละ ~50 เหรียญ แล้วหันมาใช้ **Mac Mini M4 Pro 48GB** เครื่องเดียวบนโต๊ะ ค่าไฟรวมทั้งฟลีต ~**3.5 เหรียญ/วัน** (~5,000 บาท/เดือน รวมทุกอย่าง)
+**BOMLLM คืออะไร?** ระบบ AI ที่รันเองบนเครื่องตัวเอง 100% — ผมเลิกจ่ายค่า cloud LLM วันละ ~50 เหรียญ แล้วหันมาใช้ **Mac Mini M4 Pro 48GB** เครื่องเดียวบนโต๊ะ ค่าไฟรวมทั้งฟลีต ~**0.54 เหรียญ/วัน** (~530 บาท/เดือน วัดจากการใช้งานจริง)
 
 **ใช้งานจริงตั้งแต่สิงหาคม 2026** ให้บริการ 5 ช่องทางพร้อมกัน: LINE bot, Telegram bot, MT5 EA (อ่านอย่างเดียว ไม่เทรด), เว็บแชท และ pipeline เขียนบทความผ่าน n8n — ตอบภาษาไทยและอังกฤษตลอด 24 ชม.
 

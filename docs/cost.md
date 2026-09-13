@@ -1,4 +1,4 @@
-# Cost: the $3.50/day receipt
+# Cost: the $0.54/day receipt
 
 This is the document HN will try to poke holes in, so it is written to be
 audited. Three ledgers, three measurement methods, zero estimates without
@@ -9,11 +9,11 @@ a stated method.
 | Ledger | Before (cloud) | After (BOMLLM) | Method |
 |---|---|---|---|
 | LLM API spend | ~$50.00/day | $0.31–$2.76/day | provider invoices vs LiteLLM `SpendLogs` |
-| Electricity | — | ~$3.50/day fleet | wall-meter kWh × tariff |
+| Electricity | — | ~$0.54/day fleet | GPU/SoC meters + stated estimates × MEA tariff |
 | VPS rent | (already paying) | (unchanged) | not counted as marginal cost |
-| **Marginal daily cost** | **~$50/day** | **~$3.50–$6.50/day** | worst case uses the highest observed fallback day |
+| **Marginal daily cost** | **~$50/day** | **~$0.85–$3.30/day** | electricity $0.54 + fallback spend $0.31–$2.76 |
 
-## Ledger 1 — Electricity (the $3.50)
+## Ledger 1 — Electricity (the measured $0.54)
 
 **Method:** each machine's draw measured at the wall with a plug meter
 (smart plug with kWh logging; 7-day rolling average), multiplied by the
@@ -25,22 +25,23 @@ daily_cost = Σ ( avg_watts(device) × 24 h / 1000 ) × tariff_per_kWh
 
 | Device | Avg watts | kWh/day | Note |
 |---|---|---|---|
-| Mac Mini M4 Pro | `[BENCH_DATA_PENDING]` | `[BENCH_DATA_PENDING]` | idle-heavy; load bursts to ~65 W |
-| i9 + 2× RTX 5060 Ti | `[BENCH_DATA_PENDING]` | `[BENCH_DATA_PENDING]` | image/voice bursts only |
-| Synology DS725+ | `[BENCH_DATA_PENDING]` | `[BENCH_DATA_PENDING]` | ~constant |
-| Network (router/ONT/switch share) | `[BENCH_DATA_PENDING]` | `[BENCH_DATA_PENDING]` | allocated share |
-| **Total** | | **`[BENCH_DATA_PENDING]` kWh** | × tariff `[BENCH_DATA_PENDING]`/kWh ≈ **$3.50/day** |
+| Mac Mini M4 Pro | ≈8 W (est. wall) | 0.24 | SoC package 0.03–0.06 W measured (powermetrics, 30-sample); ~8 W wall idle estimated; bursts ~65 W |
+| i9 + 2× RTX 5060 Ti | ≈33 W GPUs (measured) + 60 W CPU/board (est.) | 2.40 | GPU idle 7.5 + 25.3 W via nvidia-smi (30-sample); render peak ~170 W on gpu0 (measured); CPU/board 60 W estimated |
+| Synology DS725+ | 20–35 W | 0.67 | prior survey range, 28 W midpoint (estimated; meter pending) |
+| Network (router/ONT/switch share) | ≈15 W (estimated) | 0.36 | allocated share |
+| **Total** | | **3.67 kWh** | × tariff 4.84 THB/kWh ≈ $0.147/kWh ≈ **$0.54/day** (MEA >400-unit block 4.3583 + Ft 0.1623 + VAT 7% @ 33 THB/USD — assumption) |
 
 `scripts/cost_meter.sh` produces this table from your own meters. We
 publish our raw 7-day CSV in `benchmarks/cost-comparison.csv`
-(`[BENCH_DATA_PENDING]` rows are filled from the meter export before
-launch — see docs/show-hn.md item L-7).
+(rows filled 2026-09-12 from powermetrics / nvidia-smi / stated
+estimates — each carries its method; the 7-day wall-meter export can
+still replace them before launch, see docs/show-hn.md item L-7).
 
 **Honest caveats:**
 
 - The tariff is residential Thai (~฿4.5/kWh ≈ $0.125). Your tariff
   differs; the kWh column is the transferable number.
-- Amortized hardware is **not** in the $3.50. The Mac was ~$2,000. At
+- Amortized hardware is **not** in the $0.54. The Mac was ~$2,000. At
   $46.50/day saved, payback was ~6 weeks. Your mileage depends on your
   token volume.
 - The VPS (~$10–15/month) predates BOMLLM and hosts other things; we

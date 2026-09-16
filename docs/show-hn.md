@@ -15,6 +15,14 @@ Under 80 chars. No adjectives like "blazing".
 
 ## T-minus checklist
 
+**Readiness note (2026-09-16, T-21d):** the 709-L cutover is baked into
+the repo (README, docs/thai.md, configs/ollama-modelfile.example,
+configs/sampling-recipe.yaml — Arm B paired-eval numbers in, sampling
+pin t0.6/top_p0.95/pp0/rep1.05 documented verbatim from the production
+Modelfile). L-7 status: Config G cells resolved-as-invalidated (note in
+sampling-recipe.yaml), Arm B eval cells filled; meter CSV cells still
+`[BENCH_DATA_PENDING]` until the post-cutover electricity re-run.
+
 ### L — Logistics (T-14d → T-1d)
 
 - [ ] **L-1.** GitHub org `bomllm` created; repo `bomllm/bomllm` public;

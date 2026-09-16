@@ -69,15 +69,18 @@ system_prompt_config_g:
 # ---------------------------------------------------------------------------
 # LAYER 2b — PER-TASK PROFILES (production, supersedes Config G prompt work)
 # ---------------------------------------------------------------------------
-# Mac Modelfile production pin (artifact 34909, VERIFIED):
-#   temperature 0.6 / top_p 0.95 / top_k 20 / repeat_penalty 1.05
-#   Modelfile has NO presence_penalty parameter; pp is applied per profile
-#   at the LiteLLM/API layer.
-# Profiles: artifact 33953, VALIDATED.
+# 709-L PRODUCTION PIN (cutover 2026-09-16, promoted after the Arm B paired
+# eval: +0.225 publishable-first-pass rate vs the 735 incumbent, 8-1-11
+# W/L/T over 20 articles; Modelfile dumped VERBATIM from the Mac prod model):
+#   temperature 0.6 / top_p 0.95 / top_k 20 / presence_penalty 0 /
+#   repeat_penalty 1.05 / num_ctx 32768 / num_predict 12288
+#   (earlier note claimed the Modelfile has no presence_penalty key — wrong:
+#    the production 709-L Modelfile carries `PARAMETER presence_penalty 0`)
+# Profiles: artifact 33953, VALIDATED. Arm B harvest: artifact 36247.
 # NOTE: LAYER 1 sampling above (t0.7 / top_p 0.80 / pp 1.5) equals the
 # realtime_short profile — intentional, NOT drift.
 per_task_profiles:
-  modelfile_pin: { temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05 }
+  modelfile_pin: { temperature: 0.6, top_p: 0.95, top_k: 20, presence_penalty: 0.0, repeat_penalty: 1.05, num_ctx: 32768, num_predict: 12288 }
   profiles:
     chat:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05, presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }
     code:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }

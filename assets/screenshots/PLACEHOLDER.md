@@ -16,6 +16,16 @@ Rules for every screenshot in this folder:
 5. **Video:** `walkthrough_90s.mp4` lives on the release page, not in git
    (repo size). Link from README once uploaded.
 
+Captured 2026-09-12 (headless, vision-verified — not yet curated to the
+naming/width rules above):
+
+- `webui_thai_chat.png` — Thai question + Thai answer visible (vision-checked)
+- `litellm_spend.png` — LiteLLM usage/spend dashboard, Sep 5–12 window
+- `mac_dashboard.png` — monitoring dashboard substitute (Netdata: CPU /
+  memory / disk / network, multi-node) — **wall-meter photo pending**;
+  the desk shot with the plug meter still needs a physical capture
+- Not captured (physical): LINE bot phone photo, 90 s walkthrough video
+
 Planned shots (from the README placeholders):
 
 - [ ] WebUI answering a Thai gold-price question with web search citations

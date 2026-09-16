@@ -44,8 +44,8 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.33 (MLX backend)"]
-        M1["Qwen3.8-27B class<br/>TURBO-Fable nvfp4<br/>~30 tok/s · 23 GB resident"]
+        OL["Ollama 0.34.1 (MLX backend)"]
+        M1["Qwen3.5-27.8B class<br/>709-L (TWIN-TURBO-709-ULTRA) nvfp4<br/>~30 tok/s · 23 GB resident"]
         EMB["bge-m3 embeddings"]
     end
 
@@ -137,6 +137,29 @@ Graded head-to-head, 50 production-style cases (LINE Q&A, signal analysis, class
 | Chinese-char leakage | **15/100** replies | 43/100 on stock quant | turbo leaks *less* ✅ |
 
 Every number above is reproducible with [benchmarks/README.md](benchmarks/README.md). Where a run needs re-measurement on your hardware, the CSV cells say `[BENCH_DATA_PENDING]` — that's deliberate: we publish the harness, not just the claims.
+
+### The 709-L cutover (2026-09-16)
+
+The resident model was promoted from the 735 tune to **709-L**
+(TWIN-TURBO-709-ULTRA, Qwen3.5-27.8B, MLX nvfp4) after a paired production eval on 20
+real articles: publishable-first-pass **0.781 vs 0.600** (paired mean
+**+0.225**, W/L/T 8-1-11), wall time **141 s vs 439 s** under real
+contention. Ollama upgraded 0.33.3 → 0.34.1 in the same window
+(versioned install, seconds-level rollback via `ollama cp` from the
+kept `-bak` alias). Full protocol and honest caveats (partial reps):
+[docs/thai.md](docs/thai.md).
+
+### Post-promotion hardening (2026-09-16)
+
+- **LiteLLM `max_tokens` floors** on the three thin routes (`qwen38` 2048,
+  `qwen38-chat` 1024, `bom-read-image` 1024) — thinking-model replies can no
+  longer come back empty when a caller omits a budget.
+- **NAS grind-orphan reaper** — a scheduled script now kills runaway translate
+  jobs (>2 h, reparented to init) that were wedging the Mac MLX runner.
+- **Rollback alias retained** — `qwen38-uni-735-bak` (previous incumbent)
+  stays until 2026-09-30; restore is one `ollama cp`.
+- Re-verified after a Mac reboot: sandbox 9/9, QC suite 5/5, Thai stream
+  TTFT **1.94 s**, **576 GB** free after model cleanup.
 
 ## Quickstart
 

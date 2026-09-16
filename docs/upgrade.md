@@ -114,7 +114,7 @@ Keep a table in your ops repo. Ours looks like:
 | Date | Component | From → To | Smoke | Rollback needed |
 |---|---|---|---|---|
 | 2026-08-31 | Open WebUI | 0.10.x → v0.11.3 | 6/6 | no |
-| `[BENCH_DATA_PENDING]` | | | | |
+| YYYY-MM-DD | component (e.g. Ollama) | vX.Y → vX.Z | N/6 | no/yes |
 
 ## If it breaks at 2 a.m.
 

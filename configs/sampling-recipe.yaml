@@ -51,7 +51,9 @@ sampling:
 #   +0.0286 thai_ratio vs mirror prompt; Han events halve (35 -> 15 per 100).
 # Structure below is exact; the verbatim 4,101-char production text is
 # attached to the HF repo (bomllm/turbo-thai-config) as system_prompt.th.txt
-# [BENCH_DATA_PENDING: paste verbatim Config G text from locked artifact]
+# [RESOLVED 2026-09-12 benchfill-safe] Config G verbatim intentionally NOT
+# pasted: the Config G system prompt + few-shot were INVALIDATED (0 of 4 Thai
+# AI teams adopted them after review). Per-task profiles below supersede.
 system_prompt_config_g:
   structure:
     - "1. Identity + persona (Thai, polite, domain: finance/tech assistant)"
@@ -63,6 +65,28 @@ system_prompt_config_g:
   notes:
     - "The Han-ban line itself containing Han characters did NOT increase leakage (priming hypothesis REFUTED: V1 with Han in ban line leaked 6, CJK-free variant leaked 8)"
     - "Keep rule 2 worded to your audience: routing English technical questions to English flipped our Thai-purity gates (owner reverted)"
+
+# ---------------------------------------------------------------------------
+# LAYER 2b — PER-TASK PROFILES (production, supersedes Config G prompt work)
+# ---------------------------------------------------------------------------
+# 709-L PRODUCTION PIN (cutover 2026-09-16, promoted after the Arm B paired
+# eval: +0.225 publishable-first-pass rate vs the 735 incumbent, 8-1-11
+# W/L/T over 20 articles; Modelfile dumped VERBATIM from the Mac prod model):
+#   temperature 0.6 / top_p 0.95 / top_k 20 / presence_penalty 0 /
+#   repeat_penalty 1.05 / num_ctx 32768 / num_predict 12288
+#   (earlier note claimed the Modelfile has no presence_penalty key — wrong:
+#    the production 709-L Modelfile carries `PARAMETER presence_penalty 0`)
+# Profiles: artifact 33953, VALIDATED. Arm B harvest: artifact 36247.
+# NOTE: LAYER 1 sampling above (t0.7 / top_p 0.80 / pp 1.5) equals the
+# realtime_short profile — intentional, NOT drift.
+per_task_profiles:
+  modelfile_pin: { temperature: 0.6, top_p: 0.95, top_k: 20, presence_penalty: 0.0, repeat_penalty: 1.05, num_ctx: 32768, num_predict: 12288 }
+  profiles:
+    chat:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05, presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }
+    code:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }
+    deep_reasoning: { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05, presence_penalty: 0.0, num_ctx: 32768, num_predict: 12288 }
+    vision_ocr:     { think: false, temperature: 0.0, top_p: 0.80, top_k: 20, repeat_penalty: 1.05, presence_penalty: 1.5, num_ctx: 32768, num_predict: 2048 }
+    realtime_short: { think: false, temperature: 0.7, top_p: 0.80, top_k: 20, repeat_penalty: 1.05, presence_penalty: 1.5, num_ctx: 8192,  num_predict: 256 }
 
 # ---------------------------------------------------------------------------
 # ALTERNATE — simpler equal (measured, CI includes zero vs Config G)

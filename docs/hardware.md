@@ -68,7 +68,7 @@ Modelfiles. `configs/ollama-modelfile.example` follows this.
 | Config | Fits? | Notes |
 |---|---|---|
 | 27B nvfp4 + embeddings | ✅ daily driver | our production |
-| 27B nvfp4 + 7B vision (qwen2.5vl) | ⚠️ tight | works, watch pressure; evict vision when idle |
+| 27B nvfp4 + 7B vision (bom-read-image, vision alias → turbo) | ⚠️ tight | works, watch pressure; evict vision when idle |
 | 2× 27B anything | ❌ | swap thrash, measured |
 | 32B mxfp8 (~32 GB) | ❌ practical | loads, but headroom gone; swap risk on long ctx |
 | 70B any quant | ❌ | not on 48 GB |
@@ -77,8 +77,8 @@ Modelfiles. `configs/ollama-modelfile.example` follows this.
 
 | Machine | Spec | Draw (measured at wall) | Role |
 |---|---|---|---|
-| Mac Mini M4 Pro | 48 GB | `[BENCH_DATA_PENDING]` W idle / ~65 W load | LLM |
-| i9-13900K + 2× RTX 5060 Ti | 128 GB | `[BENCH_DATA_PENDING]` W idle / `[BENCH_DATA_PENDING]` W load | image + voice |
+| Mac Mini M4 Pro | 48 GB | ≈8 W idle (est. wall; SoC package 0.03–0.06 W measured via powermetrics) / ~65 W load | LLM |
+| i9-13900K + 2× RTX 5060 Ti | 128 GB | ≈93 W idle (GPUs 32.8 W measured via nvidia-smi + 60 W CPU/board estimated) / ≈250 W load (gpu0 render ~170 W measured) | image + voice |
 | Synology DS725+ | — | ~20–35 W | n8n, monitoring, backups |
 | VPS (Contabo-class) | 12 vCPU / 47 GB | n/a (rented) | proxy, UI, RAG stores |
 

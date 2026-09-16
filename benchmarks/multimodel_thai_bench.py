@@ -76,23 +76,51 @@ MODELS = [
 ]
 
 ZAI_WANTED = ["zai-fallback", "zai-brain", "glm-4.6v-flash", "zai-glm-4.6v"]
-r = subprocess.run(
-    ["ssh", "-p99", "-o", "ConnectTimeout=10", "-o", "BatchMode=yes",
-     "bom@YOUR_SERVER_IP", "cat /home/bom/bomllm/litellm/config.yaml"],
-    capture_output=True, text=True, timeout=30,
-)
-config = yaml.safe_load(r.stdout)
-for m in config.get("model_list", []):
-    lp = m.get("litellm_params", {})
-    name = m.get("model_name", "")
-    if name in ZAI_WANTED:
+# secret-free fallback if the runtime config ssh fails (transient network);
+# mirrors Contabo /home/bom/bomllm/litellm/config.yaml z.ai routes 2026-09-11
+FALLBACK_ROUTES = [
+    {"name": "zai-fallback", "model": "glm-4.5"},
+    {"name": "zai-brain", "model": "glm-5.2"},
+    {"name": "glm-4.6v-flash", "model": "glm-4.6v-flash"},
+    {"name": "zai-glm-4.6v", "model": "glm-4.6v"},
+]
+config = None
+for attempt in (1, 2):
+    try:
+        r = subprocess.run(
+            ["ssh", "-p99", "-o", "ConnectTimeout=10", "-o", "BatchMode=yes",
+             "bom@109.123.233.171", "cat /home/bom/bomllm/litellm/config.yaml"],
+            capture_output=True, text=True, timeout=30,
+        )
+        if r.stdout and r.stdout.strip().startswith("general_settings"):
+            config = yaml.safe_load(r.stdout)
+            break
+        log(f"config ssh attempt {attempt}: empty stdout, rc={r.returncode}")
+    except Exception as e:
+        log(f"config ssh attempt {attempt} failed: {sanitize(e)}")
+if config is not None:
+    for m in config.get("model_list", []):
+        lp = m.get("litellm_params", {})
+        name = m.get("model_name", "")
+        if name in ZAI_WANTED:
+            MODELS.append({
+                "name": name,
+                "api_base": lp.get("api_base", "").rstrip("/"),
+                "model": lp.get("model", "").replace("openai/", ""),
+                "api_key": lp.get("api_key", ""),
+                "type": "openai",
+                "note": "via z.ai",
+            })
+else:
+    log("FALLBACK: using embedded route list (config ssh unavailable)")
+    for fr in FALLBACK_ROUTES:
         MODELS.append({
-            "name": name,
-            "api_base": lp.get("api_base", "").rstrip("/"),
-            "model": lp.get("model", "").replace("openai/", ""),
-            "api_key": lp.get("api_key", ""),
+            "name": fr["name"],
+            "api_base": "https://api.z.ai/api/paas/v4",
+            "model": fr["model"],
+            "api_key": "os.environ/ZAI_API_KEY",
             "type": "openai",
-            "note": "via z.ai",
+            "note": "via z.ai (embedded fallback)",
         })
 
 seen = set()
@@ -106,6 +134,15 @@ MODELS = [MODELS[0]] + cloud
 if SMOKE and len(MODELS) > 2:
     MODELS = MODELS[:2]
 
+# resolve os.environ/<VAR> api_key refs from process env (populated at launch);
+# value never printed, never written to disk
+for m in MODELS:
+    k = m.get("api_key", "")
+    if k.startswith("os.environ/"):
+        var = k.split("/", 1)[1]
+        m["api_key"] = os.environ.get(var, "")
+        log(f"  key {m['name']}: env {var}, {'length=' + str(len(m['api_key'])) if m['api_key'] else 'MISSING'}")
+
 log(f"=== MODELS TO BENCH ({len(MODELS)}) ===")
 for m in MODELS:
     log(f"  {m['name']} -> {m.get('model', m.get('api', '?'))}")
@@ -117,6 +154,7 @@ for model_cfg in MODELS:
     log(f"--- {model_cfg['name']} START ---")
     for i, prompt in enumerate(PROMPTS):
         t0 = time.time()
+        log(f"  {i+1}/{len(PROMPTS)} ASK ({prompt[:18]}...)")
         try:
             if model_cfg["type"] == "ollama":
                 resp = requests.post(model_cfg["api"], json={
@@ -126,7 +164,7 @@ for model_cfg in MODELS:
                     "options": {"temperature": 0.6, "top_p": 0.95, "top_k": 20,
                                 "repeat_penalty": 1.05, "num_predict": 2048,
                                 "num_ctx": 16384, "seed": 42},
-                }, timeout=300)
+                }, timeout=900)
                 d = resp.json()
                 content = d.get("message", {}).get("content", "")
                 tokens = d.get("eval_count", len(content) // 4)

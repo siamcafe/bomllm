@@ -1,11 +1,11 @@
 date,ledger,item,quantity,unit,unit_cost_usd,cost_usd,source,note
-2026-09-04,cloud_fallback,litellm_spendlogs,1370,calls,,1.0967,litellm_postgres,"tier-3 fallback only; typical day"
-2026-09-05,cloud_fallback,litellm_spendlogs,1470,calls,,0.6638,litellm_postgres,"typical day"
-2026-09-06,cloud_fallback,litellm_spendlogs,3448,calls,,2.7595,litellm_postgres,"peak day; 55% of $5/day cap"
-2026-09-07,cloud_fallback,litellm_spendlogs,494,calls,,0.3063,litellm_postgres,"partial day"
-[BENCH_DATA_PENDING],cloud_before,zai_invoice_avg,1,day,,50.00,provider_invoices,"final 30-day average before cutover"
-[BENCH_DATA_PENDING],electricity,mac_mini_m4pro,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"idle-heavy; ~65W load bursts"
-[BENCH_DATA_PENDING],electricity,i9_2x5060ti,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"image/voice bursts only"
-[BENCH_DATA_PENDING],electricity,nas_ds725,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"near-constant draw"
-[BENCH_DATA_PENDING],electricity,network_share,[BENCH_DATA_PENDING],kwh_day,0.125,[BENCH_DATA_PENDING],wall_meter_7d,"router/ONT/switch allocated share"
-[BENCH_DATA_PENDING],electricity,fleet_total,[BENCH_DATA_PENDING],kwh_day,0.125,3.50,derived,"the headline number; sum of device rows"
+2026-09-04,cloud_fallback,litellm_spendlogs,1370,calls,,1.0967,litellm_postgres,tier-3 fallback only; typical day
+2026-09-05,cloud_fallback,litellm_spendlogs,1470,calls,,0.6638,litellm_postgres,typical day
+2026-09-06,cloud_fallback,litellm_spendlogs,3448,calls,,2.7595,litellm_postgres,peak day; 55% of $5/day cap
+2026-09-07,cloud_fallback,litellm_spendlogs,494,calls,,0.3063,litellm_postgres,partial day
+[BENCH_DATA_PENDING],cloud_before,zai_invoice_avg,1,day,,50.00,provider_invoices,final 30-day average before cutover
+2026-09-12,electricity,mac_mini_m4pro,0.24,kwh_day,0.147,0.04,powermetrics_soc_plus_est,SoC package 0.03-0.06 W measured (powermetrics 30-sample); ~8 W wall idle est; bursts ~65 W; 7d wall-meter pending; idle-heavy; ~65W load bursts
+2026-09-12,electricity,i9_2x5060ti,2.40,kwh_day,0.147,0.35,nvidia_smi_plus_est,GPU idle 7.5+25.3 W measured (nvidia-smi 30-sample); render peak ~170 W gpu0 measured; CPU/board +60 W estimated; image/voice bursts only
+2026-09-12,electricity,nas_ds725,0.67,kwh_day,0.147,0.10,prior_survey_estimate,"Grok survey 20-35 W range, midpoint 28 W; meter pending; near-constant draw"
+2026-09-12,electricity,network_share,0.36,kwh_day,0.147,0.05,estimated,router/ONT/switch ~15 W allocated share (estimated); router/ONT/switch allocated share
+2026-09-12,electricity,fleet_total,3.67,kwh_day,0.147,0.54,derived,sum of device rows; MEA >400u block 4.3583+Ft0.1623+VAT=4.84 THB/kWh ~ $0.147 @33 THB/USD (assumption); the headline number; sum of device rows

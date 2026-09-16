@@ -44,8 +44,8 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.33 (MLX backend)"]
-        M1["Qwen3.8-27B class<br/>TURBO-Fable nvfp4<br/>~30 tok/s · 23 GB resident"]
+        OL["Ollama 0.34 (MLX backend)"]
+        M1["Qwen3.8-27B class<br/>709-L nvfp4 (since 2026-09-16)<br/>~30 tok/s · 23 GB resident"]
         EMB["bge-m3 embeddings"]
     end
 
@@ -137,6 +137,17 @@ Graded head-to-head, 50 production-style cases (LINE Q&A, signal analysis, class
 | Chinese-char leakage | **15/100** replies | 43/100 on stock quant | turbo leaks *less* ✅ |
 
 Every number above is reproducible with [benchmarks/README.md](benchmarks/README.md). Where a run needs re-measurement on your hardware, the CSV cells say `[BENCH_DATA_PENDING]` — that's deliberate: we publish the harness, not just the claims.
+
+### The 709-L cutover (2026-09-16)
+
+The resident model was promoted from the 735 tune to **709-L** (same
+27B TURBO-Fable series, MLX nvfp4) after a paired production eval on 20
+real articles: publishable-first-pass **0.781 vs 0.600** (paired mean
+**+0.225**, W/L/T 8-1-11), wall time **141 s vs 439 s** under real
+contention. Ollama upgraded 0.33.3 → 0.34.1 in the same window
+(versioned install, seconds-level rollback via `ollama cp` from the
+kept `-bak` alias). Full protocol and honest caveats (partial reps):
+[docs/thai.md](docs/thai.md).
 
 ## Quickstart
 

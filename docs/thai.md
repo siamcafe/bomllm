@@ -11,12 +11,36 @@ that cost us nights.
 |---|---|---|---|
 | Qwen3.8-27B class, stock | GGUF Q4_K_M | good, slow (7.9 tok/s) | p13a bench |
 | Same, MLX | nvfp4 MLX | good, **30.2 tok/s** | p13a bench |
-| TURBO-Fable (DavidAU fine-tune) | nvfp4 MLX | **incumbent** — no Thai regression vs stock, fewer think tokens | A/B below |
+| TURBO-Fable (DavidAU fine-tune) | nvfp4 MLX | no Thai regression vs stock, fewer think tokens | A/B below |
+| 709-L (TURBO-Fable series tune) | nvfp4 MLX | **incumbent since 2026-09-16** — +0.225 publishable first-pass over 735 | Arm B below |
 | Typhoon (Thai-specialized) | GGUF | retired — general model + good prompt beat it on our traffic | internal A/B |
 | OpenThai / granite merges | various | evaluated, not promoted | internal |
 
-**Current production:** TURBO-Fable nvfp4 (MLX), one manifest, five
-aliases (chat / think / code / deep / fast) sharing one blob.
+**Current production (since 2026-09-16):** 709-L nvfp4 (MLX), ONE
+manifest, ONE production alias (`qwen38-uni`) + a `-bak` pointer to the
+735 incumbent for second-level rollback. The old chat / think / code /
+deep / fast alias fan-out was retired — behavior differentiation lives
+on the LiteLLM route only.
+
+### The 709-L cutover (2026-09-16, Arm B paired eval)
+
+Same 20 production articles run through both models on the same box,
+same gates (G2/G3/G5/G7/G9), graded on publishable-first-pass:
+
+| Metric | 709-L | 735 (ex-incumbent) |
+|---|---|---|
+| Publishable first-pass rate | **0.781** (25/32) | 0.600 (24/40) |
+| Paired mean delta | **+0.225** | — |
+| Paired W/L/T (20 articles) | **8 / 1 / 11** | |
+| Wall time mean / max | **141 s / 302 s** | 439 s / 1569 s |
+| Gate failures | G7×6, G2×1 | G2×3, G3×6, G7×5, G9×1, G5×1 |
+| Hard errors | 0 | 5 (1 suspect-fast + 4 timeouts at 1400 s) |
+
+Honest caveats: partial repetitions (1.6–2.0 per article vs 3 planned —
+the eval was killed mid-run by a VRAM contention stall from a
+concurrent production grind), so the +0.225 is directional, not final.
+The 3× wall-time advantage was measured under real contention, which is
+how production actually runs. Full harvest: ops artifact 36247.
 
 ### The turbo-vs-stock Thai question (settled with statistics)
 

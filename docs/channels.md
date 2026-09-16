@@ -67,8 +67,10 @@ cron → n8n → LiteLLM (model=bom-writer, num_predict=8192)
 ```
 
 - Measured throughput on the writer route: see `benchmarks/` — the
-  10-post generation drill is the canonical load test
-  (`[BENCH_DATA_PENDING]` for posts/hour on your hardware).
+  10-post generation drill is the canonical load test. Our measured
+  4-post drill (2026-09-12, prod writer route, report
+  `_ops/reports/ops-hub/content_parallel_burst/`): ~9 posts/hour serial,
+  ~20 posts/hour with the writer=4 thread pool (2.24x).
 - Nothing auto-publishes. Ever.
 
 ## Virtual key policy (the metering fabric)

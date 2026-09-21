@@ -161,6 +161,18 @@ kept `-bak` alias). Full protocol and honest caveats (partial reps):
 - Re-verified after a Mac reboot: sandbox 9/9, QC suite 5/5, Thai stream
   TTFT **1.94 s**, **576 GB** free after model cleanup.
 
+## v3 Changelog (2026-09-21)
+
+- Ollama 0.33.3 → 0.34.2 MLX
+- Model: TWIN-TURBO-709-ULTRA (709-L), Qwen3.8-27B nvfp4
+- repeat_penalty: 1.05 → 1.0 (MTP alignment, DavidAU recommendation)
+- MTP verified: 23 tensors, 19-25 tok/s, acceptance 0.61-0.83
+- Benchmark: +0.2250 (8W-1L-11D/20), 5/5 quality pass
+- Disk cleanup: +85GB recovered (deleted 735 artifacts + BF16 source)
+- AI Live Stream deployed (Restream → live-router → OWUI → 709-L)
+
+Full v3 stack reference: [***REMOVED***.md](***REMOVED***.md).
+
 ## Quickstart
 
 ```bash

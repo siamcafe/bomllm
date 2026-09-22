@@ -102,7 +102,7 @@ Correct. Payback math above. After payback, the marginal cost of a token
 is genuinely ~$0.
 
 **"$50/day of GLM is a lot of tokens."**
-Yes — 5 channels, thousands of calls/day, Thai long-form content
+Yes — 4 BOM channels + LINE hybrid, thousands of calls/day, Thai long-form content
 generation. The 50-case graded eval (`benchmarks/`) shows the local 27B
 *outscoring* the cloud model it replaced on our traffic mix (ratio 1.20).
 We didn't downgrade to save money; we upgraded and stopped paying.

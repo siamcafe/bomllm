@@ -89,7 +89,7 @@ for attempt in (1, 2):
     try:
         r = subprocess.run(
             ["ssh", "-p99", "-o", "ConnectTimeout=10", "-o", "BatchMode=yes",
-             "user@VPS_HOST_REDACTED", "cat /home/bom/bomllm/litellm/config.yaml"],
+             "user@VPS_HOST", "cat /home/bom/bomllm/litellm/config.yaml"],
             capture_output=True, text=True, timeout=30,
         )
         if r.stdout and r.stdout.strip().startswith("general_settings"):

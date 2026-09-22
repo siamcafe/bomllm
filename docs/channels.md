@@ -1,6 +1,8 @@
 # Channels: wiring LINE, Telegram, WebUI, and MT5 (sanitized)
 
-Five production channels. All converge on one LiteLLM endpoint; each gets
+Four fully-BOM production channels — web chat, n8n content pipelines,
+live-stream Q/A overlay, chart-vision overlay — plus a hybrid LINE bot
+(cloud fallback disclosed). All converge on one LiteLLM endpoint; each gets
 its own **virtual key** with its own **budget and model allow-list**.
 That is the whole trick: one proxy, many doors, every door metered.
 
@@ -35,6 +37,9 @@ LINE Messaging API → webhook → n8n (NAS) → LiteLLM (model=thai-chat-rt)
   (scanned weekly).
 
 ## Channel 3 — Telegram bot
+
+> **Status: currently cloud, migrating.** The Telegram bot is not yet on
+> the BOM stack; the wiring below is the target pattern for the migration.
 
 Same pattern as LINE: platform webhook → n8n → LiteLLM → reply.
 Differences: MarkdownV2 escaping in post-processing, and a state-change

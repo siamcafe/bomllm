@@ -14,7 +14,7 @@
 #    apply it per-route, not baked in, so raw callers and WebUI users can
 #    each get the right persona.
 #  * RENDERER/PARSER below are the Thai-script rendering keys our
-#    production ollama build honors (verified on stock 0.34.1 — the
+#    production ollama build honors (verified on stock 0.34.2 — the
 #    model manifest carries them through `ollama show --modelfile`).
 #    If your build errors on unknown keys, delete those two lines.
 # ============================================================================
@@ -27,7 +27,7 @@ FROM turbo-fable-nvfp4   # CHANGE_ME — your local tag for the 27B MLX weights
 
 # Thai script rendering/parser binding (production 709-L Modelfile verbatim).
 RENDERER qwen3.8
-PARSER qwen3.5
+PARSER qwen3.8
 
 # Context floor for every caller.
 # [PROD LESSON] post-swap we lost the Modelfile floor and raw callers
@@ -42,7 +42,7 @@ PARAMETER temperature 0.6
 PARAMETER top_p 0.95
 PARAMETER top_k 20
 PARAMETER presence_penalty 0
-PARAMETER repeat_penalty 1.05
+PARAMETER repeat_penalty 1.0
 
 # Minimal safety floor persona (REPLACE with your own; the full validated
 # Thai recipe with few-shots is in configs/sampling-recipe.yaml).

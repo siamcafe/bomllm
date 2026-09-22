@@ -39,7 +39,7 @@ model_list:
       temperature: 0.7
       top_p: 0.8
       top_k: 20
-      repeat_penalty: 1.05
+      repeat_penalty: 1.0
       num_ctx: 32768
       num_predict: 2048
 

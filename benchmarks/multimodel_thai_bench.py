@@ -162,7 +162,7 @@ for model_cfg in MODELS:
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
                     "options": {"temperature": 0.6, "top_p": 0.95, "top_k": 20,
-                                "repeat_penalty": 1.05, "num_predict": 2048,
+                                "repeat_penalty": 1.0, "num_predict": 2048,
                                 "num_ctx": 16384, "seed": 42},
                 }, timeout=900)
                 d = resp.json()

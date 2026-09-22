@@ -12,7 +12,7 @@ the CSVs are re-measured on the release hardware before launch
 |---|---|
 | Machine | Mac Mini M4 Pro, 48 GB unified memory, 14-core CPU |
 | OS | macOS 26.x arm64 |
-| Runtime | Ollama 0.33.3, MLX backend |
+| Runtime | Ollama 0.33.3, MLX backend (release rerun pending L-7) |
 | Weights | 27B-class Qwen fine-tune (TURBO-Fable series), nvfp4, ~18 GB on disk / ~23 GB resident |
 | Context | 32768 |
 | Baseline | same weights, GGUF Q4_K_M (llama.cpp path) |

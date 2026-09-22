@@ -3,7 +3,7 @@
 ![BOMLLM](images/hero_banner.png)
 
 **I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.**
-It has served **5 production channels** — a LINE bot, a Telegram bot, a read-only MT5 EA, web chat, and n8n content pipelines — **24/7 since August 2026**, in Thai and English.
+It has served **4 production channels plus a hybrid LINE bot** — web chat, n8n content pipelines, live-stream Q/A overlay, chart-vision overlay, plus LINE bot (cloud fallback disclosed) — **24/7 since August 2026**, in Thai and English.
 One **Mac Mini M4 Pro 48GB** runs a 27B MLX model at **~30 tok/s** (measured, not marketing).
 A small VPS fronts it with **LiteLLM + Open WebUI + SearXNG**; an i9 with 2× RTX 5060 Ti renders images and voice; a Synology NAS runs n8n and monitoring.
 Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
@@ -22,12 +22,12 @@ Thai-first and proud of it — but the architecture works for any language.
 
 ```mermaid
 flowchart TB
-    subgraph USERS["Channels (5)"]
-        LINE["LINE bot"]
-        TG["Telegram bot"]
-        MT5["MT5 EA (read-only)"]
+    subgraph USERS["Channels (4 BOM + LINE hybrid)"]
         WEB["Web chat"]
         N8NP["n8n content pipelines"]
+        LSO["Live-stream Q/A overlay"]
+        CVO["Chart-vision overlay"]
+        LINE["LINE bot (cloud fallback disclosed)"]
     end
 
     CF["Cloudflare Tunnel<br/>(HTTPS, key-gated)"]
@@ -44,8 +44,8 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.34.1 (MLX backend)"]
-        M1["Qwen3.5-27.8B class<br/>709-L (TWIN-TURBO-709-ULTRA) nvfp4<br/>~30 tok/s · 21 GB resident"]
+        OL["Ollama 0.34.2 (MLX backend)"]
+        M1["Qwen3.8-27B class<br/>709-L (TWIN-TURBO-709-ULTRA) nvfp4<br/>~30 tok/s · 21 GB resident"]
         EMB["bge-m3 embeddings"]
     end
 
@@ -66,7 +66,7 @@ flowchart TB
         BAK["Backups + Vaultwarden"]
     end
 
-    LINE & TG & MT5 & WEB --> CF
+    LINE & WEB & LSO & CVO --> CF
     N8NP --> CR
     CF --> OW & LL
     OW --> LL
@@ -102,7 +102,7 @@ flowchart TB
 | LLM inference | ~$50.00/day (z.ai GLM, metered per token) | **$0.31–$2.76/day** actual fallback spend (LiteLLM spend logs) |
 | Electricity | — | **~$0.54/day** measured whole fleet (Mac + i9 + NAS + network) |
 | Rate limits | yes | none |
-| Data residency | third-party cloud | 100% our hardware |
+| Data residency | third-party cloud | ours, except explicit tier-3 fallback |
 | **Total** | **~$1,500/month** | **~$36–114/month** marginal (electricity + fallback + VPS) |
 
 Cost breakdown (what the $0.54 headline does and does not include):
@@ -141,10 +141,10 @@ Every number above is reproducible with [benchmarks/README.md](benchmarks/README
 ### The 709-L cutover (2026-09-16)
 
 The resident model was promoted from the 735 tune to **709-L**
-(TWIN-TURBO-709-ULTRA, Qwen3.5-27.8B, MLX nvfp4) after a paired production eval on 20
+(TWIN-TURBO-709-ULTRA, Qwen3.8-27B, MLX nvfp4) after a paired production eval on 20
 real articles: publishable-first-pass **0.781 vs 0.600** (paired mean
 **+0.225**, W/L/T 8-1-11), wall time **141 s vs 439 s** under real
-contention. Ollama upgraded 0.33.3 → 0.34.1 in the same window
+contention. Ollama upgraded 0.33.x → 0.34.x in the same window
 (versioned install, seconds-level rollback via `ollama cp` from the
 kept `-bak` alias). Full protocol and honest caveats (partial reps):
 [docs/thai.md](docs/thai.md).
@@ -159,13 +159,13 @@ kept `-bak` alias). Full protocol and honest caveats (partial reps):
 - **Rollback alias retained** — `qwen38-uni-735-bak` (previous incumbent)
   stays until 2026-09-30; restore is one `ollama cp`.
 - Re-verified after a Mac reboot: sandbox 9/9, QC suite 5/5, Thai stream
-  TTFT **1.94 s**, **576 GB** free after model cleanup.
+  TTFT **1.94 s**, **576 GB** disk free after model cleanup.
 
 ## v3 Changelog (2026-09-21)
 
-- Ollama 0.33.3 → 0.34.2 MLX
+- Ollama upgraded to 0.34.2 MLX
 - Model: TWIN-TURBO-709-ULTRA (709-L), Qwen3.8-27B nvfp4
-- repeat_penalty: 1.05 → 1.0 (MTP alignment, DavidAU recommendation)
+- repeat_penalty: 1.0 (MTP alignment, DavidAU recommendation)
 - MTP verified: 23 tensors, 19-25 tok/s, acceptance 0.61-0.83
 - Benchmark: +0.2250 (8W-1L-11D/20), 5/5 quality pass
 - Disk cleanup: +85GB recovered (deleted 735 artifacts + BF16 source)
@@ -238,7 +238,7 @@ This repo (glue, configs, scripts, docs) is **MIT**. Bundled components keep the
 
 **BOMLLM คืออะไร?** ระบบ AI ที่รันเองบนเครื่องตัวเอง 100% — ผมเลิกจ่ายค่า cloud LLM วันละ ~50 เหรียญ แล้วหันมาใช้ **Mac Mini M4 Pro 48GB** เครื่องเดียวบนโต๊ะ ค่าไฟรวมทั้งฟลีต ~**0.54 เหรียญ/วัน** (~530 บาท/เดือน วัดจากการใช้งานจริง)
 
-**ใช้งานจริงตั้งแต่สิงหาคม 2026** ให้บริการ 5 ช่องทางพร้อมกัน: LINE bot, Telegram bot, MT5 EA (อ่านอย่างเดียว ไม่เทรด), เว็บแชท และ pipeline เขียนบทความผ่าน n8n — ตอบภาษาไทยและอังกฤษตลอด 24 ชม.
+**ใช้งานจริงตั้งแต่สิงหาคม 2026** ให้บริการ 4 ช่องทางบนฮาร์ดแวร์ของเราเอง (เว็บแชท, pipeline เขียนบทความผ่าน n8n, โอเวอร์เลย์ถาม-ตอบในไลฟ์สตรีม, โอเวอร์เลย์วิเคราะห์กราฟ) และ LINE bot แบบไฮบริด (เปิดเผยว่ามี fallback บน cloud) — ตอบภาษาไทยและอังกฤษตลอด 24 ชม.
 
 **เทคโนโลยีหลัก:**
 - โมเดล 27B แบบ MLX (nvfp4) บน Mac — วัดจริง **~30 token/วินาที** (เร็วกว่า GGUF เดิม ~4 เท่า)

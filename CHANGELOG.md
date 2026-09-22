@@ -32,7 +32,9 @@ First public release, timed with the Show HN launch.
   Thai evaluation protocol. No weights are redistributed.
 
 ### Production provenance
-- Stack in continuous production since 2026-08 serving 5 channels
-  (LINE bot, Telegram bot, MT5 read-only EA, WebUI chat, n8n pipelines).
-- Cloud LLM spend replaced: ~$50/day → ~$3.50/day electricity
+- Stack in continuous production since 2026-08 serving 4 fully-BOM
+  channels + a hybrid LINE bot (web chat, n8n content pipelines,
+  live-stream Q/A overlay, chart-vision overlay, LINE bot with cloud
+  fallback disclosed).
+- Cloud LLM spend replaced: ~$50/day → ~$0.54/day electricity
   (methodology in `docs/cost.md`).

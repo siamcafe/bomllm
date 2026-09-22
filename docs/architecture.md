@@ -36,7 +36,7 @@ flowchart TB
     TS{"Tailscale mesh VPN<br/>WireGuard · ACL'd"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — inference brain"]
-        OL["Ollama 0.33 · MLX backend<br/>:11434 · Tailscale IP only"]
+        OL["Ollama 0.34.2 · MLX backend<br/>:11434 · Tailscale IP only"]
         MAIN["Main model: 27B-class TURBO-Fable nvfp4<br/>23 GB resident · ctx 32768<br/>aliases: chat / think / code / deep / fast"]
         EMB["bge-m3 (RAG embeddings)"]
         OL --> MAIN
@@ -171,7 +171,7 @@ Configured per-route in LiteLLM:
 
 | Component | Version | Note |
 |---|---|---|
-| Ollama | 0.33.3 | MLX backend |
+| Ollama | 0.34.2 | MLX backend |
 | Open WebUI | v0.11.3 | CVE-fixed line |
 | LiteLLM | 1.100.x | lightly patched image; stock works |
 | Postgres | 16-alpine | |

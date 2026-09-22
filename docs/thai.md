@@ -69,14 +69,14 @@ events halve (35→15 per 100 without it).
 | temperature | 0.6 | pinned; 1.0 was only ever paired with Config G, since invalidated |
 | top_p | 0.95 | |
 | top_k | 20 | |
-| repeat_penalty | 1.05 | >1.05 breaks code blocks; 8.0 (a typo) destroyed output — yes, we tested it |
+| repeat_penalty | 1.0 | v3 pin (MTP alignment, DavidAU); higher values break code blocks; 8.0 (a typo) destroyed output — yes, we tested it |
 | presence_penalty | 0.0 | any value >0 causes language mixing — pinned at zero (2026-09-12 finding; the earlier n=23 A/B tested thai_ratio suppression, a different symptom) |
 | num_ctx | 32768 | below 8192, long Thai reports truncate |
 | num_predict | 8192 | **completion safety** — see below |
 | think | route-dependent | `false` for bots, `true` for deep routes |
 
 Pinned 2026-09-12: all 6 aliases (turbo + chat / think / code / deep /
-fast) were rebuilt with explicit `PARAMETER` lines — `repeat_penalty 1.05 ·
+fast) were rebuilt with explicit `PARAMETER` lines — `repeat_penalty 1.0 ·
 temperature 0.6 · top_p 0.95 · top_k 20 · presence_penalty 0.0` — so the
 values ship in the Modelfile itself, not just the LiteLLM route layer.
 

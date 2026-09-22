@@ -5,9 +5,9 @@ HN's front page turns over on US-morning traffic; Tuesday avoids the
 Monday news flood and the Friday weekend drop).
 
 **Title (locked):**
-`Show HN: BOMLLM – I replaced $50/day cloud AI with a $3.50/day Mac Mini serving 5 bots`
+`Show HN: BOMLLM – I replaced $50/day cloud AI with a $0.54/day Mac Mini serving 5 bots`
 
-Why this title: one unexpected number ($3.50/day), one concrete contrast
+Why this title: one unexpected number ($0.54/day), one concrete contrast
 ($50/day), one credibility signal (5 bots = production, not a demo).
 Under 80 chars. No adjectives like "blazing".
 
@@ -67,7 +67,7 @@ sampling-recipe.yaml), Arm B eval cells filled; meter CSV cells still
 
 - [ ] **C-1.** First comment finalized (draft below).
 - [ ] **C-2.** Blog post on the personal site (Thai + English) telling the
-  3-month story: the swap incident, the empty-reply bug, the $50 → $3.50
+  3-month story: the swap incident, the empty-reply bug, the $50 → $0.54
   cutover. Link ready but posted AFTER HN (don't split the discussion).
 - [ ] **C-3.** Thai-language posts queued for Facebook/LINE OA —
   scheduled for T+4h, not T+0.
@@ -92,7 +92,7 @@ sampling-recipe.yaml), Arm B eval cells filled; meter CSV cells still
 >   still leak a stray Chinese character. The eval harness, the prompt
 >   bank, and the full negative results (what did NOT work) are all in
 >   the repo.
-> - **The $3.50 is electricity only.** Hardware was ~$2k for the Mac;
+> - **The $0.54 is electricity only.** Hardware was ~$2k for the Mac;
 >   payback was ~6 weeks at our volume. The cost doc shows the meter
 >   method and the LiteLLM spend-log queries so you can audit both
 >   numbers.

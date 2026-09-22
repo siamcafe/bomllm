@@ -202,7 +202,7 @@ def main() -> int:
     ap.add_argument("--temperature", type=float, default=1.0)
     ap.add_argument("--top-p", type=float, default=0.95)
     ap.add_argument("--top-k", type=int, default=20)
-    ap.add_argument("--repeat-penalty", type=float, default=1.05)
+    ap.add_argument("--repeat-penalty", type=float, default=1.0)
     ap.add_argument("--num-ctx", type=int, default=32768)
     ap.add_argument("--num-predict", type=int, default=8192)
     ap.add_argument("--think", action="store_true")

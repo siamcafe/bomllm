@@ -31,5 +31,5 @@ Planned shots (from the README placeholders):
 - [ ] WebUI answering a Thai gold-price question with web search citations
 - [ ] LINE bot conversation (phone, Thai)
 - [ ] LiteLLM spend dashboard: $0.31–$2.76/day fallback spend
-- [ ] The Mac Mini on the desk next to the plug meter (the $3.50 receipt)
+- [ ] The Mac Mini on the desk next to the plug meter (the $0.54 receipt)
 - [ ] Architecture diagram (mermaid render or the dark-theme PNG)

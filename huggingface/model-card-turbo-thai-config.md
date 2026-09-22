@@ -26,7 +26,7 @@ Full platform (repo, docs, cost receipts): **https://github.com/siamcafe/bomllm*
 ## Latest changes (2026-09-13)
 
 - **Parameters pinned on all 6 aliases** — `temperature 0.6 · top_p 0.95 ·
-  top_k 20 · repeat_penalty 1.05 · presence_penalty 0.0` baked into every
+  top_k 20 · repeat_penalty 1.0 · presence_penalty 0.0` baked into every
   Modelfile via explicit `PARAMETER` lines (turbo + 5 task names).
 - **Intent filter v2 deployed** — color-whitelist guard (37 entries) +
   finance-positive forcing (15 entries) + dual-feature mutual exclusion,
@@ -50,7 +50,7 @@ Full platform (repo, docs, cost receipts): **https://github.com/siamcafe/bomllm*
 
 **Modelfile pin** (locked 2026-09-12, artifact #34909): the prod Mac Ollama
 Modelfiles are pinned to `temperature 0.6 · top_p 0.95 · top_k 20 ·
-repeat_penalty 1.05`.
+repeat_penalty 1.0`.
 
 ```bash
 # 1. Pull weights from the original author (example tag — read their card)
@@ -67,11 +67,11 @@ not in the Modelfile:
 
 | Profile | Task | Temp | top_p | top_k | rep_pen | presence_pen | ctx | predict | think |
 |---|---|---|---|---|---|---|---|---|---|
-| chat (default) | conversation | 0.6 | 0.95 | 20 | 1.05 | 0.0 | 32768 | 8192 | ON |
+| chat (default) | conversation | 0.6 | 0.95 | 20 | 1.0 | 0.0 | 32768 | 8192 | ON |
 | code | coding | 0.6 | 0.95 | 20 | 1.0 | 0.0 | 32768 | 8192 | ON |
-| deep | reasoning | 0.6 | 0.95 | 20 | 1.05 | 0.0 | 32768 | 12288 | ON |
-| vision | OCR | 0.0 | 0.80 | 20 | 1.05 | 1.5 | 32768 | 2048 | OFF |
-| realtime | short replies | 0.7 | 0.80 | 20 | 1.05 | 1.5 | 8192 | 256 | OFF |
+| deep | reasoning | 0.6 | 0.95 | 20 | 1.0 | 0.0 | 32768 | 12288 | ON |
+| vision | OCR | 0.0 | 0.80 | 20 | 1.0 | 1.5 | 32768 | 2048 | OFF |
+| realtime | short replies | 0.7 | 0.80 | 20 | 1.0 | 1.5 | 8192 | 256 | OFF |
 
 ## Runtime mapping
 

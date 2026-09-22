@@ -7,7 +7,7 @@
 recipe_version: 1.0.0
 validated_on:
   hardware: Mac Mini M4 Pro 48GB
-  runtime: Ollama 0.33.3 (MLX backend)
+  runtime: Ollama 0.34.2 (MLX backend)
   weights: 27B-class Qwen fine-tune, nvfp4 (TURBO-Fable series, DavidAU)
   dates: 2026-09-09 .. 2026-09-11
 
@@ -35,7 +35,7 @@ sampling:
   top_p: 0.8
   top_k: 20
   presence_penalty: 1.5    # see note: no measurable Thai effect; kept for style
-  repeat_penalty: 1.0      # at THIS layer; route layer uses 1.05 — do not stack
+  repeat_penalty: 1.0      # at THIS layer; route layer is also 1.0 since v3 — do not stack
   measured:
     thai_median: 0.7821    # gate 0.78 — PASS (+0.0021, within noise)
     han_total: 12          # Chinese-char leaks across 28 replies
@@ -73,27 +73,27 @@ system_prompt_config_g:
 # eval: +0.225 publishable-first-pass rate vs the 735 incumbent, 8-1-11
 # W/L/T over 20 articles; Modelfile dumped VERBATIM from the Mac prod model):
 #   temperature 0.6 / top_p 0.95 / top_k 20 / presence_penalty 0 /
-#   repeat_penalty 1.05 / num_ctx 32768 / num_predict 12288
+#   repeat_penalty 1.0 / num_ctx 32768 / num_predict 12288
 #   (earlier note claimed the Modelfile has no presence_penalty key — wrong:
 #    the production 709-L Modelfile carries `PARAMETER presence_penalty 0`)
 # Profiles: artifact 33953, VALIDATED. Arm B harvest: artifact 36247.
 # NOTE: LAYER 1 sampling above (t0.7 / top_p 0.80 / pp 1.5) equals the
 # realtime_short profile — intentional, NOT drift.
 per_task_profiles:
-  modelfile_pin: { temperature: 0.6, top_p: 0.95, top_k: 20, presence_penalty: 0.0, repeat_penalty: 1.05, num_ctx: 32768, num_predict: 12288 }
+  modelfile_pin: { temperature: 0.6, top_p: 0.95, top_k: 20, presence_penalty: 0.0, repeat_penalty: 1.0,  num_ctx: 32768, num_predict: 12288 }
   profiles:
-    chat:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05, presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }
+    chat:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }
     code:           { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 0.0, num_ctx: 32768, num_predict: 8192 }
-    deep_reasoning: { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05, presence_penalty: 0.0, num_ctx: 32768, num_predict: 12288 }
-    vision_ocr:     { think: false, temperature: 0.0, top_p: 0.80, top_k: 20, repeat_penalty: 1.05, presence_penalty: 1.5, num_ctx: 32768, num_predict: 2048 }
-    realtime_short: { think: false, temperature: 0.7, top_p: 0.80, top_k: 20, repeat_penalty: 1.05, presence_penalty: 1.5, num_ctx: 8192,  num_predict: 256 }
+    deep_reasoning: { think: true,  temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 0.0, num_ctx: 32768, num_predict: 12288 }
+    vision_ocr:     { think: false, temperature: 0.0, top_p: 0.80, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 1.5, num_ctx: 32768, num_predict: 2048 }
+    realtime_short: { think: false, temperature: 0.7, top_p: 0.80, top_k: 20, repeat_penalty: 1.0,  presence_penalty: 1.5, num_ctx: 8192,  num_predict: 256 }
 
 # ---------------------------------------------------------------------------
 # ALTERNATE — simpler equal (measured, CI includes zero vs Config G)
 # ---------------------------------------------------------------------------
 alternate_simple:
   description: "mirror/minimal system prompt + temperature 0.6, no few-shot"
-  sampling: { temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.05 }
+  sampling: { temperature: 0.6, top_p: 0.95, top_k: 20, repeat_penalty: 1.0 }
   measured: { thai_ratio_mean: 0.7955, vs_config_g_delta: -0.0019, ci_excludes_zero: false }
   when_to_use: "you don't want a persona floor; bank- and domain-specific result"
 

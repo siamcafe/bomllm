@@ -2,15 +2,15 @@
 
 ## Pre-show checklist
 - [ ] Pause burn cron: `ssh nas 'touch /tmp/burn_pause'` (guard checks this file)
-- [ ] Verify Mac ollama running: `curl -s http://192.168.1.254:11434/api/tags | jq '.models | length'` (expect ≥1)
+- [ ] Verify Mac ollama running: `curl -s http://$MAC_LAN_IP:11434/api/tags | jq '.models | length'` (expect ≥1)
 - [ ] Verify LiteLLM health: `curl -s https://llm.siam2r.com/health/liveliness` (expect 200)
-- [ ] Verify live-router: `ssh -p 99 C2 'curl -s http://localhost:8090/healthz'` (expect ws_connected=true)
-- [ ] Verify chart-overlay: `ssh -p 99 C2 'curl -s http://localhost:8091/healthz'` (expect 200)
+- [ ] Verify live-router: `ssh -p $C2_SSH_PORT $C2_USER@$C2_HOST 'curl -s http://localhost:8090/healthz'` (expect ws_connected=true)
+- [ ] Verify chart-overlay: `ssh -p $C2_SSH_PORT $C2_USER@$C2_HOST 'curl -s http://localhost:8091/healthz'` (expect 200)
 - [ ] Confirm code.siam2r.com + ide.siam2r.com return 403
 
 ## Kuma monitor add (one-time)
 - URL: http://kuma-host:3001
-- Add monitor: type=http, name=live-router, url=http://100.111.221.171:8090/healthz, interval=60, retry=3
+- Add monitor: type=http, name=live-router, url=http://100.x.y.z:8090/healthz, interval=60, retry=3
 - Default Telegram notification auto-applies
 
 ## Mac power-loss recovery

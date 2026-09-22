@@ -9,7 +9,7 @@ Monday news flood and the Friday weekend drop).
 
 Why this title: one unexpected number ($0.54/day), one concrete contrast
 ($50/day), one credibility signal (4 channels + LINE hybrid = production, not a demo).
-Under 80 chars. No adjectives like "blazing".
+Under 120 chars. No adjectives like "blazing".
 
 ---
 

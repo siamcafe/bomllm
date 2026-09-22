@@ -45,7 +45,7 @@ flowchart TB
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
         OL["Ollama 0.34.2 (MLX backend)"]
-        M1["Qwen3.8-27B class<br/>709-L (TWIN-TURBO-709-ULTRA) nvfp4<br/>~30 tok/s · 21 GB resident"]
+        M1["Qwen3.8-27B class<br/>709-L (TWIN-TURBO-709-ULTRA) nvfp4<br/>~30 tok/s · ~23 GB resident"]
         EMB["bge-m3 embeddings"]
     end
 

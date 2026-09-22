@@ -37,7 +37,7 @@ flowchart TB
 
     subgraph MAC["Mac Mini M4 Pro 48GB — inference brain"]
         OL["Ollama 0.34.2 · MLX backend<br/>:11434 · Tailscale IP only"]
-        MAIN["Main model: 27B-class TURBO-Fable nvfp4<br/>23 GB resident · ctx 32768<br/>aliases: chat / think / code / deep / fast"]
+        MAIN["Main model: 709-L (TWIN-TURBO-709-ULTRA) nvfp4, Qwen3.8-27B class<br/>23 GB resident · ctx 32768<br/>alias: qwen38-uni"]
         EMB["bge-m3 (RAG embeddings)"]
         OL --> MAIN
         OL --> EMB

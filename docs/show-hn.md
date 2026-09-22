@@ -5,10 +5,10 @@ HN's front page turns over on US-morning traffic; Tuesday avoids the
 Monday news flood and the Friday weekend drop).
 
 **Title (locked):**
-`Show HN: BOMLLM – I replaced $50/day cloud AI with a $0.54/day Mac Mini serving 5 bots`
+`Show HN: BOMLLM – I replaced $50/day cloud AI with a $0.54/day Mac Mini serving 4 production channels + LINE hybrid`
 
 Why this title: one unexpected number ($0.54/day), one concrete contrast
-($50/day), one credibility signal (5 bots = production, not a demo).
+($50/day), one credibility signal (4 channels + LINE hybrid = production, not a demo).
 Under 80 chars. No adjectives like "blazing".
 
 ---
@@ -82,7 +82,7 @@ sampling-recipe.yaml), Arm B eval cells filled; meter CSV cells still
 > - **It's one 27B model on one Mac.** If the Mac reboots, a small CPU
 >   model on the VPS keeps the bots alive (slower, dumber), and true
 >   cloud fallback costs us $0.31–$2.76 on days it fires. Single point
->   of failure? Yes. Acceptable for a 5-bot business? Also yes, so far.
+>   of failure? Yes. Acceptable for a 4-channel production stack? Also yes, so far.
 > - **It's not a frontier model.** For hard novel coding I still pay for
 >   a frontier API. BOMLLM covers the ~85% of traffic that is Thai Q&A,
 >   content drafting, classification, and translation — and on our

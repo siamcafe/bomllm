@@ -1,7 +1,7 @@
 # Show HN launch plan — BOMLLM
 
-**Target:** Tuesday, 2026-10-07, 20:00 ICT (= 13:00 UTC = 09:00 EDT —
-HN's front page turns over on US-morning traffic; Tuesday avoids the
+**Target:** Wednesday, 2026-10-07, 20:00 ICT (= 13:00 UTC = 09:00 EDT —
+HN's front page turns over on US-morning traffic; Wednesday avoids the
 Monday news flood and the Friday weekend drop).
 
 **Title (locked):**
@@ -18,7 +18,7 @@ Under 120 chars. No adjectives like "blazing".
 **Readiness note (2026-09-16, T-21d):** the 709-L cutover is baked into
 the repo (README, docs/thai.md, configs/ollama-modelfile.example,
 configs/sampling-recipe.yaml — Arm B paired-eval numbers in, sampling
-pin t0.6/top_p0.95/pp0/rep1.05 documented verbatim from the production
+pin t0.6/top_p0.95/pp0/rep1.0 documented verbatim from the production
 Modelfile). L-7 status: Config G cells resolved-as-invalidated (note in
 sampling-recipe.yaml), Arm B eval cells filled; meter CSV cells still
 `[BENCH_DATA_PENDING]` until the post-cutover electricity re-run.

@@ -1,4 +1,4 @@
-# Channels: wiring LINE, Telegram, WebUI, and MT5 (sanitized)
+# Channels: 4 BOM production channels + hybrid LINE (sanitized)
 
 Four fully-BOM production channels — web chat, n8n content pipelines,
 live-stream Q/A overlay, chart-vision overlay — plus a hybrid LINE bot
@@ -20,33 +20,25 @@ That is the whole trick: one proxy, many doors, every door metered.
 - Features enabled in prod: web search (SearXNG), RAG (bge-m3 + Qdrant +
   reranker), image gen (ComfyUI), TTS/STT (i9).
 
-## Channel 2 — LINE bot
+## Channel 2 — Live-stream Q/A overlay
 
 ```
-LINE Messaging API → webhook → n8n (NAS) → LiteLLM (model=thai-chat-rt)
-→ n8n formats → LINE reply API
+live-stream chat (YouTube/Facebook) → n8n → LiteLLM (model=thai-chat-rt)
+→ overlay renderer → Restream Studio browser source → on-stream Q/A card
 ```
 
-- n8n workflow: verify signature → load conversation state → call LiteLLM
-  → post-process (length guard, link formatting) → reply.
-- Route pins: `think: false`, `num_predict` sized for chat, 30 s timeout.
-  A 30 s+ reply is a UX failure on LINE even if the content is perfect —
-  two edge-case categories in our eval hit this cap; they route to
-  fallback now.
-- Credentials live in n8n's credential store, never in workflow JSON
-  (scanned weekly).
+- Viewers ask questions in live chat; the pipeline drafts a Thai answer
+  that renders as an overlay card in the broadcast through a
+  browser-source widget in Restream Studio.
+- Route pins: `think: false`, `num_predict` sized for on-air latency,
+  short timeout — an answer that lands after the stream has moved on is
+  worthless; late answers drop instead of rendering stale text on air.
+- The relay side of this channel is two small services (a live-router
+  and an overlay renderer), each with its own health endpoint and a
+  Kuma probe. If the answer path degrades, the card simply stops
+  updating — never garbage on stream.
 
-## Channel 3 — Telegram bot
-
-> **Status: currently cloud, migrating.** The Telegram bot is not yet on
-> the BOM stack; the wiring below is the target pattern for the migration.
-
-Same pattern as LINE: platform webhook → n8n → LiteLLM → reply.
-Differences: MarkdownV2 escaping in post-processing, and a state-change
-alert bot (separate token) that pages the owner when probes flip
-(up/down) — driven by Uptime Kuma on the NAS.
-
-## Channel 4 — MT5 EA (read-only)
+## Channel 3 — Chart-vision overlay (MT5 EA, read-only)
 
 A MetaTrader 5 indicator panel that asks the LLM about the chart it is
 looking at.
@@ -62,7 +54,7 @@ looking at.
 - This channel is why the repo's "What this is NOT" section exists.
   BOMLLM is not a trading system.
 
-## Channel 5 — n8n content pipelines
+## Channel 4 — n8n content pipelines
 
 Scheduled n8n workflows that draft Thai articles:
 
@@ -73,10 +65,29 @@ cron → n8n → LiteLLM (model=bom-writer, num_predict=8192)
 
 - Measured throughput on the writer route: see `benchmarks/` — the
   10-post generation drill is the canonical load test. Our measured
-  4-post drill (2026-09-12, prod writer route, report
-  `_ops/reports/ops-hub/content_parallel_burst/`): ~9 posts/hour serial,
+  4-post drill (2026-09-12, prod writer route; ops report archived
+  internally, not shipped in this repo): ~9 posts/hour serial,
   ~20 posts/hour with the writer=4 thread pool (2.24x).
 - Nothing auto-publishes. Ever.
+
+## Hybrid channel — LINE bot
+
+> **Status: hybrid.** Production LINE traffic is served through the BOM
+> stack, with a disclosed cloud fallback for edge cases.
+
+```
+LINE Messaging API → webhook → n8n (NAS) → LiteLLM (model=thai-chat-rt)
+→ n8n formats → LINE reply API
+```
+
+- n8n workflow: verify signature → load conversation state → call LiteLLM
+  → post-process (length guard, link formatting) → reply.
+- Route pins: `think: false`, `num_predict` sized for chat, 30 s timeout.
+  A 30 s+ reply is a UX failure on LINE even if the content is perfect —
+  two edge-case categories in our eval hit this cap; they route to
+  fallback now.
+- Credentials live in n8n's credential store, never in workflow JSON
+  (scanned weekly).
 
 ## Virtual key policy (the metering fabric)
 
@@ -100,3 +111,13 @@ in `docs/cost.md`.
 4. If the channel is user-facing and Thai, inherit the
    `thai-chat-rt` route pattern (`think:false`, sized `num_predict`,
    Config G system prompt from `configs/sampling-recipe.yaml`).
+
+## Appendix — Telegram bot (cloud, migrating)
+
+> **Status: currently cloud, migrating.** The Telegram bot is not yet on
+> the BOM stack; the wiring below is the target pattern for the migration.
+
+Same pattern as LINE: platform webhook → n8n → LiteLLM → reply.
+Differences: MarkdownV2 escaping in post-processing, and a state-change
+alert bot (separate token) that pages the owner when probes flip
+(up/down) — driven by Uptime Kuma on the NAS.

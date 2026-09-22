@@ -7,7 +7,11 @@ import json, os, re, subprocess, sys, time, unicodedata
 
 import requests, yaml
 
-BENCH_DIR = r"D:\MY documents\thaillm\bomllm-release\benchmarks"
+BENCH_DIR = os.path.dirname(os.path.abspath(__file__))
+SSH_PORT = "99"                # relay ssh port; override for your own relay
+SSH_TARGET = "user@VPS_HOST"   # ssh alias resolved via ~/.ssh/config
+REMOTE_USER = "bom"            # relay account owning the bomllm checkout
+REMOTE_CFG = f"/home/{REMOTE_USER}/bomllm/litellm/config.yaml"
 SMOKE = "--smoke" in sys.argv
 SUFFIX = "_smoke" if SMOKE else ""
 OUT_JSON = os.path.join(BENCH_DIR, f"multimodel_thai_bench{SUFFIX}.json")
@@ -77,7 +81,8 @@ MODELS = [
 
 ZAI_WANTED = ["zai-fallback", "zai-brain", "glm-4.6v-flash", "zai-glm-4.6v"]
 # secret-free fallback if the runtime config ssh fails (transient network);
-# mirrors Contabo /home/bom/bomllm/litellm/config.yaml z.ai routes 2026-09-11
+# mirrors the relay's litellm/config.yaml z.ai routes 2026-09-11
+# (remote path built from REMOTE_USER / REMOTE_CFG constants above)
 FALLBACK_ROUTES = [
     {"name": "zai-fallback", "model": "glm-4.5"},
     {"name": "zai-brain", "model": "glm-5.2"},
@@ -88,8 +93,8 @@ config = None
 for attempt in (1, 2):
     try:
         r = subprocess.run(
-            ["ssh", "-p99", "-o", "ConnectTimeout=10", "-o", "BatchMode=yes",
-             "user@VPS_HOST", "cat /home/bom/bomllm/litellm/config.yaml"],
+            ["ssh", "-p", SSH_PORT, "-o", "ConnectTimeout=10", "-o", "BatchMode=yes",
+             SSH_TARGET, "cat " + REMOTE_CFG],
             capture_output=True, text=True, timeout=30,
         )
         if r.stdout and r.stdout.strip().startswith("general_settings"):

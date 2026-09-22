@@ -66,6 +66,7 @@ volumes/
 benchmarks/raw/
 benchmarks/results/
 benchmarks/*.jsonl
+multimodel_thai_bench*.json
 !benchmarks/*.csv
 *_results.json
 raw_results.*

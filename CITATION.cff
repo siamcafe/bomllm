@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: BOMLLM contributors
     name: BOMLLM contributors
-repository-code: https://github.com/bomllm/bomllm
-url: https://github.com/bomllm/bomllm
+repository-code: https://github.com/siamcafe/bomllm
+url: https://github.com/siamcafe/bomllm
 license: MIT
 version: 1.0.0
 date-released: "2026-10-07"

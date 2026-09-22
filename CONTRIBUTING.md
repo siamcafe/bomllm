@@ -31,7 +31,7 @@ add adjectives.
 ## Development setup
 
 ```bash
-git clone https://github.com/bomllm/bomllm.git
+git clone https://github.com/siamcafe/bomllm.git
 cd bomllm
 cp configs/.env.example .env   # fill with YOUR test values
 ./scripts/bootstrap.sh --dry-run
@@ -41,7 +41,7 @@ Run the Thai bench harness against your own endpoint:
 
 ```bash
 python3 scripts/bench_thai.py --endpoint http://localhost:4000/v1 \
-  --model your-model --bank benchmarks/thai-quality.csv --dry-run
+  --model your-model --bank prompts.jsonl --dry-run
 ```
 
 ## PR checklist

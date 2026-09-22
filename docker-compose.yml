@@ -75,7 +75,7 @@ services:
   litellm:
     # We run a lightly patched image in production (PIL patch for image
     # passthrough). The stock image works for the kit; see docs/upgrade.md.
-    image: ghcr.io/berriai/litellm:main-stable
+    image: ghcr.io/berriai/litellm:v1.100.0  # pinned; matches deployed stack version (***REMOVED*** stack table)
     restart: unless-stopped
     command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "1"]
     environment:

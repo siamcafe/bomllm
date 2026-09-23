@@ -8,8 +8,8 @@ recipe_version: 1.0.0
 validated_on:
   hardware: Mac Mini M4 Pro 48GB
   runtime: Ollama 0.34.2 (MLX backend)
-  weights: 27B-class Qwen fine-tune, nvfp4 (TURBO-Fable series, DavidAU)
-  dates: 2026-09-09 .. 2026-09-11
+  weights: Fable-Cold-Fusion-709-L (Fable 709-L), Qwen3.8-27B fine-tune, nvfp4 (DavidAU) — since 2026-09-23
+  dates: 2026-09-09 .. 2026-09-23
 
 # ---------------------------------------------------------------------------
 # LAYER 0 — COMPLETION SAFETY FLOOR (apply FIRST, before any prompt work)
@@ -79,6 +79,11 @@ system_prompt_config_g:
 # Profiles: artifact 33953, VALIDATED. Arm B harvest: artifact 36247.
 # NOTE: LAYER 1 sampling above (t0.7 / top_p 0.80 / pp 1.5) equals the
 # realtime_short profile — intentional, NOT drift.
+# [v3.1 2026-09-23] Resident weights switched ULTRA -> Fable 709-L
+#   (Qwen3.8-27B-TWIN-TURBO-Fable-Cold-Fusion-709-L-Uncensored, digest
+#   1691692bef10) — 7-gate bench ALL PASS (Thai 2.00 vs 1.90, Han leak 0
+#   vs 3, tools 5/5, vision PASS, 22.99 tok/s = 0.954x, MTP 0.63-0.79,
+#   stop 22/22). ALL params below UNCHANGED (Config G locked).
 per_task_profiles:
   modelfile_pin: { temperature: 0.6, top_p: 0.95, top_k: 20, presence_penalty: 0.0, repeat_penalty: 1.0,  num_ctx: 32768, num_predict: 12288 }
   profiles:

@@ -4,7 +4,7 @@
 
 **I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.**
 It has served **4 production channels plus a hybrid LINE bot** — web chat, n8n content pipelines, live-stream Q/A overlay, chart-vision overlay, plus LINE bot (cloud fallback disclosed) — **24/7 since August 2026**, in Thai and English.
-One **Mac Mini M4 Pro 48GB** runs a 27B MLX model at **~30 tok/s** (measured, not marketing).
+One **Mac Mini M4 Pro 48GB** runs a 27B MLX model at **~23 tok/s** (measured, not marketing).
 A small VPS fronts it with **LiteLLM + Open WebUI + SearXNG**; an i9 with 2× RTX 5060 Ti renders images and voice; a Synology NAS runs n8n and monitoring.
 Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
 This repo is the full receipt: configs, sampling recipes, benchmark harness, and the cost meter.
@@ -45,7 +45,7 @@ flowchart TB
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
         OL["Ollama 0.34.2 (MLX backend)"]
-        M1["Qwen3.8-27B class<br/>709-L (TWIN-TURBO-709-ULTRA) nvfp4<br/>~30 tok/s · ~23 GB resident"]
+        M1["Qwen3.8-27B class<br/>Fable 709-L (TWIN-TURBO-Fable-Cold-Fusion) nvfp4<br/>~23 tok/s · ~23 GB resident"]
         EMB["bge-m3 embeddings"]
     end
 
@@ -149,6 +149,31 @@ contention. Ollama upgraded 0.33.x → 0.34.x in the same window
 kept `-bak` alias). Full protocol and honest caveats (partial reps):
 [docs/thai.md](docs/thai.md).
 
+### The Fable 709-L switch (2026-09-23)
+
+The resident model switched from TWIN-TURBO-709-ULTRA to **Fable 709-L**
+(DavidAU/Qwen3.8-27B-TWIN-TURBO-Fable-Cold-Fusion-709-L-Uncensored, Qwen3.8-27B,
+MLX nvfp4, Ollama digest `1691692bef10`, heretic level 68/100
+instruction-following) after a 7-gate paired bench — **all 7 gates PASS**:
+
+| Gate | Fable 709-L (new) | 709-L ULTRA (old) | Result |
+|---|---|---|---|
+| Thai quality | **2.00** | 1.90 | improved (gate ≥1.20) ✅ |
+| Han-character leak | **0** | 3 | eliminated ✅ |
+| Tool calling | 5/5 | 5/5 | equal ✅ |
+| Vision | PASS | PASS | equal ✅ |
+| Decode speed | 22.99 tok/s | 24.09 tok/s | 0.954× (−5%) ✅ |
+| MTP acceptance | 0.63–0.79 | 0.53–0.85 | more stable ✅ |
+| done_reason | stop 22/22 | stop 22/22 | equal ✅ |
+
+![Benchmark Fable 709-L](images/benchmark_fable.png)
+
+Decision: ALL PASS → switch. The 4 aliases
+(`qwen38-uni` / `qwen38-709l` / `qwen38-chat` / `bom-read-image`) were
+repointed in one pass; the ULTRA image is kept as the rollback
+(`ollama cp`, seconds-level restore). Config G sampling unchanged:
+temp 0.6 · top_p 0.95 · top_k 20 · repeat_penalty 1.0.
+
 ### Post-promotion hardening (2026-09-16)
 
 - **LiteLLM `max_tokens` floors** on the three thin routes (`qwen38` 2048,
@@ -172,6 +197,17 @@ kept `-bak` alias). Full protocol and honest caveats (partial reps):
 - AI Live Stream deployed (Restream → live-router → OWUI → 709-L)
 
 Full v3 stack reference: [***REMOVED***.md](***REMOVED***.md).
+
+## v3.1 Changelog (2026-09-23)
+
+- Model switched: 709-L ULTRA → **Fable 709-L**
+  (DavidAU/Qwen3.8-27B-TWIN-TURBO-Fable-Cold-Fusion-709-L-Uncensored,
+  nvfp4, digest `1691692bef10`)
+- 7-gate bench ALL PASS: Thai 2.00 vs 1.90 · Han leak 0 vs 3 · tools 5/5 ·
+  vision PASS · 22.99 tok/s (0.954×) · MTP acceptance 0.63–0.79 · stop 22/22
+- Heretic level 68/100 instruction-following (previous finalist: 6/100)
+- MTP: 23 tensors, ships its own mtp shard; vision: 333 tensors, PASS
+- New benchmark card `images/benchmark_fable.png`; hero banner refreshed
 
 ## Quickstart
 
@@ -241,7 +277,7 @@ This repo (glue, configs, scripts, docs) is **MIT**. Bundled components keep the
 **ใช้งานจริงตั้งแต่สิงหาคม 2026** ให้บริการ 4 ช่องทางบนฮาร์ดแวร์ของเราเอง (เว็บแชท, pipeline เขียนบทความผ่าน n8n, โอเวอร์เลย์ถาม-ตอบในไลฟ์สตรีม, โอเวอร์เลย์วิเคราะห์กราฟ) และ LINE bot แบบไฮบริด (เปิดเผยว่ามี fallback บน cloud) — ตอบภาษาไทยและอังกฤษตลอด 24 ชม.
 
 **เทคโนโลยีหลัก:**
-- โมเดล 27B แบบ MLX (nvfp4) บน Mac — วัดจริง **~30 token/วินาที** (เร็วกว่า GGUF เดิม ~4 เท่า)
+- โมเดล 27B แบบ MLX (nvfp4) บน Mac — วัดจริง **~23 token/วินาที** (เร็วกว่า GGUF เดิม ~3 เท่า)
 - VPS เล็กๆ รัน LiteLLM (ตัวกระจาย request + คุมงบ + fallback) + Open WebUI + SearXNG (ค้นเว็บในเครื่อง)
 - เครื่อง i9 การ์ดจอ 2 ใบ ทำภาพ (ComfyUI) และเสียงพูดไทย (TTS)
 - NAS รัน n8n + ระบบเฝ้าระวัง + สำรองข้อมูล

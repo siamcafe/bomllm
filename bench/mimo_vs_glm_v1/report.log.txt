@@ -1,0 +1,222 @@
+raw log mimo_vs_glm_bench_v1 2026-09-25
+============================================================
+SECTION 1: MiMo run records (from runs/*.json, wall_s = client HTTP wall clock)
+------------------------------------------------------------
+t1 http=200 wall_s=7.169 load_ms=1111315208 prompt_tok=47 eval_tok=218 eval_ms=5754755000 done=stop content_chars=697
+t2 http=200 wall_s=88.993 load_ms=7901520208 prompt_tok=70 eval_tok=2984 eval_ms=80748324000 done=stop content_chars=6936
+t3 http=200 wall_s=50.136 load_ms=36141166 prompt_tok=70 eval_tok=1849 eval_ms=49722090000 done=stop content_chars=5157
+t4 http=200 wall_s=34.616 load_ms=8061667917 prompt_tok=89 eval_tok=1011 eval_ms=26213723000 done=stop content_chars=2316
+t5 http=200 wall_s=67.225 load_ms=13017247667 prompt_tok=73 eval_tok=2095 eval_ms=53850718000 done=stop content_chars=3974
+t5 http=200 wall_s=225.237 load_ms=38522375 prompt_tok=73 eval_tok=8192 eval_ms=224778044000 done=length content_chars=21584
+t6 http=200 wall_s=79.042 load_ms=16075607541 prompt_tok=69 eval_tok=2342 eval_ms=62622935000 done=stop content_chars=3363
+t7 http=200 wall_s=58.862 load_ms=8679096959 prompt_tok=83 eval_tok=1853 eval_ms=49837001000 done=stop content_chars=3982
+t8 http=200 wall_s=144.685 load_ms=8691089708 prompt_tok=109 eval_tok=4956 eval_ms=135592353999 done=stop content_chars=10632
+warmup http=200 wall_s=2.85 content='Hello! 👋 How can I help you today?'
+t5 cap8192 first attempt http=200 wall_s=225.237 done=length (truncated, superseded by rerun)
+
+SECTION: verify/t1_t2_runs.log
+------------------------------------------------------------
+=== glm t1 ===
+All tests passed.
+=== mimo t1 ===
+=== glm t2 fixture ===
+Per-symbol summary
+------------------
+AAPL       avg_close=190.1000  total_volume=3000.00
+MSFT       avg_close=392.9000  total_volume=4500.00
+
+Highest close     : 394.6000
+Date of highest   : 2026-01-06
+rc=0
+=== mimo t2 fixture ===
+
+Symbol          Avg Close     Total Volume  Highest Close         Date
+--------------------------------------------------------------------------------------
+AAPL             190.1000            3,000       195.5000   2026-01-07
+MSFT             392.9000            4,500       394.6000   2026-01-06
+--------------------------------------------------------------------------------------
+TOTAL            678.0500            7,500
+
+rc=0
+=== glm t2 missing file ===
+Error: file not found: nope.csv
+rc=1
+=== mimo t2 missing file ===
+error: [Errno 2] No such file or directory: 'nope.csv'
+rc=1
+
+SECTION: verify/t6_runs.log
+------------------------------------------------------------
+=== glm t6 ===
+Recently modified files (last 24h)
+Directory : t6fix
+Count     : 3 file(s)
+Total size: 0.00 MB
+
+   SIZE (MB)  FILE
+        0.00  t6fix/small.txt
+        0.00  t6fix/recent big one.txt
+        0.00  t6fix/sub/nested.dat
+rc=0
+=== mimo t6 ===
+Directory: t6fix
+Total files: 1
+Total size: 0.00 MB (7 bytes)
+
+Files sorted by size (descending):
+----
+       7  ?
+5 ?
+3 ?
+
+rc=0
+=== glm t6 no-arg ===
+Usage: /d/MY documents/thaillm/_ops/reports/llm-mac-mini/mimo_vs_glm_bench_v1/glm/t6_recent_files.sh <directory>
+rc=2
+=== mimo t6 bad-dir ===
+error: '/definitely/not/a/dir' is not a directory
+rc=1
+
+SECTION: verify/t7_runs.log
+------------------------------------------------------------
+=== glm t7 retry-then-success (2x500 then 200) ===
+[fetch] attempt 1/3: GET http://127.0.0.1:8791/x
+[fetch] attempt 1/3 failed: HTTP 500 Internal Server Error
+[fetch] retrying in 1000ms ...
+[fetch] attempt 2/3: GET http://127.0.0.1:8791/x
+[fetch] attempt 2/3 failed: HTTP 500 Internal Server Error
+[fetch] retrying in 2000ms ...
+[fetch] attempt 3/3: GET http://127.0.0.1:8791/x
+RESULT success {"ok":true,"n":42} elapsed_ms=3055
+rc=0
+=== mimo t7 retry-then-success ===
+node:internal/modules/cjs/loader:1451
+  throw err;
+  ^
+
+Error: Cannot find module 'mimo/t7_code.js'
+Require stack:
+- D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\driver.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1448:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1234:25)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1548:12)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\driver.js:1:13)
+    at Module._compile (node:internal/modules/cjs/loader:1804:14) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'D:\\MY documents\\thaillm\\_ops\\reports\\llm-mac-mini\\mimo_vs_glm_bench_v1\\verify\\driver.js'
+  ]
+}
+
+Node.js v24.13.1
+rc=1
+=== glm t7 all-fail timing (closed port) ===
+[fetch] attempt 1/3: GET http://127.0.0.1:1/x
+[fetch] attempt 1/3 failed: fetch failed
+[fetch] retrying in 1000ms ...
+[fetch] attempt 2/3: GET http://127.0.0.1:1/x
+[fetch] attempt 2/3 failed: fetch failed
+[fetch] retrying in 2000ms ...
+[fetch] attempt 3/3: GET http://127.0.0.1:1/x
+[fetch] attempt 3/3 failed: fetch failed
+RESULT failure: fetch failed after 3 attempts: fetch failed elapsed_ms=3043
+rc=1
+=== mimo t7 all-fail timing ===
+node:internal/modules/cjs/loader:1451
+  throw err;
+  ^
+
+Error: Cannot find module 'mimo/t7_code.js'
+Require stack:
+- D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\driver.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1448:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1234:25)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1548:12)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\driver.js:1:13)
+    at Module._compile (node:internal/modules/cjs/loader:1804:14) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'D:\\MY documents\\thaillm\\_ops\\reports\\llm-mac-mini\\mimo_vs_glm_bench_v1\\verify\\driver.js'
+  ]
+}
+
+Node.js v24.13.1
+rc=1
+=== mimo t7 retry-then-success (2x500 then 200) ===
+RESULT success {"ok":true,"n":42} elapsed_ms=8069
+rc=0
+=== mimo t7 all-fail timing (closed port) ===
+RESULT failure: fetch failed elapsed_ms=8041
+rc=1
+
+SECTION: verify/t8_runs.log
+------------------------------------------------------------
+=== glm t8 ===
+test_basic_burst: OK
+test_window_expiry: OK
+test_wait_time_value: OK
+Traceback (most recent call last):
+  File "D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\glm\t8_rate_limiter.py", line 134, in <module>
+    _test_concurrent_access()
+  File "D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\glm\t8_rate_limiter.py", line 115, in _test_concurrent_access
+    assert violations == 0, "sliding window violated %d times (%d grants)" % (violations, len(grants))
+           ^^^^^^^^^^^^^^^
+AssertionError: sliding window violated 10 times (20 grants)
+rc=1
+=== mimo t8 ===
+AssertionError: 1.0 != 0.0
+
+======================================================================
+FAIL: test_concurrent_access_respects_limit (__main__.TestRateLimiter.test_concurrent_access_respects_limit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\mimo\t8_code.py", line 183, in test_concurrent_access_respects_limit
+    self.assertEqual(limiter.wait_time(), 0.0)
+AssertionError: 1.0 != 0.0
+
+======================================================================
+FAIL: test_concurrent_burst_after_expiry (__main__.TestRateLimiter.test_concurrent_burst_after_expiry)
+Once the window expires, a burst of threads must all pass.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\mimo\t8_code.py", line 230, in test_concurrent_burst_after_expiry
+    self.assertTrue(all(successes))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_sliding_window_shortens_effective_window (__main__.TestRateLimiter.test_sliding_window_shortens_effective_window)
+A burst of requests should let the window start earlier.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\mimo\t8_code.py", line 161, in test_sliding_window_shortens_effective_window
+    self.assertEqual(limiter.wait_time(), 0.0)
+AssertionError: 0.2029999999795109 != 0.0
+
+======================================================================
+FAIL: test_threading_lock_prevents_overcount (__main__.TestRateLimiter.test_threading_lock_prevents_overcount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\MY documents\thaillm\_ops\reports\llm-mac-mini\mimo_vs_glm_bench_v1\verify\mimo\t8_code.py", line 248, in test_threading_lock_prevents_overcount
+    self.assertEqual(limiter.wait_time(), 0.0)
+AssertionError: 1.0 != 0.0
+
+----------------------------------------------------------------------
+Ran 13 tests in 3.730s
+
+FAILED (failures=5)
+rc=1
+
+SECTION: diag t8 (checker boundary isolation)
+------------------------------------------------------------
+diagA (original glm code, half-open checker): 20 grants, 0 violations, all tests passed
+diagB (now-inside-lock + half-open checker): 20 grants, 0 violations, all tests passed

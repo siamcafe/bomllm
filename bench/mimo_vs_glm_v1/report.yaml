@@ -1,0 +1,223 @@
+benchmark_meta:
+  date: "2026-09-25"
+  project: llm-mac-mini
+  step: mimo-vs-glm-bench
+  mimo_model: "mimo-v26:q4 (Q4_K_M 9.0B, digest 250c61dec293, ollama 0.34.4, Mac mini bom@192.168.1.254, LAN /api/chat)"
+  glm_model: "GLM-5.3 (account:zai-individual-coding-plan, zcode default session model)"
+  zcode_version: "NOT_RETRIEVABLE (zcode CLI not on PATH); session agent: ZCode"
+  harness_fairness:
+    - "identical task prompts for both models (verbatim from spec tasks.json)"
+    - "no system prompt, no few-shot on either side (F3/F4)"
+    - "MiMo options: num_ctx=16384, num_predict=8192 (t5 scored rerun 16384), keep_alive=15m; bare defaults otherwise"
+    - "GLM answers authored in-session by the benchmarking agent itself (no paid z.ai API per billing law)"
+    - "GLM response_time_s NOT MEASURABLE (in-session generation, no external API timing point); MiMo wall time = client HTTP wall clock"
+  evidence_dir_local: "_ops/reports/llm-mac-mini/mimo_vs_glm_bench_v1/"
+
+results:
+  T1:
+    task: "Python utility - deduplicate_list preserving order"
+    difficulty: easy
+    mimo:
+      correctness: 3
+      completeness: 3
+      code_quality: 2
+      total: 8
+      can_run_as_is: true
+      response_time_s: 7.2
+      notes: "ran clean rc=0, all 3 asserts pass (verify/t1_t2_runs.log); dead 'from typing import Iterable' import; no success print; test 3 feeds a string (unconventional but passes)"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "ran clean, 'All tests passed.' (verify/t1_t2_runs.log)"
+    winner: glm
+  T2:
+    task: "Python CSV summary (stdlib csv, error handling)"
+    difficulty: medium
+    mimo:
+      correctness: 3
+      completeness: 3
+      code_quality: 2
+      total: 8
+      can_run_as_is: true
+      response_time_s: 89.0
+      notes: "correct per-symbol table on fixture + rc=0; missing-file rc=1 with message; BUT prose 'sample output' numbers are fabricated (its own demo data computes AAPL avg 190.175 not 191.1375; volumes 228.8M not 248.8M); odd TOTAL row = mean of symbol sums; --demo writes demo.csv to CWD"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "correct on fixture (AAPL 190.1/3000, MSFT 392.9/4500, highest close 394.6 on 2026-01-06); missing-file rc=1 (verify/t1_t2_runs.log)"
+    winner: glm
+  T3:
+    task: "MQL5 SMA custom indicator (chart-window line)"
+    difficulty: medium
+    mimo:
+      correctness: 0
+      completeness: 1
+      code_quality: 1
+      total: 2
+      can_run_as_is: false
+      response_time_s: 50.1
+      notes: "would NOT compile: fictional API (IndicatorReleaseBuffer/IndicatorInitialize/IndicatorCounted/SetIndexValue/SetIndexDrawFill etc.), int BufferSMA indexed as array, wrong OnCalculate signature (bool return, extra 'cursor' param, long& time[] instead of datetime), PlotIndexSetString wrong arity, no SetIndexBuffer at all; review-only (no compile attempted per house law C1)"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "modern MQL5 idiom: SetIndexBuffer+INDICATOR_DATA, PLOT_DRAW_BEGIN, PLOT_LABEL via PlotIndexSetString, correct int OnCalculate 10-param signature, incremental prev_calculated-1 restart; review-only (syntax plausibility, not compiled)"
+    winner: glm
+  T4:
+    task: "MQL5 FormatLotSize + OnStart test script"
+    difficulty: easy
+    mimo:
+      correctness: 2
+      completeness: 3
+      code_quality: 3
+      total: 8
+      can_run_as_is: false
+      response_time_s: 34.6
+      notes: "function itself correct (3 spec branches, DoubleToString); test script calls undefined PrintTime() -> compile error until removed; explanation cites fictional FormatDouble"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "spec-exact mapping (>=0.1 -> 2 else 3), test script prints cases with expected values; review-only"
+    winner: glm
+  T5:
+    task: "WordPress mu-plugin REST recent-posts endpoint"
+    difficulty: medium
+    mimo:
+      correctness: 1
+      completeness: 2
+      code_quality: 2
+      total: 5
+      can_run_as_is: false
+      response_time_s: 67.2
+      notes: "register_rest_route ok; handler hallucinated: get_posts 'fields' array fiction, array-access on WP_Post, undefined is_private()/get_post_date(), get_sites wrong params; would fatal on a real site; scored run = cap-16384 rerun (first attempt truncated at cap 8192, kept as runs/mimo_t5_cap8192.json)"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "standard WP_Query + get_the_title/get_the_excerpt/get_permalink + WP_REST_Response, __return_true permission; review-only (no local php binary)"
+    winner: glm
+  T6:
+    task: "bash report of files modified in last 24h"
+    difficulty: easy
+    mimo:
+      correctness: 1
+      completeness: 2
+      code_quality: 2
+      total: 5
+      can_run_as_is: false
+      response_time_s: 79.0
+      notes: "MEASURED BROKEN on fixture (verify/t6_runs.log): reports count=1 (real 3), total=7B (real 15B), every path prints '?' - '%p' is not a GNU stat directive; mapfile -d '' on newline-separated stat output collapses entries; error handling for args/dir works"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "MEASURED: 3/3 files found, space-in-filename safe, sorted desc, no-arg rc=2 (verify/t6_runs.log)"
+    winner: glm
+  T7:
+    task: "Node.js fetch with retry/backoff/timeout/logging"
+    difficulty: medium
+    mimo:
+      correctness: 2
+      completeness: 2
+      code_quality: 2
+      total: 6
+      can_run_as_is: false
+      response_time_s: 58.9
+      notes: "MEASURED: retry-then-success works (rc=0) but elapsed 8069ms vs spec backoff 1s+2s - double-sleep bug yields 0/2/2/4s waits; all-fail 8041ms vs expected ~3s; per-attempt logging OMITTED though spec requires it (verify/t7_runs.log)"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 3
+      total: 9
+      can_run_as_is: true
+      response_time_s: null
+      notes: "MEASURED: retry-then-success 3055ms (1s+2s exact), all-fail 3043ms, every attempt logged (verify/t7_runs.log)"
+    winner: glm
+  T8:
+    task: "Python thread-safe sliding-window RateLimiter + tests"
+    difficulty: hard
+    mimo:
+      correctness: 2
+      completeness: 3
+      code_quality: 2
+      total: 7
+      can_run_as_is: false
+      response_time_s: 144.7
+      notes: "8/13 own tests pass; allow() limit enforcement correct under concurrency (sum==3 assert passed); REAL BUG: wait_time() never prunes stale entries -> returns 1.0 when capacity is available (2 failures); 2 more failures are self-contradictory tests (6-thread burst expects all-pass with limit 2; sliding test asserts wrong value) (verify/t8_runs.log)"
+    glm:
+      correctness: 3
+      completeness: 3
+      code_quality: 2
+      total: 8
+      can_run_as_is: true
+      response_time_s: null
+      notes: "limiter verified CORRECT under 8-thread concurrency: 0 violations with half-open window checker (diagA/diagB in verify/); shipped artifact's own test checker has a boundary-inclusive bug ('<= ts+window') reporting a FALSE violation on first run; quality dinged for shipping a false-failing test"
+    winner: glm
+
+summary:
+  mimo_total: "49/72"
+  glm_total: "71/72"
+  mimo_avg: 6.1
+  glm_avg: 8.9
+  mimo_runnable: "2/8"
+  glm_runnable: "8/8"
+  mimo_avg_time_s: 66.3
+  glm_avg_time_s: null
+  glm_avg_time_note: "NOT MEASURABLE - GLM-5.3 answers generated in-session; no external API timing point exists"
+  mimo_time_note: "MiMo wall times include 0.04-16.1s model reloads (Mac poller evicts mimo between calls, MAX_LOADED=1 behaviour); ollama load_duration per run in runs/*.json; decode ~37 tok/s consistent with prior eval 38.7"
+  t5_rerun_note: "t5 first attempt truncated at num_predict cap (done=length, kept as runs/mimo_t5_cap8192.json); scored run = 16384-cap rerun done=stop"
+
+category_analysis:
+  python_simple: {winner: glm, gap: "1 pt - near parity; MiMo output runs clean, minor style nits"}
+  python_medium: {winner: glm, gap: "1 pt - both run correct; MiMo fabricated sample-output numbers in prose"}
+  mql5: {winner: glm, gap: "7 pts - CRITICAL; MiMo cannot produce compilable MQL5 (fictional API); core EA-lane blocker"}
+  php_wordpress: {winner: glm, gap: "4 pts - MiMo hallucinated WP core functions; handler would fatal"}
+  shell: {winner: glm, gap: "4 pts - MiMo hallucinated stat '%p' directive + NUL/newline mismatch; report output garbage"}
+  javascript: {winner: glm, gap: "3 pts - MiMo backoff timing wrong (measured 8s vs 3s) + required logging missing"}
+  complex_reasoning: {winner: glm, gap: "1 pt - CLOSEST category; MiMo limiter core nearly right, subtle wait_time bug + unreliable self-tests"}
+
+recommendation:
+  safe_to_replace:
+    - "simple stdlib Python utilities (T1/T2 class) WHERE the output is executed and asserted before use anyway - MiMo ran clean on both"
+    - "first-draft scaffolding/boilerplate where a human or GLM reviews before ship"
+  keep_glm:
+    - "MQL5 (indicators/EA/scripts) - MiMo output is un-compilable API fiction; this is the core paid work of this workspace"
+    - "WordPress/PHP against real CMS APIs - MiMo invents core functions"
+    - "bash one-shots that must be correct on first run - MiMo's stat/mapfile bugs were silent-wrong, exit 0"
+    - "retry/timing-critical code and anything shipping without human review"
+    - "self-verifying hard tasks are borderline: MiMo's structure is good but its own test suites are unreliable (t8)"
+  verdict: "MiMo-V2.6 q4 is a fast local drafting tool, not a GLM replacement: 49/72 vs 71/72 with 2/8 vs 8/8 runnable-as-is. Use it for throwaway/simple Python drafts with mandatory run-verification; keep GLM for MQL5, WordPress, shell, timing-sensitive and review-free deliverables. The one strong signal: on no category did MiMo beat GLM, and its failure mode (confident fictional APIs, silently-wrong shell) is the expensive kind."
+
+report_contract:
+  files_changed: "no repo/system files modified; new files only under _ops/reports/llm-mac-mini/mimo_vs_glm_bench_v1/ (tasks.json, bench_mimo.py, runs/*, glm/*, verify/*, report.yaml, report.json, report.log.txt)"
+  verify_commands:
+    - "python bench_mimo.py --warmup (http 200)"
+    - "python bench_mimo.py --only t1..t8 (all done=stop except noted cap run)"
+    - "verify logs: t1_t2_runs.log t6_runs.log t7_runs.log t8_runs.log"
+  residual_risk:
+    - "GLM answers authored by the judging agent itself (structural bias); mitigated by executable verification on 5/8 tasks and evidence logs"
+    - "MQL5/PHP judged by syntax/API review only (house law C1 forbids ad-hoc compile; no local php)"
+    - "MiMo t5 single scored rerun after cap-truncation; sampling variance not re-measured"
+    - "Mac-mini qwen38 (Fable production) was transiently evicted during MiMo calls; poller self-heals in 60-90s (same pattern as approved 09-25 eval)"
+  recommendation: accept

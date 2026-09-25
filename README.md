@@ -196,7 +196,7 @@ temp 0.6 · top_p 0.95 · top_k 20 · repeat_penalty 1.0.
 - Disk cleanup: +85GB recovered (deleted 735 artifacts + BF16 source)
 - AI Live Stream deployed (Restream → live-router → OWUI → 709-L)
 
-Full v3 stack reference: [***REMOVED***.md](***REMOVED***.md).
+Full v3 stack reference is kept in a private repository.
 
 ## v3.1 Changelog (2026-09-23)
 

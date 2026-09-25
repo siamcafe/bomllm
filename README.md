@@ -2,19 +2,43 @@
 
 ![BOMLLM](images/hero_banner.png)
 
-**I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.**
-It has served **4 production channels plus a hybrid LINE bot** — web chat, n8n content pipelines, live-stream Q/A overlay, chart-vision overlay, plus LINE bot (cloud fallback disclosed) — **24/7 since August 2026**, in Thai and English.
-One **Mac Mini M4 Pro 48GB** runs a 27B MLX model at **~23 tok/s** (measured, not marketing).
-A small VPS fronts it with **LiteLLM + Open WebUI + SearXNG**; an i9 with 2× RTX 5060 Ti renders images and voice; a Synology NAS runs n8n and monitoring.
-Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
-This repo is the full receipt: configs, sampling recipes, benchmark harness, and the cost meter.
-Not a demo. Not a toy. The exact stack that answers my customers every day.
-MIT licensed — clone, run `./scripts/bootstrap.sh`, and you have the VPS layer up.
-The one number that matters: **$0.54/day measured whole-fleet electricity vs $50/day cloud API** — methodology inside, reproducible.
-Thai-first and proud of it — but the architecture works for any language.
-⬇️ คำอธิบายภาษาไทยอยู่ด้านล่าง
+**BOM LLM v4 — Turbo + Coding**
 
----
+I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
+It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
+
+One **Mac Mini M4 Pro 48GB** runs Fable 709-L (27B nvfp4 MLX) at **~23 tok/s** with MTP 2-3× speculation.
+A **MiMo-V2.6 Q4 (9B)** runs alongside at **37 tok/s** for local coding drafts.
+**GLM-5.3** on cloud handles production coding with 71/72 benchmark score.
+An i9 with 2× RTX 5060 Ti renders images (ComfyUI + FLUX), Thai voice (SiangTTS), and music (YuE2 + ACE-Step).
+Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
+
+This is not a demo. This is the exact stack that answers my customers every day.
+
+## What's New in v4
+
+### 🧠 Coding Stack (NEW)
+- **GLM-5.3** (cloud) — Primary coding model: 71/72 benchmark, 8/8 tasks runnable
+- **MiMo-V2.6 Q4** (local 9B) — Draft accelerator: 37 tok/s, zero network latency
+- **Verified benchmark:** 8 real coding tasks (Python, MQL5, WordPress, Bash, Node.js)
+- **Rule:** MiMo output never ships without test verification or GLM/human review
+- [Full benchmark report →](bench/mimo_vs_glm_v1/README.md)
+
+### ⚡ Turbo Inference
+- **Fable 709-L** (DavidAU Cold-Fusion, Qwen3.8-27B base) — nvfp4 MLX
+- **MTP speculation** — 2-3× effective throughput, acceptance 0.63-0.79
+- **Thai quality: 2.00** — zero Han leak, completion-gated + stacked-mark
+- think=true mode available (clean Thai reasoning)
+
+### 🎙️ Production Channels
+- **5 channels + LINE bot** — web chat, n8n content pipelines, live-stream Q/A overlay, chart-vision overlay, LINE (cloud fallback disclosed)
+- **Live stream overlay** — Restream chat → vision analysis → 4-line Thai response → Browser Source
+- **Chart analysis** — CDP capture → 709-L vision → real-time commentary
+
+### 🎵 Creative Tools
+- **Image:** ComfyUI + FLUX Dev fp8 (3 GPU workers via comfy-router)
+- **Voice:** SiangTTS (VoxCPM2 LoRA, reference-only mode)
+- **Music:** YuE2-3B instrumental + ACE-Step 1.5 Thai vocal
 
 ## Architecture
 
@@ -44,8 +68,9 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.34.2 (MLX backend)"]
-        M1["Qwen3.8-27B class<br/>Fable 709-L (TWIN-TURBO-Fable-Cold-Fusion) nvfp4<br/>~23 tok/s · ~23 GB resident"]
+        OL["Ollama 0.34.4 (MLX backend)"]
+        M1["Fable 709-L (27B nvfp4)<br/>~23 tok/s · MTP 2-3×"]
+        MIMO["MiMo-V2.6 Q4 (9B)<br/>37 tok/s · coding drafts"]
         EMB["bge-m3 embeddings"]
     end
 
@@ -58,6 +83,7 @@ flowchart TB
 
     subgraph AMD["AMD render box · RTX 5060 Ti"]
         CUA["ComfyUI worker — 3rd oven"]
+        ZCODE["zcode (GLM-5.3 coding)"]
     end
 
     subgraph NAS["Synology DS725+"]
@@ -84,213 +110,75 @@ flowchart TB
     OW -->|RAG rerank| RR
 ```
 
-**Request path (chat):** channel → Cloudflare Tunnel → LiteLLM (auth, budget, route) → Tailscale → Ollama MLX on the Mac → streamed back. Web search and RAG stay on the VPS; images go through the FastAPI comfy-router on the NAS to 3 GPU workers (i9 GPU0/GPU1 + AMD, GPULAW render window 17:30–19:30 ICT); voice goes to the i9.
+## Coding Benchmark
 
-**Intent routing:** every message first passes `bom_intent_filter` v2 (context-aware, valve-gated via `enable_context_v2`) and is classed image / web-search / deep-think before any model sees it. v2 fixed three production bugs: a COLOR_WHITELIST (37 entries) stops color+metal words being misrouted as finance intent, FINANCE_POSITIVE (15 entries) forces web_search for finance queries, and dual-feature mutual exclusion resolves in-session image requests against outside-session searches. Every decision is logged as one `[bom_intent]` JSON line to container stdout.
+> MiMo-V2.6 Q4 (9B local) vs GLM-5.3 (cloud) — 8 identical tasks, no system prompt
 
-**Monitoring:** Beszel v0.19.0 (hub on the NAS, agents on Mac + NAS + VPS) joins Uptime Kuma on the NAS — 10 Telegram alerts live.
+| Model | Score | Runnable | Avg Time |
+|-------|-------|----------|----------|
+| MiMo-V2.6 Q4 (local) | **49/72** | 2/8 | 66.3s |
+| GLM-5.3 (cloud) | **71/72** | 8/8 | N/A |
 
-**3-tier fallback** (configured in LiteLLM, measured in production):
-🟢 Tier 1 Mac (free, ~80–85% of traffic) → 🟡 Tier 2 small CPU model on the VPS (free) → 🔴 Tier 3 cloud API (paid, used only when both local tiers are down — our actual cloud spend after cutover: **$0.31–$2.76/day**, see `docs/cost.md`).
+**MiMo safe zone:** Simple Python drafts with test assertions, scaffolding under review
+**Keep on GLM:** MQL5/EA, WordPress/PHP, Bash, timing-critical code, review-free deliverables
 
----
+[Detailed benchmark results →](bench/mimo_vs_glm_v1/)
 
-## The cost receipt
+## Cost
 
-| | Before (cloud API) | After (BOMLLM) |
-|---|---|---|
-| LLM inference | ~$50.00/day (z.ai GLM, metered per token) | **$0.31–$2.76/day** actual fallback spend (LiteLLM spend logs) |
-| Electricity | — | **~$0.54/day** measured whole fleet (Mac + i9 + NAS + network) |
-| Rate limits | yes | none |
-| Data residency | third-party cloud | ours, except explicit tier-3 fallback |
-| **Total** | **~$1,500/month** | **~$36–114/month** marginal (electricity + fallback + VPS) |
+| Item | Monthly | Daily |
+|------|---------|-------|
+| Mac Mini M4 Pro electricity | ~$16 | $0.54 |
+| VPS (Singapore) | $12 | $0.40 |
+| Cloudflare (free tier) | $0 | $0 |
+| Tailscale (free tier) | $0 | $0 |
+| **Total self-hosted** | **~$28** | **~$0.94** |
+| Cloud API equivalent | ~$1,500 | ~$50 |
 
-Cost breakdown (what the $0.54 headline does and does not include):
+**Savings: ~98% vs cloud API**
 
-| Component | Cost | Basis |
-|---|---|---|
-| Electricity, whole fleet | **$0.54/day** | measured: wall meters + `powermetrics`/`nvidia-smi` × MEA tariff — full table in [docs/cost.md](docs/cost.md) |
-| VPS (LiteLLM + Open WebUI + SearXNG front) | $10–15/month | predates BOMLLM, hosts other things — counted as sunk, not marginal per-token cost |
-| z.ai fallback (tier 3, both local tiers down) | $0.31–2.76/day | LiteLLM `SpendLogs` export, first week of September 2026 |
-| Hardware depreciation | separate | not in the daily number: Mac ~$2,000, payback ~6 weeks at $46.50/day saved |
-
-Methodology — no hand-waving: electricity is measured at the wall per machine (kWh × provincial tariff), cloud spend is exported from LiteLLM's `SpendLogs` table, and the before figure comes from actual invoices. Full breakdown, watt-draw table, and the scripts that produce it: **[docs/cost.md](docs/cost.md)**. Raw structure: [benchmarks/cost-comparison.csv](benchmarks/cost-comparison.csv).
-
-## Benchmark
-
-![Benchmark](images/benchmark.png)
-
-## The benchmark receipt
-
-Graded head-to-head, 50 production-style cases (LINE Q&A, signal analysis, classification, translation, edge cases), dual-graded (local grader + Gemini cross-check, Pearson 0.72):
-
-| Metric | BOMLLM (Mac, 27B MLX) | Cloud baseline (GLM-4.5-Flash) | Verdict |
-|---|---|---|---|
-| Quality (1–10, graded) | **7.24** | 6.02 | ratio **1.20** ✅ |
-| LINE Q&A quality | **8.93** | 6.33 | ratio **1.41** ✅ |
-| Latency p50 | **5.2 s** | 35.1 s | **~7× faster** ✅ |
-| Latency p95 | **19.9 s** | 85.6 s | ✅ |
-| Error rate | 4% (2/50, 30 s cap) | 0% | honest ⚠️ |
-| Decode speed | **30.2 tok/s** (MLX nvfp4) | 7.9 tok/s (same weights, GGUF Q4_K_M) | **+285%** from MLX alone |
-| TTFT (warm) | **0.040 s** bench / 0.5–2 s production | — | |
-| Thai purity (`thai_ratio`) | **0.797** (0.832 strict) with Config G | stock prompt: 0.762 | recipe in `configs/` |
-| Chinese-char leakage | **15/100** replies | 43/100 on stock quant | turbo leaks *less* ✅ |
-
-Every number above is reproducible with [benchmarks/README.md](benchmarks/README.md). Where a run needs re-measurement on your hardware, the CSV cells say `[BENCH_DATA_PENDING]` — that's deliberate: we publish the harness, not just the claims.
-
-### The 709-L cutover (2026-09-16)
-
-The resident model was promoted from the 735 tune to **709-L**
-(TWIN-TURBO-709-ULTRA, Qwen3.8-27B, MLX nvfp4) after a paired production eval on 20
-real articles: publishable-first-pass **0.781 vs 0.600** (paired mean
-**+0.225**, W/L/T 8-1-11), wall time **141 s vs 439 s** under real
-contention. Ollama upgraded 0.33.x → 0.34.x in the same window
-(versioned install, seconds-level rollback via `ollama cp` from the
-kept `-bak` alias). Full protocol and honest caveats (partial reps):
-[docs/thai.md](docs/thai.md).
-
-### The Fable 709-L switch (2026-09-23)
-
-The resident model switched from TWIN-TURBO-709-ULTRA to **Fable 709-L**
-(DavidAU/Qwen3.8-27B-TWIN-TURBO-Fable-Cold-Fusion-709-L-Uncensored, Qwen3.8-27B,
-MLX nvfp4, Ollama digest `1691692bef10`, heretic level 68/100
-instruction-following) after a 7-gate paired bench — **all 7 gates PASS**:
-
-| Gate | Fable 709-L (new) | 709-L ULTRA (old) | Result |
-|---|---|---|---|
-| Thai quality | **2.00** | 1.90 | improved (gate ≥1.20) ✅ |
-| Han-character leak | **0** | 3 | eliminated ✅ |
-| Tool calling | 5/5 | 5/5 | equal ✅ |
-| Vision | PASS | PASS | equal ✅ |
-| Decode speed | 22.99 tok/s | 24.09 tok/s | 0.954× (−5%) ✅ |
-| MTP acceptance | 0.63–0.79 | 0.53–0.85 | more stable ✅ |
-| done_reason | stop 22/22 | stop 22/22 | equal ✅ |
-
-![Benchmark Fable 709-L](images/benchmark_fable.png)
-
-Decision: ALL PASS → switch. The 4 aliases
-(`qwen38-uni` / `qwen38-709l` / `qwen38-chat` / `bom-read-image`) were
-repointed in one pass; the ULTRA image is kept as the rollback
-(`ollama cp`, seconds-level restore). Config G sampling unchanged:
-temp 0.6 · top_p 0.95 · top_k 20 · repeat_penalty 1.0.
-
-### Post-promotion hardening (2026-09-16)
-
-- **LiteLLM `max_tokens` floors** on the three thin routes (`qwen38` 2048,
-  `qwen38-chat` 1024, `bom-read-image` 1024) — thinking-model replies can no
-  longer come back empty when a caller omits a budget.
-- **NAS grind-orphan reaper** — a scheduled script now kills runaway translate
-  jobs (>2 h, reparented to init) that were wedging the Mac MLX runner.
-- **Rollback alias retained** — `qwen38-uni-735-bak` (previous incumbent)
-  stays until 2026-09-30; restore is one `ollama cp`.
-- Re-verified after a Mac reboot: sandbox 9/9, QC suite 5/5, Thai stream
-  TTFT **1.94 s**, **576 GB** disk free after model cleanup.
-
-## v3 Changelog (2026-09-21)
-
-- Ollama upgraded to 0.34.2 MLX
-- Model: TWIN-TURBO-709-ULTRA (709-L), Qwen3.8-27B nvfp4
-- repeat_penalty: 1.0 (MTP alignment, DavidAU recommendation)
-- MTP verified: 23 tensors, 19-25 tok/s, acceptance 0.61-0.83
-- Benchmark: +0.2250 (8W-1L-11D/20), 5/5 quality pass
-- Disk cleanup: +85GB recovered (deleted 735 artifacts + BF16 source)
-- AI Live Stream deployed (Restream → live-router → OWUI → 709-L)
-
-Full v3 stack reference is kept in a private repository.
-
-## v3.1 Changelog (2026-09-23)
-
-- Model switched: 709-L ULTRA → **Fable 709-L**
-  (DavidAU/Qwen3.8-27B-TWIN-TURBO-Fable-Cold-Fusion-709-L-Uncensored,
-  nvfp4, digest `1691692bef10`)
-- 7-gate bench ALL PASS: Thai 2.00 vs 1.90 · Han leak 0 vs 3 · tools 5/5 ·
-  vision PASS · 22.99 tok/s (0.954×) · MTP acceptance 0.63–0.79 · stop 22/22
-- Heretic level 68/100 instruction-following (previous finalist: 6/100)
-- MTP: 23 tensors, ships its own mtp shard; vision: 333 tensors, PASS
-- New benchmark card `images/benchmark_fable.png`; hero banner refreshed
-
-## Quickstart
+## Quick Start
 
 ```bash
 git clone https://github.com/siamcafe/bomllm.git
 cd bomllm
-cp configs/.env.example .env        # fill in YOUR values (all CHANGE_ME)
-./scripts/bootstrap.sh              # VPS layer: LiteLLM + WebUI + SearXNG + DBs
+./scripts/bootstrap.sh
 ```
 
-Then point LiteLLM at your Mac's Ollama (`configs/ollama-modelfile.example` builds the model; `configs/sampling-recipe.yaml` is the validated Thai config). Full walkthrough: [docs/architecture.md](docs/architecture.md).
+## Fleet
 
-## Screenshots
+| Machine | Role | Key Specs |
+|---------|------|-----------|
+| Mac Mini M4 Pro | Brain | 48GB, Ollama 0.34.4, Fable 709-L + MiMo Q4 |
+| VPS Singapore | Gateway | Docker, OWUI, LiteLLM, SearXNG |
+| i9 Windows | GPU Worker | 2× RTX 5060 Ti, ComfyUI, TTS, Music |
+| AMD | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
+| Synology DS725+ | Infra | comfy-router, monitoring, n8n, backups |
 
-> `[SCREENSHOT_PENDING]` — curated set lands before Show HN (tracked in [docs/show-hn.md](docs/show-hn.md)):
->
-> 1. WebUI chat answering a Thai gold-price question (with web search)
-> 2. LINE bot conversation on a phone
-> 3. LiteLLM spend dashboard showing $0.31–$2.76/day
-> 4. The Mac Mini on the desk next to the electricity meter
-> 5. 90-second walkthrough video
+## License
 
-## What this is NOT
+MIT — clone, run, deploy. See [LICENSE](LICENSE).
 
-- **Not a trading bot.** The MT5 integration is a *read-only* QC panel. Nothing here places trades. Nothing here is financial advice.
-- **Not a frontier-model replacement.** For hard, novel coding problems we still reach for a frontier cloud model — that's what Tier 3 fallback is for. BOMLLM covers the ~85% of traffic that doesn't need it.
-- **Not a SaaS starter kit.** Single-organization design. Invite-only users, per-user virtual keys, budgets — but no billing, no multi-tenancy.
-- **Not "docker compose up and you're done" magic.** You are the SRE. We ship the runbooks we actually use ([docs/upgrade.md](docs/upgrade.md)), including the failure modes.
-- **Not benchmark-chasing.** We publish production receipts: cost logs, graded Thai evals, uptime. If a leaderboard number matters to you more than your invoice, this repo will bore you.
+## Contributing
 
-## License matrix
-
-This repo (glue, configs, scripts, docs) is **MIT**. Bundled components keep their own licenses — read [NOTICE](NOTICE) before you redistribute or build a service on top:
-
-| Component | License | Watch out for |
-|---|---|---|
-| BOMLLM (this repo) | MIT | — |
-| LiteLLM | MIT | enterprise features are commercial |
-| Ollama | MIT | — |
-| Open WebUI | Custom (BSD-derived + branding terms) | read upstream LICENSE before SaaS use |
-| SearXNG | AGPL-3.0 | network copyleft if modified + exposed |
-| ComfyUI | GPL-3.0 | copyleft on distributed modifications |
-| n8n | Sustainable Use (fair-code) | **not OSI open source**; internal use only |
-| Qdrant | Apache-2.0 | — |
-| PostgreSQL | PostgreSQL License | — |
-| Valkey | BSD-3-Clause | — |
-| Tailscale client | BSD-3-Clause | coordination server is a hosted service |
-| Model weights | upstream (Qwen: Apache-2.0; fine-tune: author's terms) | **not redistributed here** — pull from the original HF repo |
-
-## Docs
-
-- [docs/architecture.md](docs/architecture.md) — full diagram + request flows
-- [docs/hardware.md](docs/hardware.md) — the M4 Pro 48GB memory map, what fits and what swaps
-- [docs/cost.md](docs/cost.md) — electricity methodology + cloud invoice comparison
-- [docs/thai.md](docs/thai.md) — model matrix, Thai eval protocol, known issues
-- [docs/channels.md](docs/channels.md) — LINE / Telegram / WebUI / MT5 wiring (sanitized)
-- [docs/security.md](docs/security.md) — threat model: bind localhost, no leaked keys
-- [docs/upgrade.md](docs/upgrade.md) — how we update Ollama, LiteLLM, WebUI without downtime
-- [docs/show-hn.md](docs/show-hn.md) — our own launch checklist (fork it for yours)
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
-## คำอธิบายภาษาไทย (Thai summary)
+## 🇹🇭 ภาษาไทย
 
-**BOMLLM คืออะไร?** ระบบ AI ที่รันเองบนเครื่องตัวเอง 100% — ผมเลิกจ่ายค่า cloud LLM วันละ ~50 เหรียญ แล้วหันมาใช้ **Mac Mini M4 Pro 48GB** เครื่องเดียวบนโต๊ะ ค่าไฟรวมทั้งฟลีต ~**0.54 เหรียญ/วัน** (~530 บาท/เดือน วัดจากการใช้งานจริง)
+**BOM LLM v4 — Turbo + Coding**
 
-**ใช้งานจริงตั้งแต่สิงหาคม 2026** ให้บริการ 4 ช่องทางบนฮาร์ดแวร์ของเราเอง (เว็บแชท, pipeline เขียนบทความผ่าน n8n, โอเวอร์เลย์ถาม-ตอบในไลฟ์สตรีม, โอเวอร์เลย์วิเคราะห์กราฟ) และ LINE bot แบบไฮบริด (เปิดเผยว่ามี fallback บน cloud) — ตอบภาษาไทยและอังกฤษตลอด 24 ชม.
+แทนที่ค่า API คลาวด์ $50/วัน ด้วย Mac Mini บนโต๊ะ $0.54/วัน (ค่าไฟจริง)
 
-**เทคโนโลยีหลัก:**
-- โมเดล 27B แบบ MLX (nvfp4) บน Mac — วัดจริง **~23 token/วินาที** (เร็วกว่า GGUF เดิม ~3 เท่า)
-- VPS เล็กๆ รัน LiteLLM (ตัวกระจาย request + คุมงบ + fallback) + Open WebUI + SearXNG (ค้นเว็บในเครื่อง)
-- เครื่อง i9 การ์ดจอ 2 ใบ ทำภาพ (ComfyUI) และเสียงพูดไทย (TTS)
-- NAS รัน n8n + ระบบเฝ้าระวัง + สำรองข้อมูล
-- เชื่อมทุกเครื่องด้วย Tailscale (VPN ส่วนตัว) เปิดออกเน็ตผ่าน Cloudflare Tunnel เท่านั้น ทุก API มีคีย์
+ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**คุณภาพภาษาไทยวัดจริง:** คะแนนรวมชนะ cloud ที่เคยจ่าย (อัตราส่วน 1.20 เท่า จาก 50 เคสที่ให้กรรมการ 2 ตัวตรวจ) ตอบเร็วกว่า ~7 เท่า และมีสูตร sampling + system prompt ภาษาไทยที่ผ่านการทดสอบ A/B แล้วใน `configs/sampling-recipe.yaml`
+**v4 ใหม่:**
+- เขียนโค้ดได้แล้ว! GLM-5.3 (คลาวด์) + MiMo 9B (โลคอล 37 tok/s)
+- Benchmark ผ่าน 8 โจทย์จริง: Python, MQL5, WordPress, Bash, Node.js
+- Live stream overlay: วิเคราะห์กราฟ real-time ด้วย AI vision
+- Thai quality 2.00, ไม่มีตัวจีนหลุด, MTP เร็ว 2-3 เท่า
 
-**สิ่งที่ต้องรู้ก่อนใช้:** นี่ไม่ใช่บอทเทรด ไม่ใช่คำแนะนำการลงทุน และไม่ใช่ของเล่นที่กดปุ่มเดียวแล้วจบ — คุณต้องดูแลระบบเอง แต่เราแถม runbook ที่ใช้จริงทุกฉบับ
+Self-hosted AI ที่ใช้งานจริงทุกวัน ไม่ใช่ของเล่น 💪
 
-**ลิขสิทธิ์:** โค้ดของโปรเจกต์นี้เป็น MIT ส่วนโปรแกรมที่เอามาประกอบ (Open WebUI, n8n, SearXNG, ComfyUI ฯลฯ) อยู่ภายใต้ลิขสิทธิ์ของเจ้าของแต่ละตัว — อ่านไฟล์ [NOTICE](NOTICE) ก่อนนำไปใช้ต่อ
-
-**อัปเดตล่าสุด:** ระบบ intent filter v2 แยก intent อัตโนมัติ (ภาพ/ค้นเว็บ/คิดลึก) พร้อม logging ทุกข้อความ
-
----
-
-*Built in Bangkok. Production since 2026-08. Receipts inside.*
+#BOMLLM #SelfHostedAI #ThaiAI

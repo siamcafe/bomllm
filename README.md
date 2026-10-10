@@ -1,19 +1,26 @@
 # BOMLLM
 
-![BOMLLM](images/hero_banner.png)
+![BOMLLM](images/hero_banner_v5.png)
 
 **BOM LLM v4 — Turbo + Coding**
 
 I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
 It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
 
-One **Mac Mini M4 Pro 48GB** runs Fable 709-L (27B nvfp4 MLX) at **~23 tok/s** with MTP 2-3× speculation.
+One **Mac Mini M4 Pro 48GB** runs Fable 732 (27B nvfp4 MLX) at **~21 tok/s** with MTP 2-3× speculation.
 A **MiMo-V2.6 Q4 (9B)** runs alongside at **37 tok/s** for local coding drafts.
 **GLM-5.3** on cloud handles production coding with 71/72 benchmark score.
 An i9 with 2× RTX 5060 Ti renders images (ComfyUI + FLUX), Thai voice (SiangTTS), and music (YuE2 + ACE-Step).
 Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
 
 This is not a demo. This is the exact stack that answers my customers every day.
+
+## What's New in v5
+
+### 🇹🇭 Fable 732 production swap (Oct 10, 2026)
+- **Fable 732** (DavidAU Fable-735-882, nvfp4 MLX, digest `5bd9e2dc6f01`) replaces Fable 709-L under the same `qwen38-uni` tag
+- 40-prompt bench: **Thai 20.8 tok/s · English 21.5 tok/s · Han 0/40 direct** (LiteLLM path: 1/40 leaked, fix tracked)
+- [v5 benchmark card](images/benchmark_732.png) · [Han detail](images/benchmark_732_han_detail.png) · [bench JSON](benchmarks/v5_732/bench_v5_results.json)
 
 ## What's New in v4
 
@@ -25,7 +32,7 @@ This is not a demo. This is the exact stack that answers my customers every day.
 - [Full benchmark report →](bench/mimo_vs_glm_v1/README.md)
 
 ### ⚡ Turbo Inference
-- **Fable 709-L** (DavidAU Cold-Fusion, Qwen3.8-27B base) — nvfp4 MLX
+- **Fable 732** (DavidAU Fable-735-882, Qwen3.8-27B base) — nvfp4 MLX
 - **MTP speculation** — 2-3× effective throughput, acceptance 0.63-0.79
 - **Thai quality: 2.00** — zero Han leak, completion-gated + stacked-mark
 - think=true mode available (clean Thai reasoning)
@@ -33,7 +40,7 @@ This is not a demo. This is the exact stack that answers my customers every day.
 ### 🎙️ Production Channels
 - **5 channels + LINE bot** — web chat, n8n content pipelines, live-stream Q/A overlay, chart-vision overlay, LINE (cloud fallback disclosed)
 - **Live stream overlay** — Restream chat → vision analysis → 4-line Thai response → Browser Source
-- **Chart analysis** — CDP capture → 709-L vision → real-time commentary
+- **Chart analysis** — CDP capture → 732 vision → real-time commentary
 
 ### 🎵 Creative Tools
 - **Image:** ComfyUI + FLUX Dev fp8 (3 GPU workers via comfy-router)
@@ -68,8 +75,8 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.34.4 (MLX backend)"]
-        M1["Fable 709-L (27B nvfp4)<br/>~23 tok/s · MTP 2-3×"]
+        OL["Ollama 0.40.1 (MLX backend)"]
+        M1["Fable 732 (27B nvfp4)<br/>~21 tok/s · MTP 2-3×"]
         MIMO["MiMo-V2.6 Q4 (9B)<br/>37 tok/s · coding drafts"]
         EMB["bge-m3 embeddings"]
     end
@@ -149,7 +156,7 @@ cd bomllm
 
 | Machine | Role | Key Specs |
 |---------|------|-----------|
-| Mac Mini M4 Pro | Brain | 48GB, Ollama 0.34.4, Fable 709-L + MiMo Q4 |
+| Mac Mini M4 Pro | Brain | 48GB, Ollama 0.40.1, Fable 732 + MiMo Q4 |
 | VPS Singapore | Gateway | Docker, OWUI, LiteLLM, SearXNG |
 | i9 Windows | GPU Worker | 2× RTX 5060 Ti, ComfyUI, TTS, Music |
 | AMD | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |

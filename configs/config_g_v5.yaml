@@ -1,0 +1,28 @@
+# BOMLLM Config G — v5 (Fable 732 production sampling config)
+# LOCKED per GOD CONFIG art#46717 — DO NOT change values.
+# Verified live on macmini-ai 2026-10-10 via `ollama show qwen38-uni --modelfile`.
+model:
+  tag: qwen38-uni
+  name: "DavidAU Fable 732 (Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882)"
+  digest: 5bd9e2dc6f018a1b
+  format: nvfp4 MLX
+  size_gb: 21.6
+  mtp_tensors: 15
+
+modelfile_parameters:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  repeat_penalty: 1.0
+  presence_penalty: 0
+  num_ctx: 8192
+  num_predict: 4096
+
+forbidden:
+  - no min_p or additional sampling knobs
+  - do not exceed temperature 0.7 on this model family
+  - GGUF on Mac MLX is banned (Thai quality drop)
+
+rollback:
+  - "qwen38-uni-709L-bak (previous production 709-L, rebuilt digest af79151c7518)"
+  - "qwen38-uni-pre-mtp-bak (1c387c2ea265, pre-MTP)"

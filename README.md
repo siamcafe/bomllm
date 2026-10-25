@@ -1,6 +1,6 @@
 # BOMLLM
 
-![BOMLLM](images/hero_banner_v5.png)
+![BOM LLM](images/bomllm_promo_00001_.png)
 
 **BOM LLM v6 — TURBO-Fable Release**
 
@@ -63,6 +63,8 @@ num_predict: 4096
 ```
 
 Full bench data: [benchmarks/turbo_fable_bench.yaml](benchmarks/turbo_fable_bench.yaml) · Config: [configs/config_g_v5.4.yaml](configs/config_g_v5.4.yaml)
+
+Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_00001_.png) · [2](images/bomllm_promo_00002_.png) · [3](images/bomllm_promo_00003_.png)
 
 ## What's New in v5
 

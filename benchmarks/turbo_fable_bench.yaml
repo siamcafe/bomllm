@@ -1,0 +1,59 @@
+# TURBO-Fable 27.78B benchmark — measured 2026-10-25, Mac Mini M4 Pro (MLX nvfp4)
+# Source: hub art#52920 (turbo_fable_735_882_convert_bench_swap final report, status VERIFIED)
+model:
+  repo: DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NM-DAU
+  tag: qwen38-uni
+  digest: 7fc322da14cfbe78b27282a87801469a266439becde2430f7202481ddde0b5d9
+  params: 27781081984
+  layers: 1204
+  size_bytes_nvfp4_mlx: 21576875283
+  gguf_q4_k_m:
+    bytes: 18498573856
+    sha256: bc7a6cf2bcc78d1190aaf04d1ab1c5cb845b6ff23aa0e7d24fe0d2ea6d3a7c7c
+
+thai_gate:
+  score: "20/20"
+  ratio: 1.0
+  questions: 10
+  harness: "think=false request flag; temp=0.6 top_p=0.95 top_k=20 repeat_penalty=1.0 num_ctx=8192 presence_penalty=0.0"
+  per_question:
+    - {idx: 1, score: 2, thai: 430, han: 0, bytes: 1539, tokens: 194, seconds: 90.2}
+    - {idx: 2, score: 2, thai: 464, han: 0, bytes: 1506, tokens: 155, seconds: 85.9}
+    - {idx: 3, score: 2, thai: 532, han: 0, bytes: 2092, tokens: 512, seconds: 97.2}
+    - {idx: 4, score: 2, thai: 350, han: 0, bytes: 1096, tokens: 121, seconds: 84.5}
+    - {idx: 5, score: 2, thai: 693, han: 0, bytes: 2343, tokens: 260, seconds: 91.3}
+    - {idx: 6, score: 2, thai: 865, han: 0, bytes: 2764, tokens: 297, seconds: 91.7}
+    - {idx: 7, score: 2, thai: 292, han: 0, bytes: 929, tokens: 92, seconds: 82.5}
+    - {idx: 8, score: 2, thai: 488, han: 0, bytes: 1653, tokens: 175, seconds: 86.3}
+    - {idx: 9, score: 2, thai: 1064, han: 0, bytes: 3878, tokens: 512, seconds: 103.6}
+    - {idx: 10, score: 2, thai: 779, han: 0, bytes: 2585, tokens: 326, seconds: 93.8}
+
+han_leak:
+  total_han_chars: 0
+  questions: 5
+  pass: true
+  per_question:
+    - {idx: 1, han: 0, thai: 38, bytes: 115}
+    - {idx: 2, han: 0, thai: 461, bytes: 1483}
+    - {idx: 3, han: 0, thai: 482, bytes: 1745}
+    - {idx: 4, han: 0, thai: 117, bytes: 356}
+    - {idx: 5, han: 0, thai: 606, bytes: 1991}
+
+street_test:
+  pass_count: "3/3"
+  qc: "thai>50, han<3, bytes>200"
+  per_question:
+    - {idx: 1, thai: 96, han: 0, bytes: 1719}
+    - {idx: 2, thai: 546, han: 0, bytes: 1843}
+    - {idx: 3, thai: 622, han: 0, bytes: 2032}
+
+speed:
+  avg_tok_s: 18.5
+  range: "17-20"
+  hardware: "Mac Mini M4 Pro, MLX nvfp4"
+  note: "~4.5-5 tok/s during bench window (warmer contention, litellm-staging PID 729); 17-20 tok/s confirmed by K3 survey"
+
+swap:
+  status: SUCCESS
+  old_digest: 5bd9e2dc6f018a1b1321e8075a7e1d6bd3ca6a564952bce6b28344035e9628c6
+  rollback_alias: qwen38-uni-pre-turbofable-bak

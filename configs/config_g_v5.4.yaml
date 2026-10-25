@@ -1,0 +1,31 @@
+# BOMLLM Config G — v5.4 (TURBO-Fable production sampling config)
+# LOCKED per GOD CONFIG v5.4 (hub art#52999) — DO NOT change values.
+# Model swapped 2026-10-25 (bench art#52920): Fable 732 -> TURBO-Fable under qwen38-uni.
+model:
+  tag: qwen38-uni
+  name: "DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NM-DAU"
+  digest: 7fc322da14cf
+  format: MLX nvfp4
+  params: 27781081984
+  layers: 1204
+  size_bytes: 21576875283
+  gguf_q4_k_m:
+    bytes: 18498573856
+    sha256: bc7a6cf2bcc78d1190aaf04d1ab1c5cb845b6ff23aa0e7d24fe0d2ea6d3a7c7c
+
+locked_params:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  repeat_penalty: 1.0
+  presence_penalty: 0.0
+  num_ctx: 8192
+  num_predict: 4096
+
+forbidden:
+  - no min_p or additional sampling knobs
+  - do not exceed temperature 0.7 on this model family
+  - GGUF on Mac MLX is banned (Thai quality drop)
+
+rollback:
+  - "qwen38-uni-pre-turbofable-bak (previous Fable 732, digest 5bd9e2dc)"

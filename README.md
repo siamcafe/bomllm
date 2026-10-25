@@ -2,18 +2,67 @@
 
 ![BOMLLM](images/hero_banner_v5.png)
 
-**BOM LLM v4 — Turbo + Coding**
+**BOM LLM v6 — TURBO-Fable Release**
 
 I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
 It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
 
-One **Mac Mini M4 Pro 48GB** runs Fable 732 (27B nvfp4 MLX) at **~21 tok/s** with MTP 2-3× speculation.
+One **Mac Mini M4 Pro 48GB** runs TURBO-Fable (27.78B nvfp4 MLX) at **17–20 tok/s** (avg 18.5, verified 2026-10-25).
 A **MiMo-V2.6 Q4 (9B)** runs alongside at **37 tok/s** for local coding drafts.
 **GLM-5.3** on cloud handles production coding with 71/72 benchmark score.
 An i9 with 2× RTX 5060 Ti renders images (ComfyUI + FLUX), Thai voice (SiangTTS), and music (YuE2 + ACE-Step).
 Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
 
 This is not a demo. This is the exact stack that answers my customers every day.
+
+## What's New in v6 — 🇹🇭 TURBO-Fable Release (Oct 25, 2026)
+
+**Current production model: TURBO-Fable**
+`DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NM-DAU`
+
+| Spec | Value |
+|------|-------|
+| Parameters | 27.78B (27,781,081,984) |
+| Layers | 1,204 |
+| Format | MLX nvfp4 |
+| Size | 21.58 GB |
+| GGUF | Q4_K_M 18.50 GB |
+| Context | 8,192 tokens |
+| Max Predict | 4,096 tokens |
+
+### Benchmark Results (Verified)
+
+**Thai Language Gate — 20/20 = 1.00 ✅**
+- 10 questions, all scored 2/2
+- Thai character range: 292–1,064 per answer
+- Han (Chinese) leak: **0** on every question
+
+**Han Leak Test — 0/5 = 0.00 ✅**
+- 5 dedicated leak probes
+- Zero Chinese characters in any response
+
+**Street Test — 3/3 PASS ✅**
+- Thai chars > 50 per response
+- Han chars < 3 per response
+- Byte length > 200 per response
+
+**Inference Speed**
+- Average: **18.5 tok/s** (range 17–20)
+- Hardware: Apple M4 Pro (Mac Mini), MLX nvfp4
+
+### Recommended Parameters (GOD CONFIG v5.4 locked_params)
+
+```yaml
+temperature: 0.6
+top_p: 0.95
+top_k: 20
+repeat_penalty: 1.0
+presence_penalty: 0.0
+num_ctx: 8192
+num_predict: 4096
+```
+
+Full bench data: [benchmarks/turbo_fable_bench.yaml](benchmarks/turbo_fable_bench.yaml) · Config: [configs/config_g_v5.4.yaml](configs/config_g_v5.4.yaml)
 
 ## What's New in v5
 

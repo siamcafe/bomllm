@@ -1,8 +1,10 @@
 # BOMLLM
 
+![BOM LLM v7](images/hero_banner_v7.png)
+
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v6 — TURBO-Fable Release**
+**BOM LLM v7 — Security & Fleet Update**
 
 I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
 It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
@@ -15,7 +17,18 @@ Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; ev
 
 This is not a demo. This is the exact stack that answers my customers every day.
 
-## What's New in v6 — 🇹🇭 TURBO-Fable Release (Oct 25, 2026)
+## What's New in v7 — 🔒 Security & Fleet Update (Oct 27, 2026)
+
+- **GOD CONFIG v5.5** — 9 production config changes (Ollama 0.40.10, router truth, rollback containers)
+- **Open WebUI v0.12.4** — upgraded from v0.11.3 (Python 3.12.15, Pillow 13)
+- **LiteLLM v1.106.3** — security patched; v1.107.0 supply-chain compromise blocked
+- **Ollama 0.40.10** — upgraded from 0.40.1 (versioned LaunchDaemon pattern)
+- **Qdrant v1.20.0** — upgraded from 1.19
+- **Fleet cleanup** — 33.2GB freed across 6 machines
+- **SWAP optimized** — UA 2114→320GB, AM4 837→320GB (~2.3TB NVMe reclaimed)
+- **think=false routing** — 21 LiteLLM routes patched
+
+### Previous: v6 — 🇹🇭 TURBO-Fable Release (Oct 25, 2026)
 
 **Current production model: TURBO-Fable**
 `DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NM-DAU`
@@ -50,7 +63,7 @@ This is not a demo. This is the exact stack that answers my customers every day.
 - Average: **18.5 tok/s** (range 17–20)
 - Hardware: Apple M4 Pro (Mac Mini), MLX nvfp4
 
-### Recommended Parameters (GOD CONFIG v5.4 locked_params)
+### Recommended Parameters (GOD CONFIG v5.5 locked_params)
 
 ```yaml
 temperature: 0.6
@@ -62,7 +75,7 @@ num_ctx: 8192
 num_predict: 4096
 ```
 
-Full bench data: [benchmarks/turbo_fable_bench.yaml](benchmarks/turbo_fable_bench.yaml) · Config: [configs/config_g_v5.4.yaml](configs/config_g_v5.4.yaml)
+Full bench data: [benchmarks/turbo_fable_bench.yaml](benchmarks/turbo_fable_bench.yaml) · Config: [configs/config_g_v5.5.yaml](configs/config_g_v5.5.yaml)
 
 Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_00001_.png) · [2](images/bomllm_promo_00002_.png) · [3](images/bomllm_promo_00003_.png)
 
@@ -115,10 +128,10 @@ flowchart TB
     CF["Cloudflare Tunnel<br/>(HTTPS, key-gated)"]
 
     subgraph VPS["VPS — Singapore (Debian 12, Docker)"]
-        OW["Open WebUI v0.11.3"]
-        LL["LiteLLM proxy 1.100<br/>(routing, virtual keys, budgets, fallback)"]
+        OW["Open WebUI v0.12.4"]
+        LL["LiteLLM proxy 1.106.3<br/>(routing, virtual keys, budgets, fallback)"]
         PG[("Postgres 16")]
-        QD[("Qdrant 1.19")]
+        QD[("Qdrant 1.20.0")]
         VY[("Valkey 8")]
         SX["SearXNG (localhost only)"]
     end
@@ -126,7 +139,7 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.40.1 (MLX backend)"]
+        OL["Ollama 0.40.10 (MLX backend)"]
         M1["Fable 732 (27B nvfp4)<br/>~21 tok/s · MTP 2-3×"]
         MIMO["MiMo-V2.6 Q4 (9B)<br/>37 tok/s · coding drafts"]
         EMB["bge-m3 embeddings"]
@@ -207,7 +220,7 @@ cd bomllm
 
 | Machine | Role | Key Specs |
 |---------|------|-----------|
-| Mac Mini M4 Pro | Brain | 48GB, Ollama 0.40.1, Fable 732 + MiMo Q4 |
+| Mac Mini M4 Pro | Brain | 48GB, Ollama 0.40.10, TURBO-Fable + MiMo Q4 |
 | VPS Singapore | Gateway | Docker, OWUI, LiteLLM, SearXNG |
 | i9 Windows | GPU Worker | 2× RTX 5060 Ti, ComfyUI, TTS, Music |
 | AMD | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
@@ -225,7 +238,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v4 — Turbo + Coding**
+**BOM LLM v7 — Security & Fleet Update**
 
 แทนที่ค่า API คลาวด์ $50/วัน ด้วย Mac Mini บนโต๊ะ $0.54/วัน (ค่าไฟจริง)
 

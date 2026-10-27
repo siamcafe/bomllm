@@ -11,6 +11,50 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [7.0.0] - 2026-10-27
+
+### Changed
+- Production sampling config: GOD CONFIG v5.4 -> v5.5 (art#53479) — 9 changes: Ollama 0.40.10, router truth table, rollback containers, overlay base images
+- Open WebUI: v0.11.3 -> v0.12.4 (C2, Python 3.12.15, Pillow 13) — upgraded via art#52989
+- LiteLLM proxy: v1.100 -> v1.106.3-pil2 (security patched, 32 routes) — v1.107.0 supply-chain compromise avoided
+- Ollama: 0.40.1 -> 0.40.10 (Mac MLX, LaunchDaemon pattern with versioned-dir)
+- Qdrant: 1.19 -> 1.20.0 (C2)
+- Architecture diagram: all version numbers updated to match production
+- Fleet table: updated to reflect current versions
+- Thai section: v4 -> v7
+
+### Added
+- `configs/config_g_v5.5.yaml` — locked Config G reference for TURBO-Fable under GOD CONFIG v5.5
+- `images/hero_banner_v7.png` — ComfyUI-generated v7 hero banner (FLUX Dev fp8)
+- `images/benchmark_v7_stats.png` — v7 benchmark stat card
+- Git tag v7.0.0 — first release tag in repo history
+
+### Fixed
+- LiteLLM think=false routing: 21 routes patched, qwen38-think exempted (art#53465->53480)
+- SWAP optimization: UA 2114->320GB, AM4 837->320GB, ~2.3TB NVMe reclaimed (art#53183)
+- Fleet garbage cleanup: 33.2GB freed across 6 machines (art#53052)
+- Mac CoreSimulator cleanup: 261->6 processes, 6695MB RSS freed, swap 1110->254MB
+- C2 litellm-gw OOM: 640m->1280m (art#53483)
+- QUEUE_LIMIT drift fixed: disk=runtime=8
+
+### Security
+- LiteLLM v1.107.0 supply-chain compromise identified and blocked — pinned to v1.106.4 safe target
+- pil2 transformation.py integrity verified (SHA f2b63f8206035add6cdcafa356497f8b8916eb27b1459f88a2d0ea6c6c7b9ca3)
+
+## [6.0.0] - 2026-10-25
+
+### Changed
+- Production model: Fable 732 -> TURBO-Fable (DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic, nvfp4 MLX, digest 7fc322da) under tag `qwen38-uni`
+- Bench: Thai gate 20/20=1.00, Han leak 0/5, street test 3/3 PASS, speed 18.5 tok/s avg (art#52920)
+- README updated to v6 with TURBO-Fable spec table and benchmark results
+- GOD CONFIG: v5.3 -> v5.4 (art#52999)
+
+### Added
+- `benchmarks/turbo_fable_bench.yaml` — full TURBO-Fable benchmark data
+- `configs/config_g_v5.4.yaml` — locked Config G for TURBO-Fable
+- `huggingface/model-card-turbo-fable.md` — HF model card template
+- `images/bomllm_promo_00001_.png` through `00003_.png` — ComfyUI promo art
+
 ## [5.0.0] - 2026-10-10
 
 ### Changed

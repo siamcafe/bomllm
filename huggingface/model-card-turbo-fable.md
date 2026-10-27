@@ -26,9 +26,17 @@ model-index:
             name: Han Leak (0/5)
 ---
 
-# BOM LLM — TURBO-Fable 27.78B
+# BOM LLM v7 — TURBO-Fable 27.78B
 
 🇹🇭 Thai AI Model — Free for Thai people
+
+## What's New in v7 (Oct 27, 2026)
+
+- **GOD CONFIG v5.5** — 9 production config changes
+- **Open WebUI v0.12.4** — upgraded from v0.11.3
+- **LiteLLM v1.106.3** — security patched (v1.107.0 supply-chain compromise blocked)
+- **Ollama 0.40.10** — upgraded from 0.40.1
+- **Qdrant v1.20.0** — upgraded from 1.19
 
 ## Model Details
 
@@ -47,7 +55,7 @@ model-index:
 | Street Test | 3/3 PASS | thai>50, han<3, bytes>200 |
 | Speed | 18.5 tok/s | Range 17-20, Apple M4 Pro MLX |
 
-## Recommended Parameters
+## Recommended Parameters (GOD CONFIG v5.5)
 
 | Parameter | Value |
 |-----------|-------|
@@ -58,6 +66,8 @@ model-index:
 | presence_penalty | 0.0 |
 | num_ctx | 8192 |
 | num_predict | 4096 |
+
+⚠️ **presence_penalty MUST be 0.0** — setting 1.5 causes Han (Chinese) character leakage.
 
 ## License
 

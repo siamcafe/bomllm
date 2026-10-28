@@ -1,0 +1,542 @@
+version: "6.3"
+date: "2026-10-29"
+project: "ops-hub"
+title: "GOD BLUEPRINT v6.3 — llama.cpp v0.8.0 upgrade on i9 llamacpp-gpu1 (based on v6.1 mega survey)"
+status: "SURVEY_COMPLETE_FIXES_PROPOSED_NOT_APPLIED"
+based_on:
+  previous_blueprint: "GOD BLUEPRINT v5.6 (art#53796)"
+  previous_config: "GOD CONFIG v5.7 (art#53788)"
+  codex_survey: "art#53993/53994; local YAML sha256 matched publication receipt 7f05431cf21a31db1a76f43b78d1cf4b8e704751e65724bf59b6642973578cd6"
+  live_ssh_survey: "Kimi K3 read-only SSH survey 2026-10-28; all five machines reached"
+  evidence_directory: "output/god_blueprint_config_v61_20261028/evidence"
+
+survey_contract:
+  production_configuration_changed: false
+  services_restarted: []
+  containers_changed: []
+  databases_changed: []
+  routes_changed: []
+  locked_params_changed: false
+  methods:
+    - "Read-only SSH, Docker inspect/exec, PostgreSQL SELECT, HTTP health and bounded inference probes"
+    - "Configuration and extension source inspection with credential redaction before local evidence storage"
+    - "One direct C2 embedding, one C2 HAProxy embedding, one rejected C2-to-AM4 embedding reachability probe"
+    - "Direct Mac inference, C2-to-Mac inference, and AM4-to-Mac inference; no paid z.ai calls"
+  not_repeated:
+    - "Authenticated full-OWUI gold and music requests; no new 63.942-second or 27.417-second measurement is claimed"
+    - "Image generation, Thai-overlay pixel validation, FLUX timing, PuLID rendering, and music audio generation"
+    - "Mutating LiteLLM drain probes, service rehearsals, packet capture, and supply-chain attestation"
+  interpretation: "Live evidence below verifies current configuration, source paths, health, and bounded behavior. Historical Codex measurements not repeated here remain Codex-only, not new passes."
+
+architecture:
+  default_chat_route:
+    path: "User -> OWUI :3000 (C2) -> LiteLLM :4000 (C2) -> Mac:11434 ollama_chat/qwen38-uni"
+    verified: true
+    latency_ms: 3571
+    latency_evidence: "C2 bom-thai-chat short Bitcoin request: HTTP 200, prompt=420, completion=52, finish=stop, CURL_TIME 3.571000s"
+    detailed_latency_ms: 13372
+    detailed_evidence: "C2-to-Mac three-paragraph request: HTTP 200, prompt=429, completion=232, three paragraphs, Han=0, CURL_TIME 13.372270s"
+    upstream_proof: "Live /v1/model/info: bom-thai-chat -> ollama_chat/qwen38-uni -> http://100.118.133.38:11434, timeout=180.0"
+  gpt_oss_120b_route:
+    path: "User -> OWUI :3000 (C2) -> LiteLLM :4000 (C2) -> LiteLLM :4100 (UA) -> llm-smart :8380 (UA)"
+    verified: true
+    verification_scope: "Each configured hop and live model inventory verified; no protected-model generation was submitted"
+    evidence: "C2 live model info: gpt-oss-120b -> openai/tier_smart_local -> http://100.82.173.22:4100; UA staging advertises tier_smart_local; UA :8380 returns gpt-oss-120b-MXFP4.gguf"
+  am4_thai_route:
+    path: "AM4 LiteLLM thai_prod -> Mac 192.168.1.254:11434 ollama_chat/qwen38-uni"
+    verified: true
+    latency_ms: 873
+    evidence: "HTTP 200, prompt=14, completion=12, finish=stop, CURL_TIME 0.872779s"
+  embedding_route:
+    path: "OWUI -> HAProxy rag-lb:7998 -> C2 Infinity 172.18.0.1:7997"
+    verified: true
+    am4_backend: "100.80.16.53:7997 is configured disabled; AM4 Infinity is healthy on LAN 192.168.1.249:7997 but C2 Tailscale probe returned HTTP 000 in 0.099796s"
+  music_route:
+    configured_endpoint: "http://desktop-g3mkh6j.tailf5814f.ts.net:18188"
+    verified: true
+    evidence: "C2 exact-host /queue HTTP 200 in 0.084499s with empty running/pending queues; /system_stats HTTP 200 in 0.487772s"
+    autoroute_enabled: false
+
+fleet_status:
+  c2:
+    ssh: "bom@100.83.20.100:99"
+    hostname: "contabo2-bom-llm"
+    memory: "47 GiB total; 31 GiB free; 36 GiB available; swap used 0 B"
+    disk: "281 GiB available on 394 GiB root"
+    load: "5.37, 5.20, 5.05"
+    owui:
+      version: "0.12.4"
+      status: "running and healthy; /health returned {\"status\":true}"
+      image: "ghcr.io/open-webui/open-webui@sha256:c5354e4a8e83ae6e0c75521c494e7ca0e66ccd88421dcd625d618518cab181f1"
+      persistent_config: true
+      active_functions: 18
+      knowledge_collections: 0
+    litellm:
+      package_version: "1.106.4"
+      image: "bomllm/litellm:1.106.4-pil2"
+      image_id: "sha256:5dceb4ad8e2765540f6c5e1289d8e1a7fc06fd980eb57d955fd6c87836e9773b"
+      advertised_aliases: 28
+      live_deployments: 29
+      file_deployments: 27
+      store_model_in_db: true
+      db_added_aliases:
+        - "gpt-oss-120b"
+        - "qwen3-30b-fast"
+      drain_endpoint_configured: true
+      admission:
+        active_limit: 2
+        queue_limit_per_lane: 8
+        per_user_inflight: 1
+        queue_timeout_s: 300.0
+        mode: "email-only"
+        active_observed: 0
+        queue_depth_observed: 0
+        avg_wait_last50_s: 0.01
+        breaker: "closed"
+        default_max_tokens_floor: 512
+        bom_thai_chat_floor: 0
+    rag:
+      searxng: "HTTP 200 in 0.015185s"
+      qdrant: "healthz HTTP 200"
+      infinity_models: "HTTP 200; nomic, bge-m3, and bge-reranker advertised; queue 0"
+      haproxy_model_path: "HTTP 200"
+      haproxy_admin_socket: "No runtime statistics returned; no admin socket is configured in the inspected HAProxy file"
+    exited_containers: 0
+    docker_disk: "Images 28.13 GB; containers 1.611 GB; volumes 6.49 GB; build cache 13.2 GB"
+  mac:
+    ssh: "bom@100.118.133.38:22"
+    os: "Darwin macmini-ai 27.2.0 arm64"
+    memory: "48 GiB class hardware (51539607552 bytes); memory_pressure free=42%; swap used 9548.19 MiB"
+    disk: "658 GiB available"
+    ollama:
+      version: "0.40.10"
+      listener: "Root PID 1319 listens on *:11434; separate owner gateway Python PID 1485 listens only on 127.0.0.1:11435"
+      model_count: 6
+      loaded_model: "qwen38-uni:latest"
+      loaded_context: 8192
+      api_footprint_bytes: 31021738772
+      daemon_rss_note: "Main PID RSS was 27984 KiB; API model footprint and process RSS are different accounting views and are not equated"
+      launchdaemon:
+        binary: "/usr/local/lib/ollama-v0.40.10/ollama"
+        OLLAMA_CONTEXT_LENGTH: "16384"
+        OLLAMA_KEEP_ALIVE: "-1"
+        OLLAMA_MAX_LOADED_MODELS: "1"
+        OLLAMA_NUM_PARALLEL: "1"
+        OLLAMA_FLASH_ATTENTION: "1"
+        OLLAMA_KV_CACHE_TYPE: "f16"
+    model_identity:
+      alias: "qwen38-uni:latest"
+      digest: "7fc322da14cfbe78b27282a87801469a266439becde2430f7202481ddde0b5d9"
+      format: "safetensors"
+      runner: "mlx"
+      quantization: "nvfp4"
+      architecture: "qwen3_5"
+      parameter_size: "27.8B"
+      native_context_capability: 262144
+      fable_732_filename_confirmed: false
+      identity_note: "Live API identity is verified; the requested DavidAU/Fable-735-882 filename lineage is not exposed and is not claimed"
+  ua:
+    ssh: "bom@100.82.173.22:99"
+    hostname: "ubuntu-ai"
+    memory: "123 GiB total; about 2.7 GiB free; about 16 GiB available; swap used 368 MiB"
+    cpu_sample: "Second vmstat sample: 99% idle, 0% iowait, zero swap I/O"
+    disk: "531 GiB root available; 1.8 TiB /data available"
+    gpus:
+      gpu0: "RTX 5080; 14634/16303 MiB used; 1291 MiB free; driver 615.71.09; 32 C"
+      gpu1: "RTX 5060 Ti; 10124/16311 MiB used; 5818 MiB free; driver 615.71.09; 34 C"
+    litellm_prod:
+      package_version: "1.106.4"
+      image: "ghcr.io/berriai/litellm-non_root:v1.106.4"
+      image_id: "sha256:ee5cb38e33c8be6d6774f7db922396b6b04d1cd962e77521b6c892b8f1c70fd8"
+      advertised_aliases: 11
+      drain_endpoint_configured: true
+    litellm_staging:
+      package_version: "1.106.4"
+      advertised_aliases: 4
+      live_deployments_from_file: 6
+      bind: "100.82.173.22:4100, not localhost"
+      master_key_variable: "LITELLM_STAGING_MASTER_KEY; presence used without printing"
+      drain_endpoint_configured: true
+    llm_smart:
+      status: "alive; protected production untouched"
+      endpoint: "127.0.0.1:8380"
+      model: "/models/gpt-oss-120b/gpt-oss-120b-MXFP4.gguf"
+      context: 32768
+      parameters: 116829156672
+    ollama:
+      system_service: "inactive"
+      user_service: "active but disabled"
+      advertised_tags: 9
+      interpretation: "Current service is reachable and active; Codex's stopped-state observation is not the current state. Enablement remains a lifecycle/owner-governance issue, not a restart instruction."
+  am4:
+    ssh: "bom@100.80.16.53:99"
+    hostname: "ubuntu"
+    naming_note: "This target is called AM4 in the task and older records; some newer records call the same address AM5. No host or worker was renamed"
+    memory: "121 GiB total; 34 GiB free; 56 GiB available; swap used 66 MiB"
+    cpu_sample: "32 CPUs; load 32.44/21.39/17.40; second vmstat sample 52% idle and 0% iowait, so high load is recorded without claiming total saturation"
+    disk: "597 GiB root available; 1.1 TiB /data available"
+    gpus:
+      gpu0: "RTX 5060 Ti; 2338/16311 MiB used; driver 615.71.09"
+      gpu1: "RTX 5060 Ti; 13294/16311 MiB used; 2648 MiB free; driver 615.71.09"
+    litellm:
+      package_version: "1.106.4"
+      image: "bomllm/litellm:1.106.4-pil2"
+      image_id: "sha256:2bcb854e5a4022c55ed78a2f6e33dc7c44e655f497ee0051d03666a1d59156f7"
+      advertised_aliases: 8
+      stale_aliases: 7
+      working_alias: "thai_prod"
+      drain_endpoint_configured: true
+    hub: "HTTP 200 via 192.168.1.249:8192/health; localhost is not the bound address"
+    owui: "HTTP 200 on localhost:3000/health"
+    infinity: "Healthy HTTP 200 via LAN 192.168.1.249:7997; C2 cannot reach the Tailscale address"
+    comfy_router:
+      status: "Six workers up, suspect=false, queues empty"
+      active_profile: "admin_override"
+      active_weights:
+        am4_gpu0: 3
+        am4_gpu1: 3
+        i9_gpu0: 0
+        i9_gpu1: 0
+        ubuntu_ai_gpu0: 4
+        ubuntu_ai_gpu1: 3
+      saved_market_and_weekend_i9_weights: "2/2 in both profiles"
+      persistence_issue: "Runtime override differs from saved profiles; a restart would lose the override"
+      stock_c2_path_uses_router: false
+    protected_paths:
+      agent_hub: "/data/migrated/agent-hub exists; untouched"
+      quarantine: "/data/_quarantine exists; untouched"
+  i9:
+    ssh: "bomi9@100.85.255.14:22"
+    os: "Windows 10 Pro 19045; host DESKTOP-G3MKH6J"
+    memory: "130836 MB total; latest filtered systeminfo sample available=514 MB; Comfy API also reported below 1 GiB free"
+    memory_dominants:
+      - "PowerShell PID 77628: WorkingSetSize=48899825664 bytes; generic encoded survey launcher; parent PID 47976"
+      - "PowerShell PID 58536: WorkingSetSize=46916648960 bytes; generic encoded survey launcher; parent PID 36236"
+    ownership: "Purpose/owner lane not established; no process was signaled or stopped"
+    gpus:
+      driver: "617.42"
+      gpu0: "RTX 5060 Ti; 8359 MiB used; 7694 MiB free; 34 C; 153 W cap shown by nvidia-smi"
+      gpu1: "RTX 5060 Ti; 15656 MiB used; 397 MiB free in final query; 34 C; 153 W cap shown by nvidia-smi"
+    comfyui_gpu0:
+      port: 8188
+      status: "HTTP 200 via LAN; ComfyUI 0.43.0; queue empty; NSSM service Running"
+      listener: "192.168.1.20:8188 owned by Python PID 37224"
+    comfyui_gpu1:
+      port: 8190
+      status: "HTTP 200; ComfyUI 0.43.0; NSSM service Stopped but live Python PID 48216 owns the listener"
+      warning: "Do not start the NSSM service blindly and create a duplicate worker"
+    yue2:
+      endpoint: "http://desktop-g3mkh6j.tailf5814f.ts.net:18188"
+      status: "HTTP 200 for /system_stats and /queue from C2 using the exact configured hostname; queue empty"
+      nodes: "YuE2GenerateMusic and TextEncodeAceStepAudio1.5 present; ACE bpm range 10-300 and language=th available"
+      standalone_acestep: "No listener on candidate ports 7860, 8860, or 9860; no active ACE-Step OWUI pipe found"
+    llamacpp_gpu1:
+      status: "HTTP 200 {\"status\":\"ok\"} on :8080; GPU1 process present; upgraded to v0.8.0 on 2026-10-29"
+      binary:
+        version: "v0.8.0 (llama-server reports 0.8.0-dev build 11960, commit 8642541b2)"
+        previous_version: "0.7.0-dev (build 11712, commit 10b8b7553)"
+        build: "pre-built release binary (CUDA 13.4 x64, b11960)"
+        source: "https://github.com/ggml-org/llama.cpp/releases/tag/v0.8.0"
+        install_path: "E:\\llm\\llama.cpp\\llama-server.exe"
+      startup_flags: "-m E:\\llm\\models\\gemma3-12b-it-q4_k_m.gguf --alias bomai-pro --host 0.0.0.0 --port 8080 --n-gpu-layers 999 --ctx-size 16384 --parallel 2 --threads 8 --threads-batch 12 --batch-size 1024 --ubatch-size 256 --flash-attn on --cache-type-k q8_0 --cache-type-v q8_0 --jinja --metrics"
+      env: "CUDA_VISIBLE_DEVICES=1 (NSSM AppEnvironmentExtra, unchanged)"
+      breaking_changes_applied:
+        - "--model/-m flag already present in startup; v0.8.0 requirement satisfied with no param change"
+      new_capabilities:
+        - "/v1/realtime endpoint (WebSocket; plain GET returns 404)"
+        - "--connect flag (p2p)"
+        - "Anthropic /v1/messages forwarding"
+        - "logprobs with speculative decoding"
+      benchmark:
+        pre_upgrade_tps: 47.5951
+        post_upgrade_tps: 35.3413
+        diff_pct: -25.75
+        note: "reproducible after warm-up (35.36 avg); full GPU offload intact (15594 MiB on GPU1); WARN recorded, not rolled back per spec"
+      ggml_version: "v0.28.0"
+      last_upgrade: "2026-10-29T01:33+07:00"
+      backup_path: "E:\\llamacpp_backup_20261029_0133"
+    disks: "C free 351891156992 bytes; D free 388263141376 bytes; E free 3730829877248 bytes; G free 881974960128 bytes"
+
+problems_verified:
+  sluggishness:
+    codex_finding: "Full OWUI gold request took 63.942 seconds; direct C2 LiteLLM tests took 1.405-6.454 seconds; forced web search and a 30-second embedding disconnect were implicated"
+    live_verified: true
+    verification_scope: "The avoidable-work mechanism is verified; the exact historical full-OWUI latency and disconnect were not reproduced"
+    evidence: |
+      force_web_search_global is active/global; source default priority=999, respect_explicit_off=False, and stored valves do not override either default.
+      web.search.result_count=3; bypass_web_loader=false; bypass_embedding_and_retrieval=false; web.search.concurrent_requests=0.
+      HAProxy: connect=3s, client=30s, server=30s; AM4 server disabled; only C2 local Infinity remains.
+      Current direct short chat: HTTP 200 in 3.571000s. Current HAProxy single embedding: HTTP 200 in 5.042574s.
+    root_cause: "Forced late search plus full-page loading and unbounded single-item embedding fanout remains a verified source of avoidable latency. The contribution to the historical 63.942-second request is not re-quantified; admission active=0 and queue=0 do not indicate queue delay in this snapshot"
+  brief_answers:
+    codex_finding: "Production answers were suspected of being brief; locked parameters and direct response lengths needed verification"
+    live_verified: false
+    evidence: "Mac direct request produced 3 paragraphs, 1320 characters, eval_count=404, done_reason=stop. C2 detailed route produced 3 paragraphs, 1017 characters, completion=232, finish=stop. C2 short prompt produced 52 tokens, consistent with its short-answer instruction"
+    root_cause: "Not reproduced. No evidence supports changing the seven locked parameters to address brevity"
+  image_overlay:
+    codex_finding: "Thai overlay exists but direct API, attached-image, PuLID, and multi-image paths are unreliable"
+    live_verified: true
+    verification_scope: "Live deployed source and runtime prerequisites; no rendered-image claim"
+    evidence: |
+      bom_intent_filter returns attached-image turns before the overlay stash at its later image-generation block.
+      images.py successful PuLID branch uploads and returns before the stock maybe_apply hook.
+      Stock generation calls maybe_apply before upload. thai_overlay.maybe_apply requires chat_id and uses Redis GETDEL, consuming one spec for n>1.
+      Direct URL loop has no per-attempt exception handler around comfyui_create_image.
+      Font /app/backend/data/fonts/IBMPlexSansThai-Bold.ttf exists; runtime raqm=True.
+      image_generation.model=DreamShaper_8_pruned.safetensors, size=512x512, steps=20; AM4 inventories DreamShaper and flux1-dev-fp8; images.edit.enable=false; COMFY_ROUTER_ENABLED=False.
+    root_cause: "Confirmed metadata/early-return design gaps and consumable side channel, not a missing font or RAQM capability. Runtime caption spelling remains unverified"
+  music_edm:
+    codex_finding: "Generic EDM stayed on chat, explicit YuE2 failed text-length validation, autoroute was off, EDM mapped to 122 BPM, and busy gate used the wrong endpoint"
+    live_verified: true
+    verification_scope: "Current routing defaults, source, valves, parser, and endpoint behavior verified; historical application-level failures and audio quality were not regenerated"
+    evidence: |
+      Stored bom_intent_filter valves contain only target_models=bom-thai-chat,bom-glm12b. Filter loader constructs Valves(**stored_values); source default enable_music_intent=False.
+      music_yue2 ENABLED=true, MAX_DURATION_S=30, MAX_CALLS_PER_DAY=5, LOCAL_TIMEOUT_S=600.
+      parse_request rejects empty or >8000-character input. Middleware stores metadata.base_user_prompt before source enrichment, but the pipe consumes last_user_text(body), not that original field.
+      electronic preset = melodic deep house, 122 BPM; parser extracts duration/seed/lyrics/genre and has no explicit BPM or energy propagation.
+      Intent busy check uses http://100.85.255.14:8188/queue and fails open. C2 probe there returned HTTP 000 after 5.049508s.
+      Exact configured YuE2 hostname returned /queue HTTP 200 in 0.084499s with empty queues.
+    root_cause: "Confirmed routing disabled, original-message/context-boundary mismatch, fixed genre tempo mapping, and unreachable fail-open busy probe. The precise historical post-filter text length and actual audio BPM remain unmeasured"
+  embedding:
+    codex_finding: "Embedding disconnected after 30.429 seconds under full-page web retrieval; batch_size=1 and unlimited concurrency targeted the sole C2 CPU backend behind a 30-second proxy"
+    live_verified: false
+    configuration_risk_verified: true
+    evidence: |
+      Direct C2 Infinity embedding: HTTP 200, 768 dimensions, prompt_tokens=25, time=2.000976s.
+      HAProxy embedding: HTTP 200, 768 dimensions, prompt_tokens=23, time=5.042574s.
+      rag.embedding_batch_size=1; rag.embedding_concurrent_requests=0; rag.enable_async_embedding=true; deployed source treats concurrency 0 as no semaphore.
+      HAProxy client/server=30s; AM4 backend disabled; C2 local backend is marked backup but is the only enabled server.
+      C2 to AM4 Tailscale embedding probe: HTTP 000 in 0.099796s. AM4 LAN health itself is HTTP 200.
+    root_cause: "No timeout was reproduced by bounded single requests, so the precise disconnect origin remains unproven. The fanout/deadline mismatch and C2-only working route are verified; enabling AM4 requires a separate secure bind/reachability design"
+  am4_stale_routes:
+    codex_finding: "Seven of eight AM4 LiteLLM aliases were stale; thai_prod was the remaining working route"
+    live_verified: true
+    evidence: "Eight aliases advertised. Ports 8000 and 8080 unreachable; port 8082 is MeTube and /v1/models returns 404. thai_prod returned HTTP 200 in 0.872779s"
+    root_cause: "Confirmed stale destination inventory; these aliases are not on the demonstrated C2 default-chat path"
+  i9_memory_pressure:
+    codex_finding: "i9 GPU1 had about 655 MiB free and RAM was about 41.89% free"
+    live_verified: true
+    discrepancy: "Current RAM pressure is much worse; final GPU1 free sample is 397 MiB"
+    evidence: "Available Physical Memory=514 MB. Two PowerShell processes hold WorkingSetSize 48899825664 and 46916648960 bytes. GPU1=15656/16311 MiB used, 397 MiB free. Comfy and music queues are empty"
+    root_cause: "Two dominant PowerShell memory consumers are identified and explain most observed host pressure. Their workload purpose is not established because both use generic encoded survey launchers; ownership and safe disposition require the owning lane"
+  mac_language_and_memory:
+    codex_finding: "Mac had about 45% free memory, 7.257 GiB swap, and no Han in sampled C2 responses"
+    live_verified: true
+    discrepancy: "Current memory free=42%, swap used=9548.19 MiB, and direct Mac output contained three Han-range characters"
+    evidence: "Direct Mac response: eval_count=404, eval_duration=21.139s, 19.112 tok/s, three paragraphs, Han=3, done_reason=stop. C2 detailed response had Han=0. presence_penalty=0.0 was explicitly supplied in the direct request"
+    root_cause: "Single-sample language leak observed; cause undetermined and no parameter change is justified. Swap occupancy alone does not prove active thrashing"
+  router_and_service_persistence:
+    codex_finding: "AM4 active admin_override differed from saved profiles; i9 GPU1 served HTTP despite stopped NSSM service"
+    live_verified: true
+    evidence: "AM4 active_profile=admin_override with i9 weights 0/0; saved market/weekend profiles both contain i9 2/2. i9 ComfyUI_GPU1 service Stopped while Python PID 48216 serves :8190"
+    root_cause: "Confirmed persistence and supervisor-ownership gaps; neither permits an automatic restart or override clear"
+  litellm_version_and_provenance:
+    codex_finding: "All active packages were 1.106.4; C2/AM4 custom image provenance remained unresolved"
+    live_verified: true
+    evidence: "C2, UA prod, UA staging, and AM4 all report package 1.106.4. UA image ID matches the observed ee5cb38e33c8... digest; C2 and AM4 custom image IDs remain distinct"
+    root_cause: "Package pin is verified. Custom build lineage is still not a completed supply-chain attestation; a digest prefix alone is not compromise evidence"
+
+locked_params:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  repeat_penalty: 1.0
+  presence_penalty: 0.0
+  num_ctx: 8192
+  num_predict: 4096
+  verification: "ALL 7 MATCH from C2 PostgreSQL model.params for bom-thai-chat live query"
+  actual_output: "bom-thai-chat | top_k=20, top_p=0.95, num_ctx=8192, num_predict=4096, temperature=0.6, repeat_penalty=1.0, presence_penalty=0.0"
+  scope_note: "The spec's config-table key query returns no rows; models.default_params={} and the authoritative tested profile is model.id=bom-thai-chat. Other think/deep profiles intentionally have different context limits"
+  mac_modelfile: "Six displayed parameters match; presence_penalty is not explicit in /api/show and is not inferred from backend defaults. C2 model.params and the direct test explicitly used 0.0"
+
+discrepancies_from_older_records:
+  - "Mac Ollama is 0.40.10 live, not 0.40.8"
+  - "UA bomai-ollama user service is active but disabled with nine tags, not currently stopped/unreachable"
+  - "UA, C2, and AM4 inspected LiteLLM configs now contain enable_drain_endpoint=true; this documents configuration only and is not a passed mutating drain rehearsal"
+  - "AM4 Infinity is healthy on its LAN bind, but C2 cannot use the configured Tailscale endpoint; disabled does not mean globally down, and LAN health does not prove C2 reachability"
+  - "Mac swap is about 9.32 GiB versus Codex 7.257 GiB; no active-thrashing conclusion is drawn"
+  - "i9 available RAM is below 1 GiB versus Codex about 41.89% free; two PowerShell processes dominate current memory"
+  - "The task's v1.107.0 compromise statement and digest prefix are retained as owner constraints, not independently verified security evidence; live UA package 1.106.4 also carries that prefix, so prefix matching alone cannot establish compromise"
+  - "The advanced Open WebUI env-configuration URL supplied in the task returned HTTP 404; the current reference/env-configuration page and deployed 0.12.4 source were used"
+
+fixes:
+  fix_1_web_search_override:
+    priority: CRITICAL
+    problem: "Late global filter overrides explicit web_search=false and does not exclude the actual music pipe"
+    root_cause: "respect_explicit_off defaults false; disable_for_pipes tests substring 'pipe', which music_yue2.music-yue2 does not contain"
+    fix_steps:
+      - step: "Backup current valves with GET /api/v1/functions/id/force_web_search_global/valves before any change"
+        target: "C2:Open WebUI admin API; credential loaded from the approved existing store without printing"
+      - step: "POST /api/v1/functions/id/force_web_search_global/valves/update with JSON {\"respect_explicit_off\":true,\"excluded_model_ids\":\"deep-think-pipe,bom-vision,bom-thai-think,qwen38-chat,music_yue2.music-yue2\"}"
+        target: "C2:function force_web_search_global; preserves the existing exclusion list and adds only the music pipe"
+      - step: "Read back valves and test four bodies: explicit-off chat, greeting fast-pass, music pipe, and explicit-on search"
+        target: "C2:extension-level regression test; no core OWUI source edit"
+    validation: "Explicit-off and greeting remain web_search=false with no sources; music pipe receives no forced retrieval; explicit-on still searches; image_generation remains excluded"
+    rollback: "Restore the backed-up valves through the same endpoint; prior effective behavior is respect_explicit_off=false and the original four-entry exclusion list"
+  fix_2_embedding_deadline_and_fanout:
+    priority: CRITICAL
+    problem: "Unlimited single-item fanout can exceed the 30-second proxy boundary; C2 is the only working enabled backend"
+    root_cause: "batch_size=1, concurrency=0, async gather, full-page retrieval, and 30-second client/server timeouts; AM4 Tailscale address is not reachable from C2"
+    fix_steps:
+      - step: "Save GET /api/v1/retrieval/embedding and /api/v1/retrieval/config responses plus /home/bom/rag-lb/haproxy.cfg to a timestamped backup before any future change"
+        target: "C2:read-only backup in the approved future execution window"
+      - step: "In staging only, POST /api/v1/retrieval/embedding/update with the complete current engine/model/openai fields plus RAG_EMBEDDING_BATCH_SIZE=8, RAG_EMBEDDING_CONCURRENT_REQUESTS=2, ENABLE_ASYNC_EMBEDDING=true"
+        target: "Staging:do not omit openai_config or required fields from EmbeddingModelUpdateForm"
+      - step: "Run a bounded matched-page corpus with explicit attempt cap and cooldown; record per-stage p50/p95, queue depth, failures, and orphaned work. Do not raise HAProxy timeout unless backend p95 and end-to-end budgets justify it"
+        target: "Staging:one hypothesis per round; candidate proxy timeout is 60s only after measurement"
+      - step: "Do not enable the AM4 HAProxy server until an owner-approved secure listener/proxy path makes 100.80.16.53:7997 reachable from C2 without exposing an unprotected embedding API"
+        target: "AM4/C2:network design gate; current C2 probe is HTTP 000"
+    validation: "No disconnects across the matched corpus; bounded concurrency=2 is observed; response budgets remain below the proxy deadline; document RAG still works independently of snippet-only web search"
+    rollback: "Restore engine/model/batch=1/concurrency=0/async=true and the backed-up HAProxy file through tmp+cp and the approved existing deployment path; no C2 docker compose"
+  fix_3_snippet_only_search_profile:
+    priority: IMPORTANT
+    problem: "Every forced search loads full pages and embeds/retrieves them even when only snippets are needed"
+    root_cause: "web.search.bypass_web_loader=false and web.search.bypass_embedding_and_retrieval=false with result_count=3"
+    fix_steps:
+      - step: "After fix 1 and staging evidence, POST /api/v1/retrieval/config/update with JSON {\"web\":{\"WEB_SEARCH_RESULT_COUNT\":2,\"BYPASS_WEB_SEARCH_WEB_LOADER\":true,\"BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL\":true}}"
+        target: "C2:persisted web-search ConfigVars; ENABLE_PERSISTENT_CONFIG=true"
+      - step: "Read back both API and PostgreSQL values and compare identical forced-search prompts before/after"
+        target: "C2:verify no unrelated keys, model profiles, or locked params changed"
+    validation: "Responses include retrievable source evidence without embed/store failure; record that snippets may omit numeric details; do not claim a universal token target"
+    rollback: "POST the original values result_count=3 and both bypass flags=false; read back again"
+  fix_4_music_pipeline:
+    priority: CRITICAL
+    problem: "Music autoroute is off, web context can inflate parser input, EDM ignores requested tempo, and busy check fails open on an unreachable port"
+    root_cause: "Disabled intent valve, last_user_text on enriched body, fixed electronic=122 BPM parser, and hardcoded Tailscale IP:8188 busy URL"
+    fix_steps:
+      - step: "Apply and verify fix 1 first so music_yue2.music-yue2 never receives forced web/RAG context"
+        target: "C2:dependency gate"
+      - step: "Create a new reviewed music pipe/extension version that consumes metadata.base_user_prompt with an original-message fallback, uses http://desktop-g3mkh6j.tailf5814f.ts.net:18188/queue, and makes busy-probe failure visible for explicit music requests"
+        target: "C2:function music_yue2 and bom_intent_filter through extension version history; no upstream OWUI core edit"
+      - step: "Parse an explicit BPM with bounds 60-200, preserve genre/energy qualifiers, use candidate EDM default 140 only when no BPM is supplied, and pass BPM through the selected workflow; use numeric bpm and language=th only for TextEncodeAceStepAudio1.5"
+        target: "C2:music parser/style assembly; prompting alone is not proof of measured output tempo"
+      - step: "Keep enable_music_intent=false until explicit 10-second playable-audio generation, no-sources, original-prompt, busy-gate, and queue-drain tests pass; only then enable autoroute for bom-thai-chat"
+        target: "C2:owner-approved staged activation"
+    validation: "Generic EDM reaches the intended pipe, explicit music returns playable audio, HTTP 200 is not treated as functional success by itself, no unrelated job is cancelled, and measured tempo is reported with half/double-time uncertainty"
+    rollback: "Set enable_music_intent=false and restore the previous function versions/valves; do not retry an ambiguous submitted ComfyUI job automatically"
+  fix_5_image_overlay:
+    priority: IMPORTANT
+    problem: "Overlay metadata is absent or consumed on several successful image paths"
+    root_cause: "Attached-image and PuLID early returns bypass the common stock hook; direct calls lack chat metadata; GETDEL is single-use"
+    fix_steps:
+      - step: "Refactor only the existing maintained owner overlay/integration path so every successful stock, attached-image, and PuLID result reaches one postprocessor before upload; do not change upstream OWUI release files"
+        target: "C2:bom_intent_filter stash logic and existing thai_overlay hook at images.py PuLID return and stock upload branches"
+      - step: "Pass explicit overlay metadata instead of relying only on chat_id+GETDEL; make n>1 consumption per-image and idempotent, and preserve fail-open original bytes on renderer errors"
+        target: "C2:utils/thai_overlay.py and extension metadata contract; bind-mounted files use tmp+cp, never sed -i"
+      - step: "Add per-attempt exception handling that distinguishes rejection before submission from ambiguous accepted jobs before trying another direct URL"
+        target: "C2:existing image integration direct-URL loop; avoid duplicate generation"
+    validation: "Visually inspect actual stock, attached-image, PuLID, and n=2 images with quoted Thai captions; verify coordinates/object evidence where applicable and test direct API metadata"
+    rollback: "Restore the previous owner hook and extension versions from timestamped backups; original images remain available because rendering fails open"
+  fix_6_i9_capacity_and_ownership:
+    priority: CRITICAL
+    problem: "i9 RAM is below 1 GiB available and GPU1 has only 397 MiB free; two PowerShell processes dominate RAM"
+    root_cause: "Two large encoded-launcher PowerShell workloads plus shared GPU1 consumers; exact workload ownership is unresolved"
+    fix_steps:
+      - step: "Give the owning lane the recorded PID, parent PID, creation time, and working-set evidence; revalidate current exact PID and command line before any owner-approved action"
+        target: "i9:cross-lane review only; no bare kill and no action from this survey"
+      - step: "Stop or reduce the owning workload only through its own runbook after owner approval; do not start ComfyUI_GPU1 NSSM while PID 48216 or its current successor owns :8190"
+        target: "i9:owner and owning-lane gate"
+      - step: "Define owner-approved RAM/VRAM admission floors before heavier concurrent jobs; keep YuE2, ComfyUI, llama-server, and VoxCPM capacity accounting separate"
+        target: "i9:future capacity policy, not an invented threshold in this survey"
+    validation: "Available RAM and GPU1 headroom exceed the approved floors, queues remain bounded, and exactly one intended listener owns each ComfyUI port"
+    rollback: "If an owning workload is paused under its runbook, resume only through that same runbook; no survey rollback is required because no state was changed"
+  fix_7_am4_stale_routes:
+    priority: IMPORTANT
+    problem: "Seven stale aliases point to unreachable ports or MeTube"
+    root_cause: "Legacy model_list destinations remain after backend roles changed"
+    fix_steps:
+      - step: "Backup /data/migrated/litellm/config.yaml and obtain owner disposition for fast, batch, classify, creative, t1-9b-gpu, t3a-27b-cpu, and t3c-lfm-cpu before removal or retargeting"
+        target: "AM4:owner route inventory; preserve thai_prod"
+      - step: "Apply only the approved route diff via tmp+cp and the existing drained deployment runbook"
+        target: "AM4:no protected UA model, Mac owner gateway, or C2 config change"
+    validation: "Model inventory contains only intended aliases and thai_prod still returns HTTP 200; no stale destination is reported healthy"
+    rollback: "Restore the backed-up config through the same approved runbook"
+  fix_8_router_persistence:
+    priority: IMPORTANT
+    problem: "AM4 admin_override weights differ from saved market/weekend profiles and would not survive restart"
+    root_cause: "Runtime override is in memory while saved profiles retain i9 2/2"
+    fix_steps:
+      - step: "Owner confirms intended active profile and i9 market/weekend policy; capture /workers before any change"
+        target: "AM4:comfy-router admin API; key loaded without printing"
+      - step: "Reconcile or deliberately persist the override only through the router's supported admin path after staging a restart-persistence test"
+        target: "AM4:no router restart in this survey and no blind override clear"
+    validation: "Active and saved weights match the approved policy after rehearsal, C2 stock image behavior remains documented as router-disabled"
+    rollback: "Restore the captured prior weights through the supported admin API"
+  fix_9_provenance_and_drain_records:
+    priority: IMPORTANT
+    problem: "Custom LiteLLM provenance is incomplete and old drain-gap text conflicts with current enable_drain_endpoint=true"
+    root_cause: "Custom pil2 builds have divergent IDs and documentation was not updated when drain configuration changed"
+    fix_steps:
+      - step: "Record Dockerfiles, patch hashes, base registry digest, variant, platform, and signatures for C2 and AM4 custom images; keep package 1.106.4 pinned"
+        target: "C2/AM4:evidence recovery only; no image replacement"
+      - step: "Update operational records to show drain configured on C2, UA prod/staging, and AM4, but keep the rehearsal gate open until an authorized staging drain proves readiness and in-flight semantics"
+        target: "Documentation first; no mutating drain call in this task"
+    validation: "Exact variant signature/provenance is reviewed and a future authorized staging drain has evidence; no claim based solely on tag or digest prefix"
+    rollback: "Keep current running images and configuration; documentation corrections do not alter runtime"
+
+security_constraints:
+  - "LiteLLM pin v1.106.4 ONLY — v1.107.0 COMPROMISED (sha256:ee5cb38e33c8) is retained as an owner constraint, not independently attested here"
+  - "gpt-oss-120b on UA = LIVE PRODUCTION — do not stop/modify/restart"
+  - "CAT (122.155.168.7) — NEVER TOUCH except bomai.app/public_html/"
+  - "AM4 /data/migrated/agent-hub — LIVE PRODUCTION HUB"
+  - "n8n on NAS — NEVER restart/upgrade (OWNER HOLD)"
+  - "docker compose on C2 — NEVER (docker run with flags only)"
+  - "presence_penalty MUST be 0.0 (1.5 = Han leak); the observed Han=3 sample proves 0.0 is not a general language guarantee, not permission to change it"
+  - "Mac port 11435 — owner gateway DO NOT TOUCH"
+  - "chattr +i forbidden ALL machines"
+  - "sshd/auth config — ALL machines forbidden"
+  - "sed -i on bind-mounted files forbidden (use tmp+cp)"
+  - "bare kill — PID-scoped only, after exact PID and command-line revalidation"
+  - "retry/loop without max_attempts + cooldown — FORBIDDEN"
+  - "OLLAMA BLOBS: never touch"
+  - "AM4 /data/_quarantine/ — never touch"
+  - "DO NOT DELETE /home/admin/admin_backups"
+  - "systemctl restart nginx/httpd/directadmin FORBIDDEN — only reload"
+  - "NEVER run inference on C2 (CPU bottleneck); C2 ollama = EMPTY. Only the bounded existing-Infinity embedding probes explicitly required by this task were run; no new inference deployment is authorized"
+  - "No paid z.ai API calls; inventory-only inspection of existing routes is permitted"
+  - "No credentials, tokens, keys, personal account identifiers, or encrypted valve blobs in artifacts"
+
+execution_plan:
+  status: "PLANNED_NOT_EXECUTED"
+  owner_approval_required: true
+  ordered_steps:
+    - order: 1
+      action: "Review this live evidence and approve one bounded staging change window"
+      dependencies: "None"
+      gate: "Owner selects fix 1 first; no production change is implicit in this blueprint"
+    - order: 2
+      action: "Apply fix 1 valves only and run explicit-off/greeting/music/explicit-on regression tests"
+      dependencies: "Step 1 and backed-up valves"
+      gate: "Stop if readback differs or any explicit-on search is lost"
+    - order: 3
+      action: "Run fix 2 staging fanout measurements; optionally evaluate fix 3 snippet-only profile after search behavior is safe"
+      dependencies: "Step 2 and matched baseline corpus"
+      gate: "No timeout increase and no AM4 backend enablement without measurements and a secure C2-reachable bind"
+    - order: 4
+      action: "Implement and test music source/original-prompt/busy/tempo repairs; enable autoroute only after playable-audio acceptance"
+      dependencies: "Fix 1 verified and i9 capacity reviewed"
+      gate: "No autoroute while the busy probe fails or RAM/VRAM is below the owner-approved floor"
+    - order: 5
+      action: "Repair overlay metadata/common postprocessing and perform visual stock/attached/PuLID/n=2 acceptance"
+      dependencies: "Approved owner integration patch window"
+      gate: "Stop on missing original-image rollback or ambiguous duplicate-job behavior"
+    - order: 6
+      action: "Resolve i9 workload ownership and capacity before heavier music/image concurrency"
+      dependencies: "Owning lane and owner decision"
+      gate: "No bare kill and no duplicate ComfyUI_GPU1 service start"
+    - order: 7
+      action: "Clean approved AM4 aliases, reconcile router persistence, and recover LiteLLM provenance/drain documentation"
+      dependencies: "Owner route/profile decisions and staging rehearsal evidence"
+      gate: "Protected production services and locked params remain invariant"
+  final_acceptance:
+    - "All changes read back with exact before/after evidence and rollback receipts"
+    - "No production change is inferred from this survey artifact"
+    - "All seven locked params remain exact and presence_penalty remains 0.0"
+    - "Remaining unmeasured items are reported as unmeasured, not converted into passes"
+
+sources:
+  - "https://docs.openwebui.com/reference/env-configuration"
+  - "https://docs.openwebui.com/getting-started/advanced-topics/env-configuration (HTTP 404 at survey)"
+  - "https://docs.litellm.ai/docs/proxy/configs"
+  - "https://github.com/ollama/ollama/blob/main/docs/api.md"
+  - "hub artifacts 50927, 50929, 48595, 53788, 53796, 53993/53994, and task artifact 53996"

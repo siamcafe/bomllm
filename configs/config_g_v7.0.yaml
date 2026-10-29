@@ -1,0 +1,540 @@
+version: "7.0"
+policy: "bomllm.policy/v7.0"
+date: "2026-10-29"
+project: "ops-hub"
+title: "GOD CONFIG v7.0 — fleet mega tuning: 9 parameter corrections, dead-route cleanup, 210.43 GiB reclamation"
+supersedes: "GOD CONFIG v6.3 (repo commit 0f50dc6)"
+companion: "GOD BLUEPRINT v7.0"
+state: "PRODUCTION_WITH_DOCUMENTED_DEVIATIONS"
+source_artifact: "hub art#54324 (BomLLM Mega Tuning Report, 33246 bytes, 2026-10-29)"
+
+locked_params:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  repeat_penalty: 1.0
+  presence_penalty: 0.0
+  num_predict: 4096
+  num_ctx: 8192
+  status: "PRODUCTION with documented deviations"
+  note: "All generation-model Ollama tags now explicitly confirm presence_penalty=0; protected production tags retain documented ctx/predict deviations"
+
+model_parameters:
+  - model_name: "qwen38-uni"
+    machine: "Mac"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Production; parameter-only manifest; reloaded"
+  - model_name: "bomai-pro"
+    machine: "Mac"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Unloaded"
+  - model_name: "bomai-mini"
+    machine: "Mac"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Unloaded"
+  - model_name: "bomai-gemma3"
+    machine: "Mac"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Unloaded"
+  - model_name: "nomic-embed-text"
+    machine: "Mac"
+    temperature: "N/A"
+    top_p: "N/A"
+    top_k: "N/A"
+    repeat_penalty: "N/A"
+    presence_penalty: "N/A"
+    num_predict: "N/A"
+    num_ctx: 8192
+    compliant: "N/A"
+    notes: "Embedding only"
+  - model_name: "bge-m3"
+    machine: "Mac"
+    temperature: "N/A"
+    top_p: "N/A"
+    top_k: "N/A"
+    repeat_penalty: "N/A"
+    presence_penalty: "N/A"
+    num_predict: "N/A"
+    num_ctx: "unset"
+    compliant: "N/A"
+    notes: "Embedding only"
+  - model_name: "qwen3-vl:2b"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Reloaded; inference returned OK"
+  - model_name: "bomai-safe"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Existing compliant tag"
+  - model_name: "bomai"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Context/predict corrected"
+  - model_name: "siamcafe/bom-ai:latest"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 16384
+    num_ctx: 32768
+    compliant: "NO"
+    notes: "Protected production tag; not modified"
+  - model_name: "siamcafe/bom-ai:v0.3.1-rc.1"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 16384
+    num_ctx: 32768
+    compliant: "NO"
+    notes: "Protected production tag; not modified"
+  - model_name: "bom-ai r4d-prod"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 16384
+    num_ctx: 32768
+    compliant: "NO"
+    notes: "Protected prod tag; not modified"
+  - model_name: "bom-ai r4c-prod"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 16384
+    num_ctx: 32768
+    compliant: "NO"
+    notes: "Protected prod tag; not modified"
+  - model_name: "bom-ai r4d-eval"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Unchanged"
+  - model_name: "bom-ai r4c-eval"
+    machine: "UA"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "Unchanged"
+  - model_name: "bomai-v3"
+    machine: "UA"
+    temperature: "server default"
+    top_p: "server default"
+    top_k: "server default"
+    repeat_penalty: "server default"
+    presence_penalty: "0 by llama.cpp default"
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "DEVIATION"
+    notes: "parallel 2; mmproj, grammar, jinja preserved"
+  - model_name: "gpt-oss-120b"
+    machine: "UA"
+    temperature: "server default"
+    top_p: "server default"
+    top_k: "server default"
+    repeat_penalty: "server default"
+    presence_penalty: "0 by llama.cpp default"
+    num_predict: "default"
+    num_ctx: 32768
+    compliant: "DEVIATION"
+    notes: "Production llm-smart; no authorized recreate"
+  - model_name: "bomai-safe"
+    machine: "AM4"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 4096
+    num_ctx: 8192
+    compliant: "YES"
+    notes: "New tag from existing base; base ID unchanged"
+  - model_name: "siamcafe/bom-ai:v0.3.1-rc.1"
+    machine: "AM4"
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    repeat_penalty: 1.0
+    presence_penalty: 0.0
+    num_predict: 16384
+    num_ctx: 32768
+    compliant: "NO"
+    notes: "Protected base tag; not modified"
+  - model_name: "bomai-pro"
+    machine: "i9"
+    temperature: "server default"
+    top_p: "server default"
+    top_k: "server default"
+    repeat_penalty: "server default"
+    presence_penalty: "0 by llama.cpp default"
+    num_predict: "default"
+    num_ctx: 8192
+    compliant: "DEVIATION"
+    notes: "parallel 1; NSSM Automatic; health 200"
+
+litellm_routes:
+  ua_4000:
+    - route_name: "bomai-uni"
+      backend: "Mac qwen38-uni"
+      status: "Configured; Mac backend verified"
+    - route_name: "bomai-pro"
+      backend: "i9 :8080"
+      status: "Configured; direct i9 inference verified"
+    - route_name: "vision-light"
+      backend: "UA qwen3-vl:2b"
+      status: "Alive; inference returned OK"
+    - route_name: "embed-bge-m3"
+      backend: "AM4 Infinity :7997"
+      status: "Config retained; backend healthy"
+    - route_name: "embed-nomic"
+      backend: "AM4 Infinity :7997"
+      status: "Config retained; backend healthy"
+    - route_name: "rerank-bge"
+      backend: "AM4 Infinity :7997"
+      status: "Config retained; backend healthy"
+    - route_name: "zai-glm"
+      backend: "External z.ai"
+      status: "Not probed - billing restriction"
+  ua_4100_file:
+    - route_name: "tier_smart_local"
+      backend: "UA gpt-oss-120b"
+      status: "Alive; file authoritative at next reload"
+    - route_name: "tier_frontier"
+      backend: "Anthropic Claude Sonnet 5"
+      status: "External; not probed"
+    - route_name: "tier_frontier"
+      backend: "Moonshot Kimi K2.5"
+      status: "External; not probed"
+  am4_4000:
+    - route_name: "thai_prod"
+      backend: "Mac qwen38-uni"
+      status: "Alive; inference returned OK"
+  c2_4000_config:
+    - route_name: "qwen38"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "qwen38-think"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "qwen38-chat"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "qwen38-code"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "qwen38-deep"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "thai-chat"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "thai-think"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "thai-alt"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "qwen38-vision-alt"
+      backend: "Mac qwen38-uni"
+      status: "Renamed from vision; fallback key updated"
+    - route_name: "qwen38-vision"
+      backend: "Mac qwen38-uni"
+      status: "Renamed from qwen3-vl-8b; fallback key updated"
+    - route_name: "bom-thai-chat"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "thai-gate"
+      backend: "Mac qwen38-uni"
+      status: "Renamed from typhoon-gate; fallback key updated"
+    - route_name: "thai-chat-rt"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "ragsa-narrate"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "redhat-mcp-rt"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "bom-read-image"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "bom-th-blite"
+      backend: "Mac qwen38-uni"
+      status: "Duplicate removed; first entry retained"
+    - route_name: "qwen38-uni"
+      backend: "Mac qwen38-uni"
+      status: "End-to-end inference returned OK"
+    - route_name: "bom-writer"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "flood-runner"
+      backend: "Mac qwen38-uni"
+      status: "Configured; shared Mac backend verified"
+    - route_name: "nomic-embed-text"
+      backend: "Mac Ollama embedding"
+      status: "Config retained"
+    - route_name: "embed-bge"
+      backend: "Mac bge-m3"
+      status: "Config retained"
+    - route_name: "zai-fallback"
+      backend: "External z.ai GLM 4.5"
+      status: "Not probed - billing restriction"
+    - route_name: "zai-brain"
+      backend: "External z.ai GLM 5.2"
+      status: "Not probed - billing restriction"
+    - route_name: "glm-4.6v-flash"
+      backend: "External z.ai"
+      status: "Not probed - billing restriction"
+    - route_name: "zai-glm-4.6v"
+      backend: "External z.ai"
+      status: "Not probed - billing restriction"
+  c2_4000_db:
+    - route_name: "typhoon25-content"
+      backend: "UA bomai-v3 :11466"
+      status: "Configured; direct backend inference returned OK"
+    - route_name: "gpt-oss-120b"
+      backend: "UA :4100 tier_smart_local"
+      status: "Configured; UA backend present; not proxied"
+  removed_routes:
+    am4_4000: ["fast", "t1-9b-gpu", "batch", "creative", "t3a-27b-cpu", "classify", "t3c-lfm-cpu"]
+    ua_4000: ["gemma3-4b"]
+    ua_4100_file: ["tier_fast (two deployments)", "tier_batch"]
+    c2_4000_db: ["qwen3-30b-fast"]
+    c2_also_removed: ["qwen38-uncensored fallback", "duplicate bom-th-blite"]
+
+fleet_resource_usage:
+  machines:
+  - machine: "UA"
+    ram_before: "99 GiB used"
+    ram_after: "99 GiB used; 23 GiB available"
+    disk_before: "/ 337.53->318.59 GiB; /ai 155.50->151.05; /data 1682.16->1580.61"
+    disk_after: "124.95 GiB net reclaimed"
+    notes: "bomai-v3 RSS fell ~9.7->1.1 GiB; other workloads used the freed RAM"
+  - machine: "AM4"
+    ram_before: "69 GiB used"
+    ram_after: "70 GiB used"
+    disk_before: "/ 292.63->277.77 GiB; /data 714.55->686.75"
+    disk_after: "42.66 GiB net reclaimed"
+    notes: "Includes new 0.40.13 binaries"
+  - machine: "Mac"
+    ram_before: "44% free"
+    ram_after: "44% free"
+    disk_before: "Data 233.26->205.92 GiB"
+    disk_after: "27.34 GiB reclaimed"
+    notes: "qwen38-uni remains loaded"
+  - machine: "C2"
+    ram_before: "11 GiB used"
+    ram_after: "8.1 GiB used"
+    disk_before: "/ 96.89->81.73 GiB"
+    disk_after: "15.17 GiB reclaimed"
+    notes: "Startup complete; all 12 containers running"
+  - machine: "NAS"
+    ram_before: "3.2 GiB used"
+    ram_after: "3.4 GiB used"
+    disk_before: "volume1 ~1.6 TiB used"
+    disk_after: "~0.31 GiB reclaimed"
+    notes: "One referenced exporter image retained"
+  - machine: "i9"
+    ram_before: "59.2 GB free"
+    ram_after: "41.45 GiB free"
+    disk_before: "E: ~253.4 GiB used"
+    disk_after: "E: ~253.4 GiB used"
+    notes: "Other GPU workloads active; no model files deleted"
+  - machine: "Contabo-EU"
+    ram_before: "3.2 GiB used"
+    ram_after: "3.5 GiB used"
+    disk_before: "47->46.43 GiB used"
+    disk_after: "Normal runtime variance"
+    notes: "n8n healthy"
+  - machine: "CAT"
+    ram_before: "8.9 GiB used"
+    ram_after: "8.6 GiB used"
+    disk_before: "/ 38->37.18 GiB; /home 107->106.9 GiB"
+    disk_after: "No cleanup"
+    notes: "No stale large /tmp candidates"
+  total_net_disk_reclaimed: "210.43 GiB across UA, AM4, Mac, C2, and NAS"
+
+service_boot_audit:
+  - machine: "UA"
+    service: "bomai-gateway / bomai-owui / bomai-searxng"
+    type: "systemd user"
+    auto_start: "YES; Linger=yes"
+    fixed: "No"
+    notes: "Enabled and running"
+  - machine: "UA"
+    service: "bomai-ollama"
+    type: "systemd user"
+    auto_start: "Intentionally disabled"
+    fixed: "No"
+    notes: "Active manually; never re-enabled per ban"
+  - machine: "UA"
+    service: "typhoon25"
+    type: "systemd user"
+    auto_start: "Not found"
+    fixed: "YES"
+    notes: "Stale unit removed"
+  - machine: "UA"
+    service: "bomai-v3"
+    type: "Manual process"
+    auto_start: "NO"
+    fixed: "No"
+    notes: "Manual boot procedure documented in the source report"
+  - machine: "UA"
+    service: "LiteLLM, llm-smart, ComfyUI, supporting containers"
+    type: "Docker"
+    auto_start: "unless-stopped/always"
+    fixed: "No"
+    notes: "Banned containers not modified"
+  - machine: "AM4"
+    service: "bomai-ollama / gateway / owui / searxng"
+    type: "systemd user"
+    auto_start: "YES; Linger=yes"
+    fixed: "No"
+    notes: "Enabled"
+  - machine: "AM4"
+    service: "typhoon25"
+    type: "systemd user"
+    auto_start: "Not found"
+    fixed: "YES"
+    notes: "Stale unit removed"
+  - machine: "AM4"
+    service: "Critical Docker services"
+    type: "Docker"
+    auto_start: "unless-stopped/always"
+    fixed: "No"
+    notes: "Running code-server image retained"
+  - machine: "Mac"
+    service: "com.icafefx.ollama"
+    type: "launchd"
+    auto_start: "RunAtLoad=true"
+    fixed: "No"
+    notes: "Live production daemon"
+  - machine: "Mac"
+    service: "com.icafefx.ollama.watchdog"
+    type: "launchd"
+    auto_start: "RunAtLoad=true"
+    fixed: "No"
+    notes: "Port 11435 untouched"
+  - machine: "C2"
+    service: "All 12 running containers"
+    type: "Docker"
+    auto_start: "unless-stopped/always"
+    fixed: "No"
+    notes: "Healthy after cleanup"
+  - machine: "i9"
+    service: "llamacpp-gpu1"
+    type: "NSSM"
+    auto_start: "Automatic"
+    fixed: "YES"
+    notes: "Was Manual; now Running/Automatic"
+  - machine: "i9"
+    service: "ComfyUI_GPU0 / GPU1"
+    type: "NSSM"
+    auto_start: "Automatic"
+    fixed: "No"
+    notes: "GPU1/PuLID state untouched"
+  - machine: "i9"
+    service: "TtsShim / VoxCPM2 / Whisper / WhisperCPU"
+    type: "NSSM"
+    auto_start: "Automatic but stopped"
+    fixed: "No"
+    notes: "Owner-managed; documented only"
+  - machine: "NAS"
+    service: "n8n"
+    type: "Docker"
+    auto_start: "unless-stopped"
+    fixed: "No"
+    notes: "Never restarted or upgraded"
+  - machine: "NAS"
+    service: "nas-hub"
+    type: "Docker"
+    auto_start: "unless-stopped"
+    fixed: "YES"
+    notes: "Was no; container remained running"
+  - machine: "NAS"
+    service: "Socat relays"
+    type: "Docker"
+    auto_start: "unless-stopped"
+    fixed: "No"
+    notes: "Relay topology unchanged"
+  - machine: "Contabo-EU"
+    service: "All running containers"
+    type: "Docker"
+    auto_start: "unless-stopped/always"
+    fixed: "No"
+    notes: "n8n healthy"
+  - machine: "CAT"
+    service: "httpd / nginx / DirectAdmin"
+    type: "systemd"
+    auto_start: "enabled + active"
+    fixed: "No"
+    notes: "Read-only auto-start audit passed; syntax checks pass"

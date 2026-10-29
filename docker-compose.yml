@@ -45,7 +45,7 @@ services:
     networks: [bomllm]
 
   qdrant:
-    image: qdrant/qdrant:v1.19.1
+    image: qdrant/qdrant:v1.20.0
     restart: unless-stopped
     volumes:
       - qdrant_storage:/qdrant/storage

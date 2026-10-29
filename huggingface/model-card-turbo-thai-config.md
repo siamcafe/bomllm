@@ -23,7 +23,18 @@ licenses (Qwen: Apache-2.0; fine-tune: author's terms).
 
 Full platform (repo, docs, cost receipts): **https://github.com/siamcafe/bomllm**
 
-## Latest changes (2026-09-13)
+## Latest changes (2026-10-30)
+
+- **GOD CONFIG v7.0 deployed fleet-wide** — 9 parameter corrections across
+  5 model configurations; `presence_penalty 0.0` now explicit on every
+  generation-model Ollama tag (source: hub artifact #54324).
+- **Route cleanup** — 9+3 dead routes removed (7 AM4, 1 UA :4000, 3 staged
+  UA :4100, 1 C2 DB); C2 now serves 26 config routes + 2 live DB routes.
+- **Ollama 0.40.13 on UA/AM4** — Mac remains 0.40.10.
+- **BOM AI v0.3.2 verified PASS** (art#54410, art#54416, joblog 18704).
+- **Fleet cleanup** — 210.43 GiB reclaimed across UA/AM4/Mac/C2/NAS.
+
+Previous (2026-09-13):
 
 - **Parameters pinned on all 6 aliases** — `temperature 0.6 · top_p 0.95 ·
   top_k 20 · repeat_penalty 1.0 · presence_penalty 0.0` baked into every
@@ -75,10 +86,10 @@ not in the Modelfile:
 
 ## Runtime mapping
 
-Open WebUI presets → LiteLLM routes (22 config-file routes, 0 DB deployments)
+Open WebUI presets → LiteLLM routes (26 config-file routes, 2 live DB routes)
 → Ollama on the Mac (MLX, 6 model aliases, Modelfile pin above).
 
-## Measured results (Mac Mini M4 Pro 48GB, Ollama 0.33.3 MLX)
+## Measured results (Mac Mini M4 Pro 48GB, Ollama 0.40.10 (Mac) / 0.40.13 (UA, AM4) MLX)
 
 60-prompt bank · 300 completions · paired bootstrap 10,000 × 95% CI ·
 2026-09-11:

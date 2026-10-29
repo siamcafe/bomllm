@@ -11,6 +11,24 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [8.0.0] - 2026-10-30
+
+### Added
+- GOD CONFIG v7.0 / GOD BLUEPRINT v7.0 (hub artifact #54324)
+- Auto cleanup system deployed fleet-wide (8/9 machines, DRY-RUN mode)
+- BOM AI v0.3.2 verified PASS
+
+### Changed
+- Ollama upgraded to 0.40.13 on UA and AM4 (Mac remains 0.40.10)
+- LiteLLM pinned to v1.106.4 (v1.107.0 supply chain compromised)
+- Qdrant upgraded to v1.20.0
+- 9 parameter corrections in GOD CONFIG
+- 10 orphan models removed, 15 unused Docker images removed
+- 9+3 dead routes removed from config
+
+### Fixed
+- Fleet cleanup: 210.43 GiB disk reclaimed across UA/AM4/Mac/C2/NAS
+
 ## [7.0.0] - 2026-10-27
 
 ### Changed

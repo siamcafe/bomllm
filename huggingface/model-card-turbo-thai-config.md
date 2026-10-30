@@ -23,7 +23,7 @@ licenses (Qwen: Apache-2.0; fine-tune: author's terms).
 
 Full platform (repo, docs, cost receipts): **https://github.com/siamcafe/bomllm**
 
-## Latest changes (2026-09-13)
+## Latest changes (2026-10-30)
 
 - **Parameters pinned on all 6 aliases** — `temperature 0.6 · top_p 0.95 ·
   top_k 20 · repeat_penalty 1.0 · presence_penalty 0.0` baked into every

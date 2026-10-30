@@ -1,0 +1,53 @@
+# BOMLLM Config G — v7.0 (GOD CONFIG v7.0 — Mega Tuning production config)
+# LOCKED per GOD CONFIG v7.0 (hub art#54324) — DO NOT change values.
+# Model: TURBO-Fable under qwen38-uni (digest 5bd9e2dc, 21.6GB nvfp4 MLX)
+# v7.0 changes from v5.5: Ollama UA/AM4 0.40.13, 210GB fleet cleanup, 9 param corrections,
+#   bomai-safe deployed UA+AM4, dead route cleanup, Docker prune 19.33 GiB.
+model:
+  tag: qwen38-uni
+  name: "DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NM-DAU"
+  digest: 5bd9e2dc
+  format: MLX nvfp4
+  params: 27781081984
+  layers: 1204
+  size_bytes: 21576875283
+  gguf_q4_k_m:
+    bytes: 18498573856
+    sha256: bc7a6cf2bcc78d1190aaf04d1ab1c5cb845b6ff23aa0e7d24fe0d2ea6d3a7c7c
+
+locked_params:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  repeat_penalty: 1.0
+  presence_penalty: 0.0
+  num_ctx: 8192
+  num_predict: 4096
+
+fleet_versions:
+  ollama_mac: "0.40.10"
+  ollama_ua: "0.40.13"
+  ollama_am4: "0.40.13"
+  owui: "0.12.4"
+  litellm: "1.106.4"
+  qdrant: "1.20.0"
+
+changes_from_v5_5:
+  - "9 GOD CONFIG parameter corrections across 5 model configurations"
+  - "All generation-model Ollama tags now explicitly confirm presence_penalty=0"
+  - "bomai-safe deployed and verified on UA and AM4"
+  - "Ollama UA/AM4 upgraded to 0.40.13"
+  - "210.43 GiB disk reclaimed across fleet"
+  - "15 unused Docker images removed (19.33 GiB)"
+  - "9 live dead routes removed + 3 staged"
+  - "i9 llamacpp-gpu1 auto-start fixed: Manual -> Automatic"
+  - "NAS nas-hub auto-start fixed: no -> unless-stopped"
+
+forbidden:
+  - no min_p or additional sampling knobs
+  - do not exceed temperature 0.7 on this model family
+  - GGUF on Mac MLX is banned (Thai quality drop)
+  - presence_penalty MUST be 0.0 (1.5 = Han leak)
+
+rollback:
+  - "qwen38-uni-pre-turbofable-bak (previous Fable 732)"

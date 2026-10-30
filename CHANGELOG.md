@@ -11,6 +11,35 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [0.8.0] - 2026-10-30
+
+### Changed
+- GOD CONFIG: v5.5 -> v7.0 (art#54324) — 9 parameter corrections, presence_penalty=0 enforced fleet-wide
+- Ollama: UA/AM4 upgraded to 0.40.13 (Mac stays 0.40.10 for production stability)
+- Fleet role assignment updated per Mega Tuning Report
+- Fleet documentation expanded: 5 -> 8 machines (added UA, AM4, CAT)
+
+### Added
+- `configs/config_g_v7.0.yaml` — locked Config G reference for TURBO-Fable under GOD CONFIG v7.0
+- `images/hero_banner_v8.png` — ComfyUI-generated v0.8 hero banner (FLUX Dev fp8)
+- `docs/fleet_inventory.md` — full fleet specs from live SSH survey
+- `bomai-safe` model deployed on UA and AM4
+
+### Fixed
+- OWUI valve/TTS config reloaded from DB (C2 container restart)
+- UA lfm3-audio:latest GOD v7.0 compliance (was temperature=0, 6 params missing)
+- 9 GOD CONFIG parameter corrections across 5 model configurations
+- 10 orphan model paths + 1 stale Ollama tag removed (UA/AM4/Mac)
+- 9 dead LiteLLM routes removed + 3 staged for UA :4100
+- 15 unused Docker images removed (19.33 GiB)
+- i9 llamacpp-gpu1 auto-start: Manual -> Automatic
+- NAS nas-hub auto-start: no -> unless-stopped
+
+### Metrics
+- Net disk reclaimed: **210.43 GiB** across fleet
+- Docker cleanup: 19.33 GiB images + 3.60 GiB build cache
+- Fleet GOD compliance: all models 7/7 locked params (after lfm3-audio fix)
+
 ## [7.0.0] - 2026-10-27
 
 ### Changed

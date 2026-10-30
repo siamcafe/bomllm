@@ -1,10 +1,10 @@
 # BOMLLM
 
-![BOM LLM v7](images/hero_banner_v7.png)
+![BOM LLM v0.8](images/hero_banner_v8.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v7 — Security & Fleet Update**
+**BOM LLM v0.8 — Mega Tuning & Fleet Optimization**
 
 I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
 It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
@@ -17,9 +17,22 @@ Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; ev
 
 This is not a demo. This is the exact stack that answers my customers every day.
 
-## What's New in v7 — 🔒 Security & Fleet Update (Oct 27, 2026)
+## What's New in v0.8 — 🔧 Mega Tuning & Fleet Optimization (Oct 30, 2026)
 
-- **GOD CONFIG v5.5** — 9 production config changes (Ollama 0.40.10, router truth, rollback containers)
+- **GOD CONFIG v7.0** — 9 parameter corrections across 5 model configurations, all presence_penalty=0 enforced
+- **Fleet cleanup** — 210.43 GB reclaimed across UA, AM4, Mac, C2, NAS
+- **Ollama 0.40.13** — UA and AM4 upgraded (Mac stays 0.40.10 for production stability)
+- **bomai-safe deployed** — content rewrite model on UA and AM4
+- **Dead route cleanup** — 9 live + 3 staged removals across LiteLLM instances
+- **Docker cleanup** — 15 unused images removed (19.33 GB reclaimed)
+- **Auto-start fixes** — i9 llamacpp-gpu1 Automatic, NAS nas-hub unless-stopped
+- **Model inventory** — 10 orphan model paths + 1 stale Ollama tag removed
+- **Fleet expanded** — 8 machines documented (added UA, AM4, CAT)
+
+### Previous: v7 — 🔒 Security & Fleet Update (Oct 27, 2026)
+ — 🔒 Security & Fleet Update (Oct 27, 2026)
+
+- **GOD CONFIG v7.0** — 9 production config changes (Ollama 0.40.10, router truth, rollback containers)
 - **Open WebUI v0.12.4** — upgraded from v0.11.3 (Python 3.12.15, Pillow 13)
 - **LiteLLM v1.106.3** — security patched; v1.107.0 supply-chain compromise blocked
 - **Ollama 0.40.10** — upgraded from 0.40.1 (versioned LaunchDaemon pattern)
@@ -63,7 +76,7 @@ This is not a demo. This is the exact stack that answers my customers every day.
 - Average: **18.5 tok/s** (range 17–20)
 - Hardware: Apple M4 Pro (Mac Mini), MLX nvfp4
 
-### Recommended Parameters (GOD CONFIG v5.5 locked_params)
+### Recommended Parameters (GOD CONFIG v7.0 locked_params)
 
 ```yaml
 temperature: 0.6
@@ -75,7 +88,7 @@ num_ctx: 8192
 num_predict: 4096
 ```
 
-Full bench data: [benchmarks/turbo_fable_bench.yaml](benchmarks/turbo_fable_bench.yaml) · Config: [configs/config_g_v5.5.yaml](configs/config_g_v5.5.yaml)
+Full bench data: [benchmarks/turbo_fable_bench.yaml](benchmarks/turbo_fable_bench.yaml) · Config: [configs/config_g_v7.0.yaml](configs/config_g_v7.0.yaml)
 
 Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_00001_.png) · [2](images/bomllm_promo_00002_.png) · [3](images/bomllm_promo_00003_.png)
 
@@ -129,7 +142,7 @@ flowchart TB
 
     subgraph VPS["VPS — Singapore (Debian 12, Docker)"]
         OW["Open WebUI v0.12.4"]
-        LL["LiteLLM proxy 1.106.3<br/>(routing, virtual keys, budgets, fallback)"]
+        LL["LiteLLM proxy 1.106.4<br/>(routing, virtual keys, budgets, fallback)"]
         PG[("Postgres 16")]
         QD[("Qdrant 1.20.0")]
         VY[("Valkey 8")]
@@ -139,7 +152,7 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.40.10 (MLX backend)"]
+        OL["Ollama 0.40.10-0.40.13 (MLX backend)"]
         M1["Fable 732 (27B nvfp4)<br/>~21 tok/s · MTP 2-3×"]
         MIMO["MiMo-V2.6 Q4 (9B)<br/>37 tok/s · coding drafts"]
         EMB["bge-m3 embeddings"]
@@ -220,12 +233,14 @@ cd bomllm
 
 | Machine | Role | Key Specs |
 |---------|------|-----------|
-| Mac Mini M4 Pro | Brain | 48GB, Ollama 0.40.10, TURBO-Fable + MiMo Q4 |
-| VPS Singapore | Gateway | Docker, OWUI, LiteLLM, SearXNG |
-| i9 Windows | GPU Worker | 2× RTX 5060 Ti, ComfyUI, TTS, Music |
-| AMD | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
-| Synology DS725+ | Infra | comfy-router, monitoring, n8n, backups |
-
+| Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.10, TURBO-Fable + MiMo Q4, MLX nvfp4 |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.12.4, LiteLLM 1.106.4, SearXNG |
+| UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.13, gpt-oss-120b, LiteLLM staging |
+| AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, 2x RTX 5060 Ti 16GB, Ollama 0.40.13, ComfyUI x2, hub services |
+| i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI, TTS, Music, EA |
+| AM5 Windows | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
+| NAS DS725+ | Infra | comfy-router, monitoring, n8n, backups |
+| CAT Server | Web Hosting | DirectAdmin, 5 WordPress sites, MySQL |
 ## License
 
 MIT — clone, run, deploy. See [LICENSE](LICENSE).
@@ -238,17 +253,25 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v7 — Security & Fleet Update**
+**BOM LLM v0.8 — Mega Tuning & Fleet Optimization**
 
-แทนที่ค่า API คลาวด์ $50/วัน ด้วย Mac Mini บนโต๊ะ $0.54/วัน (ค่าไฟจริง)
+แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**v4 ใหม่:**
-- เขียนโค้ดได้แล้ว! GLM-5.3 (คลาวด์) + MiMo 9B (โลคอล 37 tok/s)
-- Benchmark ผ่าน 8 โจทย์จริง: Python, MQL5, WordPress, Bash, Node.js
-- Live stream overlay: วิเคราะห์กราฟ real-time ด้วย AI vision
-- Thai quality 2.00, ไม่มีตัวจีนหลุด, MTP เร็ว 2-3 เท่า
+**v0.8 ใหม่:**
+- GOD CONFIG v7.0 — ปรับแต่ง 9 จุด ข้าม 5 model configs, presence_penalty=0 ทั้ง fleet
+- Fleet cleanup — คืนพื้นที่ 210.43 GB ทั่ว fleet
+- Ollama 0.40.13 — UA + AM4 (Mac ยังอยู่ 0.40.10 เพื่อเสถียรภาพ production)
+- bomai-safe — model ใหม่ deploy บน UA + AM4
+- Docker cleanup — ลบ 15 images ไม่ใช้ (19.33 GB)
+- Fleet 8 เครื่อง — Mac + C2 + UA + AM4 + i9 + AM5 + NAS + CAT
+
+**v7 ก่อนหน้า:**
+- GOD CONFIG v5.5 — 9 ค่าปรับ production
+- Open WebUI v0.12.4
+- LiteLLM v1.106.4 — patch security (v1.107.0 supply-chain compromised)
+- Ollama 0.40.10
 
 Self-hosted AI ที่ใช้งานจริงทุกวัน ไม่ใช่ของเล่น 💪
 

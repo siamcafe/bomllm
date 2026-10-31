@@ -1,6 +1,6 @@
-# BOMLLM
+# BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v9.0.0 — Project Closure Release](images/hero_banner_v9.png)
+![BOM LLM v9.0.0 Self-Hosted Thai AI — Fleet 9/9 Verified, Pipeline PASS, 40 IRON Rules](images/hero_banner_v9.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 

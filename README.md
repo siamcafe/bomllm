@@ -17,6 +17,14 @@ Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; ev
 
 This is not a demo. This is the exact stack that answers my customers every day.
 
+## What's New in v0.8.1 — 🛡️ GOD CONFIG Docs + QC System (Oct 31, 2026)
+
+- **GOD_CONFIG.md** — full GOD CONFIG v7.0 reference (locked params, per-model compliance, protected deviations)
+- **QC System on AM4** — OCR / Whisper / ASR / Gateway, deployed Oct 31, 10/10 PASS
+- **Grok deep survey** — 30 findings across 7/7 machines; fleet fixes F001–F010 applied
+- **K3 LFM3 lightweight model blueprint** — Typhoon2-3B rank 1, lfm3:1.7b rank 2 (deployed)
+- **Pinned versions** — LiteLLM v1.106.4 (⛔ v1.107.0 COMPROMISED), ComfyUI v0.43.0 fleet-wide
+
 ## What's New in v0.8 — 🔧 Mega Tuning & Fleet Optimization (Oct 30, 2026)
 
 - **GOD CONFIG v7.0** — 9 parameter corrections across 5 model configurations, all presence_penalty=0 enforced
@@ -123,6 +131,24 @@ Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_0000
 - **Image:** ComfyUI + FLUX Dev fp8 (3 GPU workers via comfy-router)
 - **Voice:** SiangTTS (VoxCPM2 LoRA, reference-only mode)
 - **Music:** YuE2-3B instrumental + ACE-Step 1.5 Thai vocal
+
+## GOD CONFIG v7.0
+
+Locked generation parameters for all production models:
+
+| Parameter | Value | Reason |
+|-----------|-------|--------|
+| temperature | 0.6 | Thai quality gate — ≥0.7 fails |
+| top_p | 0.95 | Balanced sampling |
+| top_k | 20 | Focused vocabulary |
+| repeat_penalty | 1.0 | No repetition bias |
+| presence_penalty | 0.0 | ⛔ CRITICAL — 1.5 causes Han leak |
+| num_predict | 4096 | Max generation length |
+| num_ctx | 8192 | Context window |
+
+⛔ **DO NOT change presence_penalty from 0.0** — values >0 cause Chinese character leakage in Thai responses.
+
+Full per-model compliance table and protected deviations: [GOD_CONFIG.md](GOD_CONFIG.md)
 
 ## Architecture
 
@@ -241,6 +267,37 @@ cd bomllm
 | AM5 Windows | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
 | NAS DS725+ | Infra | comfy-router, monitoring, n8n, backups |
 | CAT Server | Web Hosting | DirectAdmin, 5 WordPress sites, MySQL |
+
+## Fleet Status (Oct 31, 2026)
+
+| Machine | Role | Ollama | Status |
+|---------|------|--------|--------|
+| Mac Mini M4 Pro | Production qwen38-uni | 0.40.10 | ✅ LIVE |
+| Ubuntu AI (UA) | gpt-oss-120b + ComfyUI | 0.40.13 | ✅ |
+| AM4 | QC Stack + Hub | 0.40.13 | ✅ |
+| C2 (Contabo) | OWUI + LiteLLM | — | ✅ |
+| i9 | ComfyUI + MT5 + llama.cpp | — | ✅ |
+| AM5 | Command station | 0.40.13 | ✅ |
+| NAS | Hub relay + n8n | — | ✅ |
+
+Production pipeline: OWUI v0.12.4 → LiteLLM v1.106.4 → llm-smart → gpt-oss-120b
+
+## QC System (AM4)
+
+Deployed Oct 31 — 10/10 PASS:
+- QC Ollama :11440 (GPU0 isolated) — 4 models
+- QC Whisper :18091 (typhoon-whisper-turbo)
+- QC ASR :18092 (typhoon-asr-realtime, CPU)
+- QC Gateway :18090 (LAN accessible)
+
+## Pinned Versions
+
+- OWUI: v0.12.4
+- LiteLLM: v1.106.4 (⛔ v1.107.0 COMPROMISED)
+- Ollama: 0.40.13 (UA/AM4), 0.40.10 (Mac)
+- ComfyUI: v0.43.0 (fleet-wide)
+- BOM AI: v0.3.2
+
 ## License
 
 MIT — clone, run, deploy. See [LICENSE](LICENSE).

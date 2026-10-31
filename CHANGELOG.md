@@ -11,6 +11,33 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [0.8.1] - 2026-10-31
+
+### Added
+- GOD CONFIG v7.0 documentation (`GOD_CONFIG.md` — locked params, 20-model compliance table, protected deviations)
+- QC system on AM4 (OCR/Whisper/ASR/Gateway) — 10/10 PASS
+- Fleet-wide Grok deep survey (30 findings, 7/7 machines)
+- K3 LFM3 lightweight model blueprint
+
+### Fixed
+- F001 CRIT: UA :4100 litellm-staging recreated (NetworkSettings corrupt)
+- F003: i9 ComfyUI GPU1 NSSM re-pointed to start_gpu1.bat
+- F006: Mac firewall enabled with pf anchor for Ollama LAN
+- F007: AM4 QC 4/4 models presence_penalty pinned to 0
+- F008: UA bomai-gateway disabled (upstream incompatible)
+- F009: AM5 Ollama upgraded 0.40.5 → 0.40.13
+- F010: NAS Kuma port corrected :32769 → :3001
+- llm-smart rebind 127.0.0.1 → 0.0.0.0
+- Mac qwen38-uni restored from backup
+- AM5 OWUI port conflict 8080 → 3000
+- AM4 Whisper max_new_tokens + ASR NeMo extraction bugs
+
+### Verified
+- E2E production chain: 13/13 PASS
+- Grok street test: 30/35 PASS (5 behavioral, not system)
+- GOD CONFIG pp=0 verified 15 models all machines
+- LiteLLM v1.106.4 pinned fleet-wide (v1.107.0 absent)
+
 ## [0.8.0] - 2026-10-30
 
 ### Changed

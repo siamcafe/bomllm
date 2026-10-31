@@ -1,6 +1,6 @@
 # BOMLLM
 
-![BOM LLM v0.8](images/hero_banner_v8.png)
+![BOM LLM v0.8.1](images/hero_banner_v081.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 

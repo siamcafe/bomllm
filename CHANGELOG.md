@@ -11,6 +11,35 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [9.0.0] - 2026-11-01
+
+### Changed
+- Version bump: v0.8.1 -> v9.0.0 (Project Closure Release)
+- README: hero banner updated, SEO badges added, keywords section added
+- Thai section: updated to v9.0.0
+
+### Added
+- `images/hero_banner_v9.png` — ComfyUI-generated v9 hero banner (FLUX Dev fp8)
+- Git tag v9.0.0 — first release tag in repo history
+- README SEO optimization: shields.io badges, keyword cloud, structured metadata
+- README Keywords section for discoverability
+
+### Verified (Project Closure)
+- Fleet: 9/9 machines SSH verified, all containers healthy
+- Pipeline: OWUI v0.12.4 → LiteLLM v1.106.4 → llm-smart → gpt-oss-120b — E2E PASS
+- GOD CONFIG v7.0: pp=0 verified 15 models all machines
+- IRON rules: 40 total (38/39/40 added for SSH safety after incident #24)
+- SSH incident #24: PasswordAuthentication restored on all 9 fleet machines
+- 14/14 findings from Grok deep scan resolved
+- FINAL BLUEPRINT art#54961 (51KB, 15 sections) published
+- FINAL HOW-TO art#54962 (32KB, 14 sections) published
+
+### Security
+- IRON 38: PasswordAuthentication config changes FORBIDDEN (owner-only)
+- IRON 39: Claude cannot self-exempt IRON rules (owner command required)
+- IRON 40: Working configs must not be changed for hardening without owner order
+- LiteLLM v1.107.0 supply-chain compromise remains blocked — v1.106.4 pinned
+
 ## [0.8.1] - 2026-10-31
 
 ### Added

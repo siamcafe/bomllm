@@ -1,10 +1,19 @@
 # BOMLLM
 
-![BOM LLM v0.8.1](images/hero_banner_v081.png)
+![BOM LLM v9.0.0 — Project Closure Release](images/hero_banner_v9.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v0.8 — Mega Tuning & Fleet Optimization**
+**BOM LLM v9.0.0 — Project Closure: Fleet Verified 9/9, Pipeline PASS, 40 IRON Rules**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Fleet Status](https://img.shields.io/badge/Fleet-9%2F9%20Verified-brightgreen)]()
+[![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
+[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v7.0-blue)]()
+[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-40-red)]()
+[![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
+[![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
+[![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-Model%20Card-yellow)](https://huggingface.co/bomllm/turbo-thai-config)
 
 I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
 It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
@@ -16,6 +25,17 @@ An i9 with 2× RTX 5060 Ti renders images (ComfyUI + FLUX), Thai voice (SiangTTS
 Everything meshes over **Tailscale**; public HTTPS via **Cloudflare Tunnel**; every API key-gated.
 
 This is not a demo. This is the exact stack that answers my customers every day.
+
+## What's New in v9.0.0 — 🏁 Project Closure Release (Nov 1, 2026)
+
+- **PROJECT CLOSURE 10/10** — all 14 findings resolved, fleet 9/9 verified, pipeline E2E PASS
+- **IRON 40 Rules** — 3 new safety rules (IRON 38/39/40) after SSH incident #24
+- **SSH Incident #24 Fixed** — PasswordAuthentication restored on all 9 fleet machines
+- **Grok Deep Root Cause Scan** — 9 machines × 9 areas, 3 root causes traced (hardware/config, not software)
+- **FINAL BLUEPRINT** — 51KB, 15 sections, comprehensive fleet architecture reference (art#54961)
+- **FINAL HOW-TO** — 32KB, 14 sections, complete operational manual (art#54962)
+- **Mega Closure Report** — 14/14 findings verified and closed (art#55017)
+- **Pinned versions verified** — LiteLLM v1.106.4, OWUI v0.12.4, Ollama 0.40.10-0.40.13, ComfyUI v0.43.0
 
 ## What's New in v0.8.1 — 🛡️ GOD CONFIG Docs + QC System (Oct 31, 2026)
 
@@ -297,6 +317,7 @@ Deployed Oct 31 — 10/10 PASS:
 - Ollama: 0.40.13 (UA/AM4), 0.40.10 (Mac)
 - ComfyUI: v0.43.0 (fleet-wide)
 - BOM AI: v0.3.2
+- IRON Rules: 40
 
 ## License
 
@@ -308,15 +329,21 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
+---
+
+## Keywords
+
+`Thai LLM` `self-hosted AI` `Mac Mini M4 Pro` `local inference` `TURBO-Fable` `BOM LLM` `Thai NLP` `fleet management` `ComfyUI` `FLUX` `open-source AI` `MLX` `Ollama` `LiteLLM` `Open WebUI` `GOD CONFIG` `production AI` `self-hosted ChatGPT alternative` `Thai language model` `low-cost AI inference` `IRON rules` `AI operations` `fleet automation`
+
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v0.8 — Mega Tuning & Fleet Optimization**
+**BOM LLM v9.0.0 — Project Closure Release**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**v0.8 ใหม่:**
+**v9.0.0 ใหม่:**
 - GOD CONFIG v7.0 — ปรับแต่ง 9 จุด ข้าม 5 model configs, presence_penalty=0 ทั้ง fleet
 - Fleet cleanup — คืนพื้นที่ 210.43 GB ทั่ว fleet
 - Ollama 0.40.13 — UA + AM4 (Mac ยังอยู่ 0.40.10 เพื่อเสถียรภาพ production)

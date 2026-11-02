@@ -2,6 +2,12 @@
 
 Policy ID: `bomllm.policy/v7.0` · Status: **PRODUCTION with documented deviations** · Source: BomLLM Mega Tuning Report (art#54324, 2026-10-29) · Verified fleet-wide 2026-10-31.
 
+## v10.0.0 Update (2026-11-02)
+
+- GOD CONFIG v7.0 parameters: NO CHANGE (all 7 locked params verified)
+- OWUI upgraded v0.12.4 -> v0.12.5 (18 mods intact)
+- Fleet verification: 15 models compliant, 3 protected deviations documented
+
 ## Locked Generation Defaults
 
 | Parameter | Value | Reason |

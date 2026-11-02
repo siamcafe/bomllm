@@ -1,15 +1,16 @@
 # BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v9.0.0 Self-Hosted Thai AI — Fleet 9/9 Verified, Pipeline PASS, 40 IRON Rules](images/hero_banner_v9.png)
+![BOM LLM v10.0.0 Self-Hosted Thai AI — Fleet 9/9 Verified, Pipeline PASS, 40 IRON Rules](images/hero_banner_v10.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v9.0.0 — Project Closure: Fleet Verified 9/9, Pipeline PASS, 40 IRON Rules**
+**BOM LLM v10.0.0 — OWUI v0.12.5 Fleet Update: Fleet Verified 9/9, Pipeline PASS, 40 IRON Rules**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-9%2F9%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
 [![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v7.0-blue)]()
+[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.12.5-blueviolet)]()
 [![IRON Rules](https://img.shields.io/badge/IRON%20Rules-40-red)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
@@ -187,7 +188,7 @@ flowchart TB
     CF["Cloudflare Tunnel<br/>(HTTPS, key-gated)"]
 
     subgraph VPS["VPS — Singapore (Debian 12, Docker)"]
-        OW["Open WebUI v0.12.4"]
+        OW["Open WebUI v0.12.5"]
         LL["LiteLLM proxy 1.106.4<br/>(routing, virtual keys, budgets, fallback)"]
         PG[("Postgres 16")]
         QD[("Qdrant 1.20.0")]
@@ -280,7 +281,7 @@ cd bomllm
 | Machine | Role | Key Specs |
 |---------|------|-----------|
 | Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.10, TURBO-Fable + MiMo Q4, MLX nvfp4 |
-| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.12.4, LiteLLM 1.106.4, SearXNG |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.12.5, LiteLLM 1.106.4, SearXNG |
 | UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.13, gpt-oss-120b, LiteLLM staging |
 | AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, 2x RTX 5060 Ti 16GB, Ollama 0.40.13, ComfyUI x2, hub services |
 | i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI, TTS, Music, EA |
@@ -300,7 +301,7 @@ cd bomllm
 | AM5 | Command station | 0.40.13 | ✅ |
 | NAS | Hub relay + n8n | — | ✅ |
 
-Production pipeline: OWUI v0.12.4 → LiteLLM v1.106.4 → llm-smart → gpt-oss-120b
+Production pipeline: OWUI v0.12.5 → LiteLLM v1.106.4 → llm-smart → gpt-oss-120b
 
 ## QC System (AM4)
 
@@ -312,7 +313,7 @@ Deployed Oct 31 — 10/10 PASS:
 
 ## Pinned Versions
 
-- OWUI: v0.12.4
+- OWUI: v0.12.5
 - LiteLLM: v1.106.4 (⛔ v1.107.0 COMPROMISED)
 - Ollama: 0.40.13 (UA/AM4), 0.40.10 (Mac)
 - ComfyUI: v0.43.0 (fleet-wide)
@@ -337,13 +338,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v9.0.0 — Project Closure Release**
+**BOM LLM v10.0.0 — OWUI v0.12.5 Fleet Update**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**v9.0.0 ใหม่:**
+**v10.0.0 ใหม่:**
 - GOD CONFIG v7.0 — ปรับแต่ง 9 จุด ข้าม 5 model configs, presence_penalty=0 ทั้ง fleet
 - Fleet cleanup — คืนพื้นที่ 210.43 GB ทั่ว fleet
 - Ollama 0.40.13 — UA + AM4 (Mac ยังอยู่ 0.40.10 เพื่อเสถียรภาพ production)

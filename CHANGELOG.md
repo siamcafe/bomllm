@@ -11,6 +11,28 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [10.0.0] - 2026-11-02
+
+### Changed
+- Open WebUI upgraded v0.12.4 -> v0.12.5 (18 mods intact, 14 overlays rebased, 12/12 QC PASS)
+- Theme Designer Pro updated 1.8.0 -> 1.19.0
+- docker-compose.yml versions updated to match production (OWUI v0.12.5, LiteLLM v1.106.4, Qdrant v1.20.0)
+- Hero banner regenerated for v10 release
+
+### Added
+- Fleet cleanup: old containers removed, orphan skill IDs cleared, Docker pruned 6.4GB
+- Grok plugin survey: 18 mods verified, 0 updates needed, GOD CONFIG v7.0 unchanged
+- Incident #26 documented: C2 polling flood from WebSocket config, K3 fix dispatched
+
+### Security
+- OWUI v0.12.5 includes upstream security fixes
+- LiteLLM pinned at v1.106.4 (v1.107.0 supply chain compromise blocked)
+
+### Verified
+- GOD CONFIG v7.0 locked params verified across 15 models (NO CHANGE)
+- 40 IRON rules maintained
+- 18/18 OWUI mods operational post-upgrade
+
 ## [9.0.0] - 2026-11-01
 
 ### Changed

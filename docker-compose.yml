@@ -100,7 +100,7 @@ services:
     networks: [bomllm]
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:v0.12.5
+    image: ghcr.io/open-webui/open-webui:v0.13.0
     restart: unless-stopped
     environment:
       OPENAI_API_BASE_URLS: "http://litellm:4000/v1"

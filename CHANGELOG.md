@@ -11,6 +11,33 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [11.0.0] - 2026-11-04
+
+### Changed
+- Open WebUI upgraded v0.12.5 -> v0.13.0 (alembic e42c8f710a36, 18 functions verified, shared BOMLLM+BOMAI instance)
+- Ollama servers v0.40.14 on Mac + UA (Mac CLI skew 0.40.10 documented; AM4 stays 0.40.13)
+- C2 performance remediation: SSH brute-force guard persisted (systemd `c2-ssh-guard`), LiteLLM DB-load keys verified at GOD CONFIG v9.0 target, poller intervals audited against the 5-minute floor
+- Hero banner regenerated for v11 (FLUX on UA ComfyUI, seed 111111, 1024x512)
+
+### Added
+- `BLUEPRINT.md` — GOD BLUEPRINT v5.2 full text (C2 performance Phase P: survey evidence, fixes, policies, dependency map)
+- `HOWTO.md` — GOD HOW-TO v4.2 full text (§3.13-§3.17: SSH guard list maintenance, LiteLLM DB checks, poller policy, external TTFB recipe, headless QC)
+- README Architecture section linking BLUEPRINT.md + HOWTO.md
+- Squid tailscale-rebind systemd drop-in on C2 (auto `squid -k reconfigure` after tailscaled restart)
+
+### Fixed
+- Residual cleanup: `charming_gauss` stray container removed (v0.13.0 image kept)
+- `/static/bomai/` hero banners now serve 200 (hero_banner_v11.png + hero_banner_v10.png)
+
+### Security
+- SSH brute-force subnet 102.220.160.0/22 blocked at boot via idempotent guard unit; NEVER-BLOCK ranges enforced in script
+
+### Verified
+- External TTFB from AM5: median 0.093 s / p90 0.182 s (api/version, 10 shots)
+- SSH connect 5x from AM5: 0.86-1.12 s (all < 5 s); C2 load1 1.03/1.05/5.42
+- Stress suite 7/8 in the 120 s window (T3 web-search passed on retry at 106.6 s)
+- GOD CONFIG v9.0 7/7 locked params unchanged; functions=18; qdrant_collections=13; headless Chromium QC 0 broken images
+
 ## [10.0.0] - 2026-11-02
 
 ### Changed

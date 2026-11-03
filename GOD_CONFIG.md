@@ -2,6 +2,12 @@
 
 Policy ID: `bomllm.policy/v7.0` · Status: **PRODUCTION with documented deviations** · Source: BomLLM Mega Tuning Report (art#54324, 2026-10-29) · Verified fleet-wide 2026-10-31.
 
+## v11.0.0 Update (2026-11-04)
+
+- GOD CONFIG v9.0 parameters: NO CHANGE — 7/7 locked params verified live on C2 (bom-thai-chat) and UA (bomai-safe: temperature 0.6, top_p 0.95, top_k 20, repeat_penalty 1.0, presence_penalty 0.0, num_predict 4096, num_ctx 8192)
+- LiteLLM `general_settings` verified at v9.0 target (proxy_batch_write_at 60, disable_error_logs true, maximum_spend_logs_retention_period 30d) — no key added, no restart needed
+- C2 performance task evidence: GOD BLUEPRINT v5.2 Phase P (see BLUEPRINT.md)
+
 ## v10.0.0 Update (2026-11-02)
 
 - GOD CONFIG v7.0 parameters: NO CHANGE (all 7 locked params verified)

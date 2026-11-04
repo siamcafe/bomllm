@@ -7,11 +7,11 @@
 **BOM LLM v11.0.0 — C2 Performance Update: OWUI v0.13.0, Ollama v0.40.14, GOD BLUEPRINT v5.2**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Fleet Status](https://img.shields.io/badge/Fleet-9%2F9%20Verified-brightgreen)]()
+[![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
 [![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v9.0-blue)]()
 [![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.0-blueviolet)]()
-[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-40-red)]()
+[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-43-red)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
 [![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-Model%20Card-yellow)](https://huggingface.co/bomllm/turbo-thai-config)
@@ -39,13 +39,24 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - **GOD BLUEPRINT v5.2 + HOW-TO v4.2** — new §3.13-§3.17 ops recipes (guard maintenance, LiteLLM DB checks, poller policy, external TTFB measurement, headless QC)
 - **GOD CONFIG v9.0 unchanged** — 7/7 locked params verified live (bom-thai-chat, bomai-safe)
 - **Residuals closed** — `charming_gauss` removed, squid tailscale-rebind automated, `/static/bomai/` hero banners serving 200
+- **IRON Rules 43** — IRON 42 (title format) + IRON 43 (structured reply) added
+- **Fleet 8/8 verified + Stress 7/8 PASS** — 8 tailscale peers; T3 web-search passed on retry at 106.6 s (180 s window)
+
+## What's New in v10.0.0 — 🔄 OWUI v0.12.5 Fleet Update (Nov 2, 2026)
+
+- **Open WebUI v0.12.4 → v0.12.5** — 18 mods intact, 14 overlays rebased, 12/12 QC PASS
+- **Theme Designer Pro 1.8.0 → 1.19.0**
+- **docker-compose.yml pinned to production** — OWUI v0.12.5, LiteLLM v1.106.4, Qdrant v1.20.0
+- **Fleet cleanup** — old containers removed, orphan skill IDs cleared, Docker pruned 6.4 GB
+- **GOD CONFIG v7.0 NO CHANGE** — locked params verified across 15 models
+- **Hero banner v10** — [images/hero_banner_v10.png](images/hero_banner_v10.png)
 
 ## What's New in v9.0.0 — 🏁 Project Closure Release (Nov 1, 2026)
 
-- **PROJECT CLOSURE 10/10** — all 14 findings resolved, fleet 9/9 verified, pipeline E2E PASS
+- **PROJECT CLOSURE 10/10** — all 14 findings resolved, fleet 8/8 verified, pipeline E2E PASS
 - **IRON 40 Rules** — 3 new safety rules (IRON 38/39/40) after SSH incident #24
-- **SSH Incident #24 Fixed** — PasswordAuthentication restored on all 9 fleet machines
-- **Grok Deep Root Cause Scan** — 9 machines × 9 areas, 3 root causes traced (hardware/config, not software)
+- **SSH Incident #24 Fixed** — PasswordAuthentication restored on all 8 fleet machines
+- **Grok Deep Root Cause Scan** — 8 machines × 9 areas, 3 root causes traced (hardware/config, not software)
 - **FINAL BLUEPRINT** — 51KB, 15 sections, comprehensive fleet architecture reference (art#54961)
 - **FINAL HOW-TO** — 32KB, 14 sections, complete operational manual (art#54962)
 - **Mega Closure Report** — 14/14 findings verified and closed (art#55017)
@@ -118,7 +129,7 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - Average: **18.5 tok/s** (range 17–20)
 - Hardware: Apple M4 Pro (Mac Mini), MLX nvfp4
 
-### Recommended Parameters (GOD CONFIG v7.0 locked_params)
+### Recommended Parameters (GOD CONFIG v9.0 locked_params)
 
 ```yaml
 temperature: 0.6
@@ -166,7 +177,7 @@ Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_0000
 - **Voice:** SiangTTS (VoxCPM2 LoRA, reference-only mode)
 - **Music:** YuE2-3B instrumental + ACE-Step 1.5 Thai vocal
 
-## GOD CONFIG v7.0
+## GOD CONFIG v9.0
 
 Locked generation parameters for all production models:
 
@@ -212,7 +223,7 @@ flowchart TB
     TS{"Tailscale mesh VPN"}
 
     subgraph MAC["Mac Mini M4 Pro 48GB — 'the brain'"]
-        OL["Ollama 0.40.10-0.40.13 (MLX backend)"]
+        OL["Ollama 0.40.14 (MLX backend)"]
         M1["Fable 732 (27B nvfp4)<br/>~21 tok/s · MTP 2-3×"]
         MIMO["MiMo-V2.6 Q4 (9B)<br/>37 tok/s · coding drafts"]
         EMB["bge-m3 embeddings"]
@@ -302,17 +313,18 @@ cd bomllm
 | NAS DS725+ | Infra | comfy-router, monitoring, n8n, backups |
 | CAT Server | Web Hosting | DirectAdmin, 5 WordPress sites, MySQL |
 
-## Fleet Status (Oct 31, 2026)
+## Fleet Status (Nov 4, 2026)
 
 | Machine | Role | Ollama | Status |
 |---------|------|--------|--------|
-| Mac Mini M4 Pro | Production qwen38-uni | 0.40.10 | ✅ LIVE |
-| Ubuntu AI (UA) | gpt-oss-120b + ComfyUI | 0.40.13 | ✅ |
+| Mac Mini M4 Pro | Production qwen38-uni | 0.40.14 | ✅ LIVE |
+| Ubuntu AI (UA) | gpt-oss-120b + ComfyUI | 0.40.14 | ✅ |
 | AM4 | QC Stack + Hub | 0.40.13 | ✅ |
 | C2 (Contabo) | OWUI + LiteLLM | — | ✅ |
 | i9 | ComfyUI + MT5 + llama.cpp | — | ✅ |
 | AM5 | Command station | 0.40.13 | ✅ |
 | NAS | Hub relay + n8n | — | ✅ |
+| CAT | Web hosting (DirectAdmin) | — | ✅ |
 
 Production pipeline: OWUI v0.13.0 → LiteLLM v1.106.4 → llm-smart → gpt-oss-120b
 
@@ -332,7 +344,7 @@ Deployed Oct 31 — 10/10 PASS:
 - Qdrant: v1.20.0
 - ComfyUI: v0.43.0 (fleet-wide)
 - BOM AI: v3.0.0
-- IRON Rules: 40
+- IRON Rules: 43
 
 ## License
 

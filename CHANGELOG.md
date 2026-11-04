@@ -18,6 +18,9 @@ versioning follows [SemVer](https://semver.org/).
 - Ollama servers v0.40.14 on Mac + UA (Mac CLI skew 0.40.10 documented; AM4 stays 0.40.13)
 - C2 performance remediation: SSH brute-force guard persisted (systemd `c2-ssh-guard`), LiteLLM DB-load keys verified at GOD CONFIG v9.0 target, poller intervals audited against the 5-minute floor
 - Hero banner regenerated for v11 (FLUX on UA ComfyUI, seed 111111, 1024x512)
+- GOD CONFIG v7.0 -> v9.0 (policy ID bump; 7 locked params unchanged)
+- IRON Rules 40 -> 43 (IRON 42 title format, IRON 43 structured reply)
+- Fleet count corrected 9 -> 8 machines (8 tailscale peers verified)
 
 ### Added
 - `BLUEPRINT.md` — GOD BLUEPRINT v5.2 full text (C2 performance Phase P: survey evidence, fixes, policies, dependency map)

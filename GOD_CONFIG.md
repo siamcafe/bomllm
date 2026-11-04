@@ -1,6 +1,6 @@
-# GOD CONFIG v7.0
+# GOD CONFIG v9.0
 
-Policy ID: `bomllm.policy/v7.0` · Status: **PRODUCTION with documented deviations** · Source: BomLLM Mega Tuning Report (art#54324, 2026-10-29) · Verified fleet-wide 2026-10-31.
+Policy ID: `bomllm.policy/v9.0` · Status: **PRODUCTION with documented deviations** · Source: BomLLM Mega Tuning Report (art#54324, 2026-10-29) · Verified fleet-wide 2026-11-04.
 
 ## v11.0.0 Update (2026-11-04)
 
@@ -29,7 +29,7 @@ Policy ID: `bomllm.policy/v7.0` · Status: **PRODUCTION with documented deviatio
 ⛔ **DO NOT change presence_penalty from 0.0** — values >0 cause Chinese character leakage in Thai responses.
 
 ```yaml
-# locked_params (bomllm.policy/v7.0)
+# locked_params (bomllm.policy/v9.0)
 temperature: 0.6
 top_p: 0.95
 top_k: 20
@@ -121,4 +121,4 @@ done
 
 ## Change Policy
 
-⛔ Parameters above are **locked**. Changing any value (especially `presence_penalty` > 0) requires an explicit owner ruling and a new policy version (`bomllm.policy/v7.x`).
+⛔ Parameters above are **locked**. Changing any value (especially `presence_penalty` > 0) requires an explicit owner ruling and a new policy version (`bomllm.policy/v9.x`).

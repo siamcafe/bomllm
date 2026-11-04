@@ -11,6 +11,22 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [12.0.0] - 2026-11-05
+
+### Added
+- Grok 4.7 full fleet audit — 8/8 machines verified (art#56080)
+- Kuma monitoring v2.5.7 on AM4 + NAS
+- ComfyUI fleet synchronization to v0.43.0 (7 instances)
+
+### Changed
+- Version bump v11.0.0 -> v12.0.0
+
+### Fixed
+- Chat residuals: keepalive timeout (KEEPALIVE_TIMEOUT=75) + web-search config
+- LiteLLM incident 30: emergency model restore (28 models recovered)
+- 8 stale RUNNING jobs cleared from hub
+- Memory defrag: consolidated project memory
+
 ## [11.0.0] - 2026-11-04
 
 ### Changed

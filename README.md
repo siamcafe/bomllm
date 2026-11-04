@@ -1,10 +1,10 @@
 # BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v11.0.0 Self-Hosted Thai AI — C2 Performance Update, OWUI v0.13.0](images/hero_banner_v11.png)
+![BOM LLM v12.0.0 Self-Hosted Thai AI — Fleet Audit + Stability, OWUI v0.13.0](images/hero_banner_v11.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v11.0.0 — C2 Performance Update: OWUI v0.13.0, Ollama v0.40.14, GOD BLUEPRINT v5.2**
+**BOM LLM v12.0.0 — Fleet Audit + Stability: OWUI v0.13.0, Ollama v0.40.14, GOD BLUEPRINT v5.2**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
@@ -30,6 +30,17 @@ This is not a demo. This is the exact stack that answers my customers every day.
 ## Architecture
 
 Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v5.2 — hardware inventory, role assignment, dependency maps, C2 performance Phase P with measured evidence) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v9.0).
+
+## What's New in v12.0.0 — 🔍 Fleet Audit + Stability (Nov 5, 2026)
+
+- **Grok 4.7 full fleet audit** — 8/8 machines verified (art#56080)
+- **ComfyUI fleet** — ALL v0.43.0 (7 instances synchronized)
+- **Kuma monitoring** — v2.5.7 deployed on AM4 + NAS
+- **Chat residuals FIXED** — keepalive timeout + web-search config corrected
+- **LiteLLM incident 30** — emergency model restore completed (28 models OK)
+- **Stale job cleanup** — 8 orphaned RUNNING jobs resolved
+- **Memory defrag** — consolidated project memory for next phase
+- Core versions unchanged: OWUI v0.13.0, LiteLLM v1.106.4, GOD CONFIG v9.0
 
 ## What's New in v11.0.0 — ⚡ C2 Performance Update (Nov 4, 2026)
 
@@ -364,11 +375,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v11.0.0 — C2 Performance Update**
+**BOM LLM v12.0.0 — Fleet Audit + Stability**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
+
+**v12.0.0 ใหม่:**
+- ตรวจสอบ fleet ครบทั้ง 8 เครื่อง (Grok 4.7 full audit)
+- ComfyUI ทั้ง fleet เป็น v0.43.0 เหมือนกันหมด (7 instances)
+- Kuma monitoring v2.5.7 บน AM4 + NAS
+- แก้ chat residuals — keepalive timeout + web-search config
+- LiteLLM incident 30 — กู้คืน models ครบ 28 ตัว
+- เวอร์ชันหลักคงเดิม: OWUI v0.13.0, LiteLLM v1.106.4, GOD CONFIG v9.0
 
 **v11.0.0 ใหม่:**
 - Open WebUI v0.13.0 — อัปเดตความปลอดภัย ระบบ mods 18 ตัวใช้งานครบ

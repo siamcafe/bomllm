@@ -50,7 +50,7 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - **LiteLLM incident 30** — emergency model restore completed (28 models OK)
 - **Stale job cleanup** — 8 orphaned RUNNING jobs resolved
 - **Memory defrag** — consolidated project memory for next phase
-- Core versions unchanged: OWUI v0.13.0, LiteLLM v1.106.4, GOD CONFIG v9.0
+- Core versions unchanged: OWUI v0.13.0, LiteLLM v1.106.5, GOD CONFIG v9.0
 
 ## What's New in v11.0.0 — ⚡ C2 Performance Update (Nov 4, 2026)
 
@@ -67,7 +67,7 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 
 - **Open WebUI v0.12.4 → v0.12.5** — 18 mods intact, 14 overlays rebased, 12/12 QC PASS
 - **Theme Designer Pro 1.8.0 → 1.19.0**
-- **docker-compose.yml pinned to production** — OWUI v0.12.5, LiteLLM v1.106.4, Qdrant v1.20.0
+- **docker-compose.yml pinned to production** — OWUI v0.12.5, LiteLLM v1.106.5, Qdrant v1.20.0
 - **Fleet cleanup** — old containers removed, orphan skill IDs cleared, Docker pruned 6.4 GB
 - **GOD CONFIG v7.0 NO CHANGE** — locked params verified across 15 models
 - **Hero banner v10** — [images/hero_banner_v10.png](images/hero_banner_v10.png)
@@ -81,7 +81,7 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - **FINAL BLUEPRINT** — 51KB, 15 sections, comprehensive fleet architecture reference (art#54961)
 - **FINAL HOW-TO** — 32KB, 14 sections, complete operational manual (art#54962)
 - **Mega Closure Report** — 14/14 findings verified and closed (art#55017)
-- **Pinned versions verified** — LiteLLM v1.106.4, OWUI v0.12.4, Ollama 0.40.10-0.40.13, ComfyUI v0.43.0
+- **Pinned versions verified** — LiteLLM v1.106.5, OWUI v0.12.4, Ollama 0.40.10-0.40.13, ComfyUI v0.43.0
 
 ## What's New in v0.8.1 — 🛡️ GOD CONFIG Docs + QC System (Oct 31, 2026)
 
@@ -89,7 +89,7 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - **QC System on AM4** — OCR / Whisper / ASR / Gateway, deployed Oct 31, 10/10 PASS
 - **Grok deep survey** — 30 findings across 7/7 machines; fleet fixes F001–F010 applied
 - **K3 LFM3 lightweight model blueprint** — Typhoon2-3B rank 1, lfm3:1.7b rank 2 (deployed)
-- **Pinned versions** — LiteLLM v1.106.4 (⛔ v1.107.0 COMPROMISED), ComfyUI v0.43.0 fleet-wide
+- **Pinned versions** — LiteLLM v1.106.5 (⛔ v1.107.0 COMPROMISED), ComfyUI v0.43.0 fleet-wide
 
 ## What's New in v0.8 — 🔧 Mega Tuning & Fleet Optimization (Oct 30, 2026)
 
@@ -347,7 +347,7 @@ cd bomllm
 | NAS | Hub relay + n8n | — | ✅ |
 | CAT | Web hosting (DirectAdmin) | — | ✅ |
 
-Production pipeline: OWUI v0.13.0 → LiteLLM v1.106.4 → llm-smart → gpt-oss-120b
+Production pipeline: OWUI v0.13.0 → LiteLLM v1.106.5 → llm-smart → gpt-oss-120b
 
 ## QC System (AM4)
 
@@ -360,11 +360,11 @@ Deployed Oct 31 — 10/10 PASS:
 ## Pinned Versions
 
 - OWUI: v0.13.0
-- LiteLLM: v1.106.4 (⛔ v1.107.0 COMPROMISED)
+- LiteLLM: v1.106.5 (⛔ v1.107.0 COMPROMISED)
 - Ollama: 0.40.14 (Mac server + UA), 0.40.13 (AM4)
 - Qdrant: v1.20.0
 - ComfyUI: v0.43.0 (fleet-wide)
-- BOM AI: v3.0.0
+- BOM AI: v2.0.3
 - IRON Rules: 43
 
 ## License
@@ -404,7 +404,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - Kuma monitoring v2.5.7 บน AM4 + NAS
 - แก้ chat residuals — keepalive timeout + web-search config
 - LiteLLM incident 30 — กู้คืน models ครบ 28 ตัว
-- เวอร์ชันหลักคงเดิม: OWUI v0.13.0, LiteLLM v1.106.4, GOD CONFIG v9.0
+- เวอร์ชันหลักคงเดิม: OWUI v0.13.0, LiteLLM v1.106.5, GOD CONFIG v9.0
 
 **v11.0.0 ใหม่:**
 - Open WebUI v0.13.0 — อัปเดตความปลอดภัย ระบบ mods 18 ตัวใช้งานครบ
@@ -420,7 +420,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 **v7 ก่อนหน้า:**
 - GOD CONFIG v5.5 — 9 ค่าปรับ production
 - Open WebUI v0.12.4
-- LiteLLM v1.106.4 — patch security (v1.107.0 supply-chain compromised)
+- LiteLLM v1.106.5 — patch security (v1.107.0 supply-chain compromised)
 - Ollama 0.40.10
 
 Self-hosted AI ที่ใช้งานจริงทุกวัน ไม่ใช่ของเล่น 💪

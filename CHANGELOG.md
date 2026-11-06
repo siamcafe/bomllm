@@ -1,3 +1,44 @@
+## v15.0.0 — 2026-11-06
+
+### Changes
+- BOM AI v2.0.3 integration: Han Fix 3-Layer HF-1.0, bom_runtime 2584 lines
+- GOD CONFIG v11.0 + GOD BLUEPRINT v7.0 (atom-level optimization)
+- Price Router v2: narrowed intent regex, 2s timeout, HTTP poll source label
+- live-router model fix: qwen38-chat -> qwen38-uni
+- C2 OWUI memory cap 8GB, ufw dead rules cleaned
+- UA memory guard deployed (cron */5), secret files permissions 600
+- AM4 llm-postgres rebound to LAN/TS/loopback (0.0.0.0 closed)
+- AM4 syslog rotated 270MB->4K, journal vacuum 312->187MB
+- CB1 zombie watch cron deployed (31 zombies from icafefx-chart)
+- Fleet config backup: NAS git tag config-snapshot-2026-11-06
+- Fleet junk cleanup: 4.8GB docker prune + 1.1GB i9 temp reclaimed
+- ComfyUI release banner generated
+
+### Fleet Version Table (atom survey verified 2026-11-06)
+| Host | Ollama | OWUI | LiteLLM |
+|------|--------|------|---------|
+| C2 | - | 0.13.0 | 1.106.5-pil2 |
+| UA | 0.40.14 | 0.12.4 | 1.106.5 |
+| AM4 | - | 0.11.4 | 1.106.5-pil2 |
+| Mac | 0.40.14 | 0.12.0 | - |
+| i9 | 0.40.13 | - | - |
+
+### Dependencies
+- BOM AI: v2.0.3 (Han Fix HF-1.0)
+- Netdata: 5 nodes (C2/UA/AM4/Mac/CAT)
+- LiteLLM pin: v1.106.5 (reconciled from v1.106.4)
+
+### Artifacts
+- Atom survey: art#56608 (225 files, 54600 lines, 32 findings)
+- K3 optimization v2: art#56647 (23 actions)
+- Wave 1+2 implement: art#56649 (11/11 DONE)
+- Wave 3 implement: art#56683 (4 DONE + 1 SKIP)
+- GOD CONFIG v11: art#56686
+- GOD BLUEPRINT v7: art#56687
+- Config backup: NAS git tag config-snapshot-2026-11-06
+- Junk survey: art#56706 (28.8GB reclaimable found)
+- BOM AI handoff: art#56812 (v2.0.3)
+
 # Changelog
 
 All notable changes to the BOMLLM release kit are documented here.

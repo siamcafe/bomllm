@@ -1,0 +1,151 @@
+# GOD BLUEPRINT v7.0 — BOMLLM Fleet
+# Full baseline update from atom survey art#56608; supersedes v6.0 (art#56565).
+project: bom-llm
+step: fleet_optimization_blueprint
+version: '7.0'
+previous: '6.0'
+base_document: art#56565 GOD BLUEPRINT v6.0 + art#56564 GOD CONFIG v10.0
+date: '2026-11-06'
+author: Kimi K3-256k /auto, spec art#56638
+recommendation: INSPECT
+references: [56608, 56564, 56565, 56543, 56578, 56483]
+v7_changes_vs_v6:
+  1: Atom survey (225 files/54600 lines/32 findings) fully incorporated; v6's 28 issues re-scored
+     against post-implementation state — 15 closed by art#56578, 23 live findings remain.
+  2: UA memory pressure remains the sole CRITICAL; freeze continues with a deployed read-only
+     guard (ACTION-01); recovery un-freeze is owner-only.
+  3: Price pipeline (deployed after v6) is the largest new defect cluster: blocking global
+     router, dishonest source labeling, missing model rows (ACTION-02/03).
+  4: LiteLLM reconcile inverted: fleet 1.106.5 vs pin 1.106.4 — blueprint adopts 1.106.5 as the
+     documented pin (IRON 40); downgrade only on owner order; 1.107.0 banned.
+  5: AM4 replaces UA as the widest exposure (ufw inactive + 0.0.0.0:5432); two-phase fix with
+     consumer-proof gate (ACTION-05).
+  6: Mac issue upgraded from path-inefficiency to generation-stall risk (70s localhost timeout);
+     bounce + owner NAT branches defined (ACTION-06).
+  7: CB1 zombie root cause refined: parent is n8n itself, not browserless — owner-window recycle
+     is the only fix (ACTION-08).
+  8: cloudflared triplicate llm.siam2r.com rules documented with three owner-intent branches
+     (ACTION-10).
+fleet_overview:
+  machines: 8
+  gpus: 7
+  vram_gib: 96
+  survey_window_ict: 2026-11-06 07:47-08:02 (atom, read-only)
+  reachable_machines: 8
+  issues_open: 23 (1 critical, 6 high, 10 medium, 6 low)
+  issues_closed_since_v6: 15 (C2 netdata tune path validated, OWUI loopback bind, UA/AM4 netdata
+    rebinds+persistence, NAS scripts.d/exporter, Mac CLI align, AM4 kern.log + exited cleanup,
+    C2 container/cleanup, CB1 browserless recycle + netdata safe-config, fleet bind/version/
+    zombie/log audits)
+  critical_issues: 1
+  roles_changed: false
+  command_station: AM5 recorded separately
+architecture:
+  diagram: "Users / owner apps
+    -> Cloudflare -> C2 cloudflared -> OWUI 0.13.0 (127.0.0.1:3000) -> C2 LiteLLM 1.106.5
+         -> Mac qwen38-uni 0.40.14 (PRIMARY; DERP sin; 70s stall under repair ACTION-06)
+         -> UA gpt-oss-120b / bomai-safe (LIVE_NO_TOUCH; memory admission FROZEN)
+         -> AM4 Qdrant + Infinity + business services via existing relays
+    Price: OWUI bom_price_router v2 (ACTION-02) -> external HTTP poll 168.119.176.113:5000
+    NAS hub/docs/service relays (n8n 2.31.2 unchanged)
+    Contabo1 monitoring/n8n 2.10.3/browserless (independent; n8n-parent zombies owner-window)
+    CAT DirectAdmin hosting (OWNER_EXECUTE only; backups + PHP default in repair)
+    i9 ComfyUI/YuE2/bomai-pro (GPU attribution gate; admission DENY)"
+  updates: No role migration. v7 overlays the price-pipeline hardening, live-router model fix,
+    AM4 exposure two-phase plan, Mac stall repair, CAT owner batch, CB1 owner recycle.
+  production_dependencies:
+  - C2 tailscaled is load-bearing (hub/docs/chart, Qdrant, embeddings, Mac generation) — never stop
+  - C2 rag-lb-relay-am4 and qdrant-relay-am4 are production-critical — never remove
+  - C2 chart-overlay_offloaded_to_am4 remains KEEP_PENDING_OWNER_REVIEW
+  - NAS n8n and Contabo1 n8n are independent owner-held instances — no restart/forced alignment
+  - single OWUI worker on C2: all filter inlet paths must be non-blocking (price router v2 enforces
+    executor fetch, 2s timeout, zero sleep)
+performance_deltas:
+  c2_netdata:
+    initial_combined_cpu_pct: 190-300 (art56352)
+    after_first_tune_combined_pct: 56-68 (art56352)
+    after_final_tune_one_core_pct: 94.0
+    latest_survey_one_core_pct: 73.9
+    post_rollback_window_pct: 48-55 (art#56578 C2-1 rolled back on 2-sample gate; original 10s
+      config restored)
+    target_one_core_pct: <50 sustained
+    verdict: within target band at last window; no further collector purge without new evidence
+  ua_memory: {available_gib: 12.4-13.4, swap_used_gib: 17.8-18.2, swap_out: active, status:
+      CRITICAL_FROZEN}
+  mac_generate: {localhost_10_token_s: 70 (timeout), target_after_path_fix_s: <15, path: DERP sin}
+  c2_external: api_ttfb_median ~0.10s / p90 ~0.18s (v5.2 evidence); localhost 0.021s; public
+    webui from station 1.23-1.60s (edge path, not box)
+  response_times_atom: {c2_owui_localhost_s: 0.0209, c2_litellm_liveliness_s: 0.072,
+    c2_litellm_readiness_s: 0.175, price_api_s: 0.634, contabo1_n8n_health_s: 0.0034,
+    am4_qdrant_localhost_s: 0.0005}
+machine_baselines:
+  c2: {role: public control plane, state: healthy (load 9.5 with 79-90% idle), versions: {owui:
+      0.13.0, alembic: e42c8f710a36, litellm: 1.106.5-pil2, searxng: 2026.11.2, postgres: '16.15',
+      valkey: 9.1.2}, open: [price pipeline defects (A02/03), live-router model id (A04),
+      cloudflared dupes (A10), ufw dead rules (A18), build cache (A19), OWUI memcap (A17)]}
+  ua: {role: GPU inference, state: CRITICAL memory (frozen), versions: {ollama: 0.40.14, litellm:
+      v1.106.5 prod / v1.106.4 staging, owui_host: 0.12.4, librechat: 0.8.8}, open: [memory guard
+      (A01), secret perms (A12), netdata stream verify (A11), litellm bind window script staged]}
+  am4: {role: embeddings/hub/business, state: healthy capacity, versions: {ollama: 0.40.13
+      (blocked upgrade), litellm: 1.106.5-pil2, owui_host: 0.11.4, qdrant: 1.20.0}, open: [ufw
+      + 0.0.0.0:5432 (A05), bomai-safe system text (A13), syslog 261MB + audit backlog (A20)]}
+  nas: {role: storage/relays/n8n, state: healthy, versions: {n8n: 2.31.2, mariadb: 11.4.13,
+      vaultwarden: 1.37.4}, open: [3 zombies + swap + PATH (A21, owner/root)]}
+  mac: {role: primary MLX inference, state: path-degraded, versions: {ollama server+cli: 0.40.14,
+      netdata: 2.12.0}, open: [DERP + 70s stall (A06), simulator volumes owner decision]}
+  i9: {role: YuE2/ComfyUI/bomai-pro, state: gated, versions: {ollama: 0.40.13, comfyui: 0.43.0,
+      pytorch: 2.14.0+cu130}, open: [0.40.14 window (A16), ESU decision (A23), admission DENY]}
+  cat: {role: DA hosting, state: OWNER_EXECUTE, versions: {directadmin: '1.713', nginx: 1.29.4,
+      php_cli: 7.4.33 (defect) / 8.3.33 present, mariadb: 10.6.22, csf: '15.05'}, open: [PHP
+      default (A07), backup stale (A14), CSF 19999 (A11), failed units + TLS audit scripts staged]}
+  contabo1: {role: monitoring, state: idle, versions: {n8n: 2.10.3, mariadb: 10.4.13 EOL, kuma:
+      2.5.6, prometheus: '3.14', grafana: 13.2.2}, open: [75 n8n-parent zombies (A08), 9090
+      shadow rule (A22), MariaDB blue/green (separate)]}
+security_audit_summary:
+  critical: [UA memory pressure]
+  high: [price router blocking inlet, live-router inactive model, AM4 exposure, Mac generation
+      stall, CAT PHP default, CB1 n8n-parent zombies]
+  no_change: [C2 ssh guard + NEVER-BLOCK, working CSF SYNFLOOD/LF, healthy n8n instances, AM4
+      FX28 + all ComfyUI, price API no-auth (IRON 19)]
+  forbidden: [sshd/PasswordAuthentication/PermitRootLogin edits or recommendations, DNS/resolv.conf
+      changes, IRON exemptions, CAT agent execution, NAS n8n restart/upgrade, LiteLLM 1.107.0,
+      paid API calls, secrets in artifacts]
+policies:
+  retry_contract: {max_attempts: 2, cooldown_s: 10}
+  backup_contract: timestamped backup before every change
+  window_contract: LiteLLM 03:00-06:00 ICT after 2-min drain; AM4/i9 Ollama same window; UA
+    inference same window
+  production_locks: [gpt-oss-120b LIVE_NO_TOUCH, ComfyUI HTTP_API_ONLY, FX28 untouched, CAT
+      OWNER_EXECUTE, n8n OWNER_HOLD, i9 D: UNTOUCHABLE, webui.siam2r.com credentials untouched]
+implementation_waves:
+  wave_1_agent_now_no_window: [ACTION-01 (UA guard), ACTION-12 (UA secret perms), ACTION-17 (C2
+      memcap), ACTION-19 (C2 cache prune), ACTION-20 (AM4 logs), ACTION-08 watch half (CB1 cron)]
+  wave_2_agent_low_traffic_window: [ACTION-02 (price router v2), ACTION-03 (model rows + pipe
+      labeling), ACTION-04 (live-router model), ACTION-18 (C2 ufw cleanup), ACTION-11 verify half
+      (UA->CAT stream)]
+  wave_3_owner_window: [ACTION-05 (AM4 rebind + ufw), ACTION-06 (Mac bounce), ACTION-09 branch B
+      (only if ordered), ACTION-10 (cloudflared MODE), ACTION-13 (bomai-safe branch), ACTION-16
+      (i9 0.40.14), ACTION-22 (CB1 9090)]
+  wave_4_owner_execute: [ACTION-07 (CAT PHP), ACTION-08 recycle half (CB1 n8n), ACTION-11 CSF half
+      (CAT), ACTION-14 (CAT backup), ACTION-15 (CB1 cleanup guard), ACTION-21 root half (NAS swap),
+      ACTION-23 (i9 ESU decision)]
+maintenance_schedule:
+  daily: [NAS 03:00/03:07/03:14/03:21 stagger, CAT backup 03:30 + offsite 04:15 ICT, CB1 zombie
+      count, UA memory guard 5-min, Mac cleanup 21:00 + dry-run 04:00]
+  weekly: [C2 Sunday 05:00 prune, Sunday 06:00 alert review, C2 netdata + Mac DERP review, price
+      router false-positive review (4 weeks)]
+  monthly: [DA restore drill, owner lifecycle review (ESM/Windows/PHP/MariaDB), firewall
+      false-positive review, CSF country lists empty]
+  restricted_window: LiteLLM 03:00-06:00 ICT after 2-min drain
+verification:
+  analysis_inputs: [art#56608, art#56564, art#56565, art#56543, art#56578, art#56483]
+  live_changes_by_this_task: NONE
+  ssh_by_this_task: NONE
+  script_validation: 23 action scripts syntax-checked; execution deferred per waves
+  acceptance: every apply has paired verify/rollback or is read-only; CAT scripts OWNER_EXECUTE
+  residual_evidence_gap: post-change fleet metrics do not exist yet; waves 1-2 produce them
+artifact_ids:
+  god_config_v11: embedded_in_this_report
+  god_blueprint_v7: embedded_in_this_report
+  atom_survey: 56608
+  spec: 56638

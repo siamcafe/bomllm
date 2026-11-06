@@ -11,6 +11,33 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [14.0.0] - 2026-11-06
+
+### Added
+- GOD CONFIG v11.0 raw (hub art#56686) in `configs/config_g_v11.0.yaml`; GOD BLUEPRINT v7.0 raw (hub art#56687) in `configs/blueprint_g_v7.0.yaml`
+- AGENTS.md safety constraints (survive compaction)
+
+### Changed
+- GOD CONFIG v11.0: LiteLLM pin reconciled to 1.106.5 (live fleet state; 1.107.0 remains forbidden)
+- GOD BLUEPRINT v7.0: atom survey (225 files / 54,600 lines / 32 findings) fully incorporated; 23 live findings addressed across 8 machines
+
+### Fleet (Wave 1+2 implement, spec art#56649 — 11/11 DONE)
+- Price router v2: narrowed intent regex, 2 s timeout, zero inlet sleep
+- Price pipeline: model rows created, MT5 WebSocket label corrected to HTTP poll
+- live-router: model id fixed qwen38-chat -> qwen38-uni
+- C2: OWUI memory cap 8 GB, ufw dead rules cleaned, build cache pruned
+- UA: memory guard deployed, secret files permissions hardened
+- AM4: llm-postgres rebound to LAN/TS/loopback only, syslog rotated; bomai-safe system text verified clean
+- CB1: zombie watch cron deployed
+- UA->CAT netdata stream verified (IRON 40, no change needed)
+
+### Known Deferred / Owner Items
+- Wave 3 owner-only: AM4 ufw enable (port-99 rule first), Mac tailscaled bounce + NAT/UDP-41641, cloudflared llm.siam2r.com dedupe (MODE choice), i9 Ollama 0.40.14, CB1 iptables 9090 shadow rule
+- Wave 4 owner-execute: CAT PHP 7.4->8.3, CB1 n8n restart to reap zombies, CAT backup stale fix + offsite, CB1 weekly_junk_cleanup guard, NAS swap clear, i9 ESU decision
+
+### Artifacts
+- Atom survey: art#56608 · K3 optimization v2: art#56647 · Wave 1+2 implement: art#56649 · Wave 3 final spec: art#56683
+
 ## [13.0.0] - 2026-11-06
 
 ### Added

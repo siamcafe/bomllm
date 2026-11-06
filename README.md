@@ -1,17 +1,18 @@
 # BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v13.0.0 Self-Hosted Thai AI — Mega Fleet Optimization, OWUI v0.13.0](images/hero_banner_v11.png)
+![BOM LLM v16.0.0](images/hero_banner_v16.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v13.0.0 — Mega Fleet Optimization: GOD CONFIG v10.0, GOD BLUEPRINT v6.0, Live XAUUSD Price Pipeline**
+**BOM LLM v16.0.0 — Atom Fleet Optimization: GOD CONFIG v11.0, GOD BLUEPRINT v7.0, IRON 44 Rules**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
-[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v10.0-blue)]()
+[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v11.0-blue)]()
 [![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.0-blueviolet)]()
-[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-43-red)]()
+[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-44-red)]()
+[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.106.5-9cf)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
 [![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-Model%20Card-yellow)](https://huggingface.co/bomllm/turbo-thai-config)
@@ -29,7 +30,25 @@ This is not a demo. This is the exact stack that answers my customers every day.
 
 ## Architecture
 
-Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v6.0 — full survey/baseline update from the Nov 6 fleet optimization, priority matrix, evidence contract) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v10.0).
+Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v7.0 — atom-level fleet survey update from the Nov 6-7 fleet optimization, priority matrix, evidence contract) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v11.0).
+
+## What's New in v16.0.0 — ⚡ Atom Fleet Optimization Complete (Nov 7, 2026)
+
+- **GOD CONFIG v11.0** (hub art#56686) + **GOD BLUEPRINT v7.0** (hub art#56687) — atom-level fleet survey 225 files, 23 optimization actions implemented
+- **Premium hero banner v16** — ultra-premium dark+gold cinematic design via ComfyUI DreamShaper
+- **Atom survey complete** — 8 machines, 225 files, 54600 lines scanned by Grok 4.7 (art#56608)
+- **K3 optimization** — 23 actions designed by Kimi K3-256k (art#56647)
+- **zcode Wave 1+2** — 11/11 actions DONE: price router v2, UA memory guard, C2 OWUI memcap, AM4 log rotation, CB1 zombie watch, live-router model fix (art#56649)
+- **zcode Wave 3** — AM4 postgres rebound, GOD v11/v7 published (art#56683)
+- **Price Router v2** — narrowed intent regex (7 symbols only), 2s timeout, honest HTTP poll source label
+- **live-router model fix** — qwen38-chat → qwen38-uni, /healthz verified 200
+- **LiteLLM v1.106.5** — fleet-wide reconciled pin (v1.107.0 remains BANNED)
+- **Fleet config backup** — NAS git tag `config-snapshot-2026-11-06` (1928 files, 8.83 MB)
+- **Fleet cleanup** — 4.8 GB reclaimed (docker prune + i9 temp)
+- **BOM AI v2.0.3** — Han Fix HF-1.0 integration, bom_runtime 2584 lines
+- **IRON Rules 44** — added IRON 44 (Grok dry-run before zcode implement)
+- **Netdata** — 5 nodes verified (AM4/C2/Mac/CAT/UA), NAS removed
+- **ComfyUI release banner** — DreamShaper 8, premium dark+gold theme
 
 ## What's New in v13.0.0 — 🚀 Mega Fleet Optimization (Nov 6, 2026)
 
@@ -198,7 +217,7 @@ Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_0000
 - **Voice:** SiangTTS (VoxCPM2 LoRA, reference-only mode)
 - **Music:** YuE2-3B instrumental + ACE-Step 1.5 Thai vocal
 
-## GOD CONFIG v10.0
+## GOD CONFIG v11.0
 
 Locked generation parameters for all production models:
 
@@ -234,7 +253,7 @@ flowchart TB
 
     subgraph VPS["VPS — Singapore (Debian 12, Docker)"]
         OW["Open WebUI v0.13.0"]
-        LL["LiteLLM proxy 1.106.4<br/>(routing, virtual keys, budgets, fallback)"]
+        LL["LiteLLM proxy 1.106.5<br/>(routing, virtual keys, budgets, fallback)"]
         PG[("Postgres 16")]
         QD[("Qdrant 1.20.0")]
         VY[("Valkey 8")]
@@ -326,7 +345,7 @@ cd bomllm
 | Machine | Role | Key Specs |
 |---------|------|-----------|
 | Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.14, TURBO-Fable + MiMo Q4, MLX nvfp4 |
-| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.0, LiteLLM 1.106.4, SearXNG |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.0, LiteLLM 1.106.5, SearXNG |
 | UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM staging |
 | AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, 2x RTX 5060 Ti 16GB, Ollama 0.40.13, ComfyUI x2, hub services |
 | i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI, TTS, Music, EA |
@@ -365,7 +384,7 @@ Deployed Oct 31 — 10/10 PASS:
 - Qdrant: v1.20.0
 - ComfyUI: v0.43.0 (fleet-wide)
 - BOM AI: v2.0.3
-- IRON Rules: 43
+- IRON Rules: 44
 
 ## License
 
@@ -385,13 +404,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v13.0.0 — Mega Fleet Optimization**
+**BOM LLM v16.0.0 — Atom Fleet Optimization**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**v13.0.0 ใหม่:**
+**v16.0.0 ใหม่:**
+- สำรวจระดับ atom ครบ 8 เครื่อง (225 ไฟล์ / 54,600 บรรทัด) + ออกแบบ 23 optimization actions
+- GOD CONFIG v11.0 + GOD BLUEPRINT v7.0
+- Price Router v2 + แก้ live-router เป็น qwen38-uni
+- LiteLLM ทั้ง fleet ล็อกเป็น v1.106.5 (v1.107.0 ยังแบน)
+- IRON Rules 44 + แบนเนอร์พรีเมียมธีมดำ-ทองใหม่
+
+**v13.0.0 ก่อนหน้า:**
 - ปรับปรุง fleet ทั้ง 8 เครื่องตาม K3 blueprint (35 actions)
 - ราคาทอง XAUUSD เรียลไทม์จาก MT5 API — แก้ hallucination ราคาเก่าถาวร
 - GOD CONFIG v10.0 + GOD BLUEPRINT v6.0

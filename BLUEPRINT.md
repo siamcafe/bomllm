@@ -1,168 +1,350 @@
-# GOD BLUEPRINT v5.2 — BOMLLM Fleet (C2 performance survey + fix + release v11)
+<!-- GOD BLUEPRINT v6.0 — supersedes v5.2 (retained in git history and hub art#55907). Raw artifact: hub art#56565. -->
+
+# GOD BLUEPRINT v6.0 — BOMLLM Fleet
+# Full survey/baseline update; performance evidence is labeled by source.
 project: bom-llm
-step: fix_c2_perf_survey_fix_release
-version: "5.2"
-previous: "5.1"
-base_document: "art#55863 (GOD BLUEPRINT v5.1 — carried in full; this is a delta update)"
-date: "2026-11-04"
-author: "zcode (GLM-5.3), spec art#55876, plan art#55871 (Fable v1.0)"
+step: fleet_optimization_blueprint
+version: '6.0'
+previous: '5.2'
+base_document: art#55907 GOD BLUEPRINT v5.2 and art#55651 GOD CONFIG v9.0
+date: '2026-11-06'
+author: Kimi K3-256k /auto, spec art#56488
 recommendation: INSPECT
 references:
-  - "art#55876 — execution spec (this task)"
-  - "art#55871 — Fable blueprint v1.0 (hypotheses H1-H5, decision tables)"
-  - "art#55862 — K3 fix report (SSH 2-min root cause, tailscale dependency map, squid audit)"
-  - "art#55863 — GOD BLUEPRINT v5.1"
-  - "art#55864 — HOW-TO v4.1"
-  - "art#55651 — GOD CONFIG v9.0 (locked params + LiteLLM general_settings target)"
-  - "art#55406 — v10 release report"
-  - "art#53622 — HF browser web-UI edit method"
-
-v5.2 changes vs v5.1:
-  1: "NEW Phase P: C2 performance survey (read-only, external + on-box) settling Fable H1-H5"
-  2: "SSH brute-force guard PERSISTED as systemd unit c2-ssh-guard (was live-but-volatile iptables rule)"
-  3: "LiteLLM DB-load policy verified against GOD CONFIG v9.0 target — live config already at target (no key added, no restart)"
-  4: "Poller interval policy: opshub-* timers audited (all already >5 min; hourly/daily/weekly/monthly); no cron line matched the */1-*/4 relax rule"
-  5: "Residuals closed: charming_gauss removed (v0.13.0 image kept); RR5 /static/bomai PNGs were genuinely absent (dir held js/css only) -> heroes delivered by v11 release; squid tailscale-rebind systemd drop-in installed"
-  6: "Verification gates re-measured from AM5 (external TTFB median/p90 + SSH connect + stress 8/8 + headless Chromium)"
-
----
-P. PHASE P — C2 PERFORMANCE SURVEY + FIX + VERIFY (2026-11-04, zcode)
-
-P.1 External baseline (AM5, pre-fix, 2026-11-04T04:58:55+07:00, p1_external_baseline.txt)
-  api_version_ttfb_s: {n: 10, median: 0.103, p90: 0.171, min: 0.097, max: 0.386}
-  favicon_ttfb_s: {n: 10, median: 0.181, p90: 0.350, max: 1.765}
-  hub_jobs_ttfb_s: {n: 10, median: 0.274, p90: 0.629}
-  ssh_connect_s: [4.679, 10.021, 11.339, 1.815, 1.001]
-  context: "load ~3.8 calm window; NOT the load-15 window where Fable measured 1.17-6.53 s"
-
-P.2 On-box survey (survey.sh, 23:00-23:09 CET, p1_survey_c2.log)
-  s1_runqueue: "r=1-7 on 12 vCPU, idle 82-99%, steal 0"
-  s2_real_cpu_top15_30s:
-    - "uvicorn open_webui 44.0% (33.3u/10.7s) — single OWUI worker"
-    - "tailscaled 35.9% (7.4u/28.5s) — mostly sys = KN1 phantom IRQ billing"
-    - "cloudflared 30.1% (8.1u/22.0s)"
-    - "litellm 24.9% (20.2u/4.6s)"
-    - "ksoftirqd/0 10.1 | live_router 9.6 | postgres 8.8 | valkey 8.3 | containerd 8.1 | searxng 7.8 | dockerd 6.9"
-  s5_pg_stat_activity: "3 snapshots: only survey query active + 4 idle connections"
-  s6_tables: "LiteLLM_SpendLogs 153,425 rows / 773 MB / 1,193 dead tup (below 1M-row / 2GB prune gates)"
-  s7_tps: "litellm_db_tps=0 over 60 s"
-  s9_config_keys_live: "general_settings already had proxy_batch_write_at 60, disable_error_logs true, maximum_spend_logs_retention_period 30d; store_prompts_in_spend_logs absent; bomai-safe block has NO repeat_penalty (clean)"
-  s13_pollers: "opshub-c2-monitor hourly@:48, light daily 03:10, deep Sat 09:10, audit monthly 1st; docker exec rate 0 across 12x5 s samples; crontab observer runs * * * * * (untouched — not a */1-4 target per spec rule)"
-  s14_cloudflared: "ha_connections=4 (sin07/09/12/16), total_requests 28361, request_errors 2590 cumulative, 292 journal err/h (client 'context canceled' aborts on hub route + :4000)"
-  s15_localhost_ttfb: "api 0.005-0.016 s, static 0.007-0.015 s, litellm liveliness 0.006-0.052 s"
-  s16_bruteforce_24h: "3,285 lines; 180.183.109.x 2,189 (owner ISP /16 = NEVER-BLOCK — reported to owner); 102.220.163.x 1,671 + 102.220.160.x 1,614 (pre-block hours, /22 DROP live); Accepted full journal: 0 from 102.220.0.0/16"
-  s17_residuals: "charming_gauss=Created image v0.13.0; bomai_static_v1 holds ONLY js/css (no PNG) -> /static/bomai/*.png 404 were missing files, not name mismatch (H5 verdict); squid both listeners; no tailscaled drop-ins yet"
-  s18_god_config: "bom-thai-chat params 7/7 PASS; functions=18"
-
-P.3 Hypothesis verdicts (Fable H1-H5)
-  H1_litellm_pg_loop: "NOT SUPPORTED — tps=0, conns idle, tables below prune gates, config already at GOD CONFIG v9.0 target, litellm real user CPU 20.2% (vs 115% during the load-15 window)"
-  H2_poller_pressure: "NOT SUPPORTED — all opshub timers >5 min, docker exec rate 0, r=1-7"
-  H3_edge_vs_box: "SUPPORTED — cloudflared healthy (ha=4), localhost 0.01 s vs external 0.10 s median; remaining delta is EU edge path (~0.09 s), not C2 queueing"
-  H4_other_subnets: "PARTIAL — 24 h counts dominated by pre-block hours of the already-blocked /22; post-block fail2ban currently-failed=0; NEW owner-ISP failed-auth churn 2,189/24 h (NEVER-BLOCK, owner to investigate)"
-  H5_rr5_statics: "SUPPORTED as missing files — static dir had no PNGs at all; heroes supplied by Phase 5"
-
-P.4 Fixes applied (all on C2, sudo; logs p2_fix_*.log)
-  ssh_guard: "DONE — /etc/c2-ssh-guard.list (1 CIDR 102.220.160.0/22) + /usr/local/sbin/c2-ssh-guard.sh + c2-ssh-guard.service enabled+active; list_lines=1 drop_rules=1; NEVER-BLOCK refused by script design; /24 candidates not added (already inside the /22)"
-  litellm: "DONE as verified-no-change — changed=none (keys already at target), SpendLogs 153,442 rows / 811,016,192 bytes below gates, ErrorLogs 0 -> no prune, NO restart (decision row 1)"
-  pollers: "DONE as verified-no-change — all 4 opshub timers kept (>5 min), 0 cron lines matched relax rule; crontab backups saved"
-  charming_gauss: "DONE — docker rm (v0.13.0 image kept, 6.44 GB)"
-  rr5_statics: "DONE via Phase 5 — hero_banner_v11.png (+hero_banner_v10.png copy) placed into bomai_static_v1 (persistent masters) AND docker cp'd into live container STATIC_DIR /app/backend/open_webui/static/bomai/ (serving path; no OWUI restart; both URLs 200). logo.png/favicon.png under /static/bomai/ remain absent (no candidates; reported)"
-  bomai_safe_repeat_penalty: "NOT NEEDED — LiteLLM bomai-safe block already clean (no repeat_penalty key); UA modelfile verified 7/7 with repeat_penalty 1"
-  squid_rebind_dropin: "DONE — /etc/systemd/system/tailscaled.service.d/squid-rebind-v52.conf (ExecStartPost sleep 8 + squid -k reconfigure); tailscaled NOT restarted to test (per FORBIDDEN); both squid listeners verified present"
-
-P.5 Verification (post-fix, AM5 external + on-box; p3_external_after.txt, p3_verify_c2.log, qc_headless.json)
-  external_am5_after:
-    api_version_ttfb_s: {n: 10, median: 0.093, p90: 0.182, max: 0.234}
-    favicon_ttfb_s: {n: 10, median: 0.118, p90: 0.186}
-    hub_jobs_ttfb_s: {n: 10, median: 0.236, p90: 0.704}
-    ssh_connect_s: [0.962, 0.861, 1.084, 1.123, 1.048]
-    verdict: "PASS (median < 0.5 AND p90 < 1.0); improved vs baseline (api median 0.103 -> 0.093; ssh median 4.679 -> 1.048, worst 11.34 -> 1.12)"
-  internal_c2:
-    load1_samples: [1.03, 1.05, 5.42]   # all < 8; 3rd = midnight CET cron burst, vmstat idle 99%
-    owui_200_ttfb_s: 0.017
-    litellm: "liveliness 200 + readiness 200"
-    services_active: "cloudflared, c2-ssh-guard, tailscaled, squid"
-    tailscale_peers: 8
-    squid_listeners: "100.83.20.100:18080 + 109.123.233.171:18080"
-    god_config_7of7: "PASS (bom-thai-chat)"
-    functions: 18
-    qdrant_collections: 13
-    guard_drop_rules: 1
-  stress_8of8: "7/8 in the mandated 120 s window (T1 200/23.2s, T2 200/19.0s, T4 200/28.1s, T5 200/71.8s/928KB, T6 200/7.3s, T7 200, T8 200; T3 web-search HTTP 000 at 121 s). T3 retry at 180 s: 200 in 106.6 s / 95,897 chars — search path healthy, 120 s window too tight for a full web-search roundtrip. Release not blocked (spec: <8 records failures without blocking)."
-  hero_static_serving_finding: "OWUI serves /static/* from container STATIC_DIR=/app/backend/open_webui/static (baked at image build), NOT from the bomai_static_v1 frontend bind (a new file in the bind 404s). v11/v10 heroes deployed via brand-dir copies (persistent masters) + docker cp into the live container (no restart); external URL 200 verified. Bake into image or add a backend bind at next OWUI rebuild."
-  headless_qc:
-    landing_status: 200
-    images_broken: 0
-    note: "networkidle never fires on OWUI (socket.io) — wait_until=load + 9 s settle; /static/bomai PNG 404 pre-release (heroes delivered by Phase 5)"
-
-P.6 New policies (binding from v5.2)
+- 56483
+- 56488
+- 55651
+- 55907
+- 55908
+- 56352
+- 56456
+v6.0 changes vs v5.2:
+  1: Full 2026-11-06 eight-machine survey incorporated; no roles changed and no live command was executed by this task.
+  2: UA memory pressure is the sole critical item; admission is frozen while gpt-oss-120b/ComfyUI/FX28 remain untouched.
+  3: C2 production OWUI 0.13.0/Alembic e42c8f710a36 and short digest 549badb7b84d confirmed; load-average interpretation corrected.
+  4: Ollama/OWUI/LiteLLM/n8n version matrix updated; LiteLLM remains 1.106.4 and independent UI/n8n versions are not force-aligned.
+  5: 'Netdata history reconciled: 190-300% baseline, later 56-68/94/73.9% samples. Spec-supplied 42.8% is labeled unverified,
+    not current.'
+  6: New per-machine bind, cleanup, log, backup, lifecycle and security targets with rollback and owner gates.
+  7: CAT backup path corrected to DirectAdmin default /home/admin/admin_backups; absence is not assumed.
+  8: Maintenance schedule, alert contract and implementation waves added without creating new cron herds.
+fleet_overview:
+  machines: 8
+  gpus: 7
+  vram_gib: 96
+  survey_window_ict: 2026-11-06 03:00-03:15
+  reachable_machines: 8
+  issues: 28
+  critical_issues: 1
+  roles_changed: false
+  command_station: AM5 recorded separately; not counted among the eight production machines
+architecture:
+  diagram: "Users / owner apps\n  -> Cloudflare -> C2 OWUI 0.13.0 -> C2 LiteLLM 1.106.4\n       -> Mac qwen38-uni 0.40.14\
+    \ server (PRIMARY, currently DERP sin)\n       -> UA gpt-oss-120b / bomai-safe (LIVE_NO_TOUCH; memory admission frozen)\n\
+    \       -> AM4 Qdrant 1.20.0 + Infinity + business services through existing relays\n  -> NAS hub/docs/service relays\
+    \ (n8n 2.31.2 unchanged)\nContabo1 monitoring/n8n 2.10.3/Browserless (independent)\nCAT DirectAdmin hosting (OWNER_EXECUTE\
+    \ only)\ni9 ComfyUI/YuE2/bomai-pro (GPU attribution gate)"
+  updates: No role migration. v6 overlays UA admission freeze, explicit-bind targets, Mac DERP remediation and CAT backup
+    evidence.
+  production_dependencies:
+  - C2 tailscaled is load-bearing for hub/docs/chart, Qdrant, embeddings and Mac generation; do not stop.
+  - C2 rag-lb-relay-am4 and qdrant-relay-am4 are production-critical; never remove during cleanup.
+  - C2 chart-overlay_offloaded_to_am4 remains KEEP_PENDING_OWNER_REVIEW.
+  - NAS n8n and Contabo1 n8n are independent owner-held instances; no restart or forced alignment.
+performance_deltas:
+  c2_netdata:
+    initial_combined_cpu_pct: 190-300 (art56352)
+    after_first_tune_combined_pct: 56-68 (art56352)
+    after_final_tune_one_core_pct: 94.0
+    latest_survey_one_core_pct: 73.9
+    target_one_core_pct: <50 sustained
+    spec_supplied_historical_delta:
+      before_pct: 300
+      after_pct: 42.8
+      verified_by_supplied_artifacts: false
+      use: Historical task input only; not current baseline
+  ua_netdata:
+    art56456_cpu_pct: 5.22
+    latest_cpu_pct: 10.05
+    verdict: CPU healthy; rebind only
+  am4_netdata:
+    restart_spike_cpu_pct: 43.96
+    art56456_settling_cpu_pct: 25.78
+    latest_cpu_pct: 0.96
+    verdict: CPU solved; persistence remains
+  c2_external_v5_2:
+    api_ttfb_median_s:
+    - 0.103
+    - 0.093
+    api_ttfb_p90_s:
+    - 0.171
+    - 0.182
+    favicon_ttfb_median_s:
+    - 0.181
+    - 0.118
+    ssh_connect_median_s:
+    - 4.679
+    - 1.048
+    gate: AM5 median <0.5s and p90 <1.0s; localhost/hairpin is not public evidence
+  c2_load: 14.26/19.06 historical high-load snapshot vs 12.54 latest under different workload; no causal improvement percentage
+    claimed.
+  mac_mlx_topk: 0.40.14 improvement applies to qwen38-uni, but no published or surveyed speed delta; measure after direct-path
+    repair.
+machine_baselines:
+  c2:
+    hostname: contabo2-bom-llm
+    role: Public OWUI/LiteLLM control plane, search, relays and live router
+    state: Debian 12, 12 vCPU, 47 GiB RAM, no GPU; RAM 6.3 GB used, disk 28%, load not saturation
+    versions:
+      owui: 0.13.0
+      alembic: e42c8f710a36
+      image_short: 549badb7b84d
+      litellm: 1.106.4-pil2
+      searxng: 2026.11.2
+      postgres: '16.15'
+      valkey: 9.1.2
+    issues:
+    - Netdata 73.9% one core
+    - OWUI wide-bind candidate
+    - five exited containers and old build cache
+    - two unnamed zombies
+    targets:
+    - Optional 15s Netdata after sustained threshold
+    - Archive four exited containers; keep chart-overlay and relays
+    - Compose/Cloudflare-gated explicit OWUI bind
+  ua:
+    hostname: ubuntu-ai
+    role: GPU inference, gpt-oss-120b, LiteLLM, ComfyUI and FX28
+    state: 'CRITICAL memory: 16.304 GB available, 16.513 GB swap used, swap-out observed; both GPUs nearly full and idle'
+    versions:
+      ollama: 0.40.14
+      owui_host: 0.12.4
+      litellm: 1.106.4
+      librechat: 0.8.8
+    issues:
+    - Memory pressure
+    - wide binds
+    - Netdata wide bind
+    - two unnamed zombies
+    targets:
+    - Freeze new placements; read-only memory guard
+    - Rebind Netdata and LiteLLM separately after consumer proof
+    - No gpt-oss-120b/ComfyUI/FX28 mutation
+  am4:
+    hostname: ubuntu
+    role: ComfyUI router/workers, embeddings, Qdrant, agent hub, LiteLLM and business services
+    state: Load 16.78 is intentional FX28/Ollama work; 70.824 GB RAM available; no capacity emergency
+    versions:
+      ollama: 0.40.13
+      owui_host: 0.11.4
+      litellm: 1.106.4-pil2
+      qdrant: 1.20.0
+    issues:
+    - Netdata config not persistent
+    - Netdata host-network wide bind
+    - kern.log >100 MB
+    - one exited agent-hub backup
+    targets:
+    - Persist and explicitly bind Netdata
+    - Dedicated kern.log rotation
+    - Ollama 0.40.14 only after FX28 stops
+    - Preserve all burn workloads
+  nas:
+    hostname: DS725_PLUS
+    role: Storage, backups, tunnels, relays, monitoring and owner-held n8n
+    state: RAID healthy; RAM available 13.817 GB; residual swap 38%; USB 65%; 03:00 herd on four threads
+    versions:
+      n8n: 2.31.2
+      mariadb_agent_hub: '11.4'
+      vaultwarden: 1.37.4
+    issues:
+    - 03:00 stacking
+    - scripts.d enabled
+    - old node_exporter wide bind
+    - residual swap
+    targets:
+    - DSM stagger 03:00/03:07/03:14/03:21
+    - Disable scripts.d only
+    - Stop old exporter after scrape proof
+    - Memory-gated swap cycle
+    - Never restart n8n
+  mac:
+    hostname: macmini-ai
+    role: Primary qwen38-uni MLX inference and embeddings
+    state: Quiet M4 Pro, 48 GB unified memory; system disk 26%; simulator volumes 98%; DERP sin primary path
+    versions:
+      ollama_server: 0.40.14
+      ollama_cli: 0.40.10
+      netdata: 2.12.0
+      qwen38_uni: 30 GB MLX resident, 7/7 locked
+    issues:
+    - DERP latency
+    - CLI skew
+    - full simulator volumes
+    - MagicSock ReceiveIPv4 down
+    targets:
+    - Owner UDP/NAT direct-path repair and measured completion
+    - Pinned CLI-only update
+    - Backup-gated simulator review
+    - No Docker start
+  i9:
+    hostname: DESKTOP-G3MKH6J
+    role: YuE2/ComfyUI, bomai-pro and owner GPU services
+    state: Windows 10 22H2 EOL, ESU unknown; RAM 66.339 GB available; GPUs hold 12.361/11.066 GB with Ollama empty
+    versions:
+      ollama: 0.40.13
+      comfyui: 0.43.0
+      python: 3.13.14
+      pytorch: 2.14.0+cu130
+    issues:
+    - OS support
+    - unattributed VRAM
+    - wide Python/RDP/SMB candidates
+    targets:
+    - Owner ESU/OS decision
+    - Read-only GPU attribution before placement
+    - Signed Ollama 0.40.14 installer after owner window
+    - ComfyUI stays LAN-only
+  cat:
+    hostname: server-122-155-168-7.da.direct
+    role: DirectAdmin production hosting; OWNER_EXECUTE only
+    state: Ubuntu 20.04.6, low load, 50.647 GB RAM available; ESM unknown; CSF enforcing; failed iptables-restore/maldet
+    versions:
+      directadmin: '1.713'
+      nginx: 1.29.4
+      php_cli: 8.3.33
+      php1: '7.4'
+      mariadb: 10.6.22
+      csf: '15.05'
+    issues:
+    - EOL PHP slots/binaries
+    - backup coverage unproven
+    - DB metrics unavailable
+    - OS support unverified
+    - failed units
+    - TLS inventory incomplete
+    targets:
+    - Verify ESM and backup first
+    - Zero-reference PHP retirement
+    - Metric-driven DB/PHP/nginx candidates
+    - Evidence-gated CSF only; country lists empty
+    - TLS audit without private-key reads
+  contabo1:
+    hostname: vmi3108393
+    role: Monitoring, alerting, independent n8n and exporters
+    state: Idle eight-core host with 20.701 GB RAM available; 79 Browserless zombies; MariaDB 10.4.13 EOL
+    versions:
+      n8n: 2.10.3
+      mariadb: 10.4.13
+      uptime_kuma: 2.5.6
+      prometheus: '3.14'
+      grafana: '13.2'
+      netdata_binary: 2.12.0-405-nightly not running
+    issues:
+    - Chromium zombie leak
+    - EOL MariaDB
+    - n8n version skew (not an outage)
+    - unsafe Netdata config if started
+    targets:
+    - Browserless-only planned recycle
+    - Separate blue/green MariaDB migration
+    - No n8n/Kuma change
+    - Preconfigure safe Netdata but leave stopped
+security_audit_summary:
+  critical:
+  - UA memory pressure
+  high:
+  - Mac DERP primary route
+  - Contabo1 zombies
+  - CAT backup recovery unproven
+  - Windows/PHP/MariaDB lifecycle
+  - wide-bind candidates after consumer proof
+  no_change:
+  - C2 ssh guard and owner ISP NEVER-BLOCK
+  - working CSF SYNFLOOD/LF rules
+  - healthy n8n instances
+  - C2/UA/AM4 LiteLLM 1.106.4
+  - AM4 FX28 and all ComfyUI
+  forbidden:
+  - sshd/PasswordAuthentication/PermitRootLogin edits or recommendations
+  - DNS/resolv.conf changes
+  - IRON exemptions
+  - CAT agent execution
+  - NAS n8n restart/upgrade
+  - LiteLLM 1.107.0
+policies:
   ssh_guard_list_maintenance:
-    rule: "Brute-force subnets are blocked ONLY via /etc/c2-ssh-guard.list + c2-ssh-guard.service (iptables INPUT DROP tcp/99). Never write rules into DOCKER chains; never install iptables-persistent; NEVER-BLOCK ranges are refused by the guard script itself."
-    add_cidr: "append /24 to the list (cap 10 entries) only when: >=100 Invalid/Failed lines in 24 h AND zero Accepted in the FULL journal AND no overlap with NEVER-BLOCK; then systemctl start c2-ssh-guard; verify drop_rules == list_lines"
-    never_block: ["180.183.0.0/16 (owner ISP)", "122.155.168.7 (CAT)", "109.205.176.7 (Contabo1)", "171.6.136.143 (am4_brain)", "100.64.0.0/10 (tailnet)", "192.168.0.0/16 (LAN)"]
-  litellm_db_load:
-    rule: "LiteLLM general_settings target is the GOD CONFIG v9.0 set (proxy_batch_write_at 60, disable_error_logs true, maximum_spend_logs_retention_period 30d, background_health_checks false, database_disable_prepared_statements true). Only ADD keys absent from live config; never modify keys GOD CONFIG defines. SpendLogs prune only when >1M rows OR >2 GB, only after pg_dump -t backup exists, only rows older than 30 days, batched 50k + VACUUM ANALYZE. LiteLLM restart only in the 03:00-06:00 ICT window after a 2-minute drain, health gate 20x10 s; otherwise keys take effect at next natural restart (reload interval excepted)."
-    measured: "2026-11-04 tps=0, SpendLogs 153k rows/773 MB — loop NOT active; H1 disproven for this window"
-  poller_min_interval:
-    rule: "Monitoring timers/cron must not hit :3000/:4000 or run docker exec more often than every 5 minutes; opshub-* systemd timers relax to 15 minutes via /etc/systemd/system/<timer>.d/interval-v52.conf drop-in (never disable); cron minute field */1-*/4 that targets :3000/:4000/docker exec is lengthened to */5 (backup crontab first). Warm-pin/keep-alive crons are GOD pipeline — keep, only lengthen if <5 min."
-    measured: "2026-11-04: all 4 opshub timers already hourly-or-slower; docker exec rate 0/12 samples; nothing to relax"
-
-P.7 Residual risks / open items (v5.2)
-  - "KN1 phantom CPU accounting on C2: permanent (host KVM), diagnose with utime/stime only"
-  - "OWUI single uvicorn worker ~44% real CPU at calm load: architectural; Phase C (move OWUI+Postgres off C2 to AM4 when EA burn ends) is the structural fix — owner decision"
-  - "EU origin latency floor ~0.09-0.25 s to Thai users via CF SIN edge -> C2 path: structural (Phase C/D or Contabo node migration — owner decision / Contabo ticket)"
-  - "Owner-ISP failed-auth churn: 2,189 Invalid/Failed lines/24 h from 180.183.109.x (NEVER-BLOCK) — owner should identify the misauthenticating client at 180.183.109.179 network"
-  - "Mac ollama CLI skew (server 0.40.14 / CLI 0.40.10): report only, untouched"
-  - "carried from v5.1: Contabo1 zombies + n8n export; UA/AM4 EA-burn loads; Mac DERP-sin relay; OWUI exit-137 flap untraced"
-  - "/static/bomai/logo.png and /static/bomai/favicon.png remain 404 (no candidates ever existed; only heroes were regenerated) — future brand drop needed if required"
-
-P.8 Owner decisions (report-only, no agent action)
-  - "Phase C/D: move OWUI + Postgres off C2 (AM4/NAS) — gate: EA burn end"
-  - "Contabo: open ticket about oversold node / silent steal / migration or resize"
-  - "tailscaled full on-demand on C2: only after Phase C removes 100.x dependencies (§O.3)"
-  - "sshd_config / PasswordAuthentication / resolv.conf: IRON 37/38/41 owner-only"
-
----
-O. PHASE O — C2 SSH SLOW-CONNECT (2026-11-04, K3) [carried unchanged from v5.1]
-
-O.1 Diagnosis evidence chain
-  Owner symptom: SSH to C2 takes ~2 minutes (2026-11-04 03:06 ICT, load 15.34).
-  Measured during fix window (21:15-21:35 CET, load 8.5-11.2): connects 8.0s -> 15.4s -> 19.0s -> 13.8s (degrading under diagnostic load; never 2min — contention-correlated).
-  - sshd -T (READ ONLY): usedns no, gssapiauthentication no — CLEAN
-  - getent reverse lookup: 33ms — CLEAN
-  - journal: Accepted publickey and session opened SAME SECOND — auth path fast once reached
-  - ss :99 conns 6 (limit 10 unauth) — near gate during bursts
-  - brute-force churn: sshd 1385 lines/h from 102.220.160.0/22; fail2ban 103 CPU-min + journald 119 CPU-min since Nov02
-  - vmstat r=10-18 on 12 vCPU with id 81-89% (silent host steal, KN1)
-  Root cause chain: constant preauth brute-force stream keeps sshd children + fail2ban + journald hot; on the oversold KVM new TCP/KEX handshakes wait for CPU slices -> connect time scales with runqueue (~2min at load 15; 8-19 s at load ~10).
-
-O.2 Actions applied (K3, all reversible)
-  - iptables subnet block 102.220.160.0/22 tcp/99 DROP after verifying ZERO historical Accepted from the range (LIVE; v5.2: now PERSISTED via c2-ssh-guard.service)
-  - tailscaled NOT stopped — dependency-proven (O.3); on-demand scripts installed /usr/local/bin/tailscale-{start,stop}.sh
-  - Squid C2 + Contabo1 audited: authenticated ncsa proxies, proxy_auth REQUIRED, deny all — KEPT
-  - query-engine = LiteLLM Prisma engine — component, untouched
-  - sshd_config / resolv.conf READ-ONLY verified clean (IRON 37/38/41)
-
-O.3 C2 Tailscale dependency map (why on-demand is conditional) [UNCHANGED, carried from v5.1]
-  C2 has NO LAN route to 192.168.1.0/24; every home-fleet path rides Tailscale 100.x:
-    - cloudflared hub.siam2r.com     -> 100.111.221.102:8191 (hub public ingress, incl. artifact push channel)
-    - cloudflared docs.siam2r.com    -> 100.111.221.102:8060 (docs public ingress)
-    - cloudflared llm overlay + /worker-ws -> 100.80.16.53:3100 (chart overlay + worker WS)
-    - socat qdrant-relay :6333       -> 100.80.16.53:6333 (RAG queries)
-    - socat rag-lb-relay :7998       -> 100.80.16.53:7997 (Infinity embeddings)
-    - LiteLLM config.yaml x15 api_base -> 100.118.133.38:11434 (Mac qwen38-uni PRIMARY generation)
-    - /etc/hosts 5x 100.x fleet names
-  Verdict: tailscaled on C2 is production-critical infrastructure. On-demand = scripts installed + stop-impact documented + boot-enabled retained. Full stop+disable remains owner-decidable.
-
-O.4 v5.1 residuals superseded by P.7 where overlapping.
-
-O.5 K3 verification (2026-11-04 21:41-21:55 CET) [carried]
-  SSH connect 1.5/0.9/2.8 s PASS; iptables 29 pkts/2232B dropped in 3 min; invalid-user lines 30-60/h -> 1;
-  OWUI 200/0.015 s; LiteLLM 200/0.019 s; public TTFB hairpin 0.28-0.34 s; qdrant relay 200 (13 collections);
-  squid tailnet listener restored; load decaying 11.19 -> 9.43.
-
----
-UNCHANGED SECTIONS
-  "S1 Hardware inventory, S2 role assignment, S3 service dependency map, S4-S12 ops content,
-   S13 fleet baseline — carried from v5.0 (art#55840) via v5.1 (art#55863) unchanged.
-   GOD CONFIG v9.0 (art#55651) remains the locked configuration; no parameter touched in this task."
+    rule: C2 blocks only through /etc/c2-ssh-guard.list and c2-ssh-guard.service; never Docker chains or iptables-persistent.
+    add_cidr_gate: '>=100 Invalid/Failed lines in 24h, zero Accepted in full journal, no NEVER-BLOCK overlap; cap 10 entries.'
+    never_block:
+    - 180.183.0.0/16
+    - 122.155.168.7
+    - 109.205.176.7
+    - 171.6.136.143
+    - 100.64.0.0/10
+    - 192.168.0.0/16
+  litellm_db_load: Keep v9 general_settings. Prune SpendLogs only >1M rows or >2GB after pg_dump, rows older than 30d, 50k
+    batches + VACUUM ANALYZE; no VACUUM FULL. Restart only 03:00-06:00 ICT after 2-minute drain.
+  poller_min_interval: No :3000/:4000/docker-exec probing more often than 5 minutes; opshub timers target 15 minutes via drop-ins;
+    GOD warm-pin/keep-alive pipelines preserved.
+  retry_contract:
+    max_attempts: 2
+    cooldown_s: 10
+  production_locks:
+  - gpt-oss-120b LIVE_NO_TOUCH
+  - ComfyUI HTTP_API_ONLY
+  - AM4 FX28 untouched
+  - CAT OWNER_EXECUTE
+  - n8n OWNER_HOLD
+  - No sshd or DNS changes
+phase_P_v5_2_evidence:
+  hypotheses:
+    H1_litellm_pg_loop: NOT SUPPORTED (tps=0, idle conns, tables below prune gates)
+    H2_poller_pressure: NOT SUPPORTED
+    H3_edge_vs_box: SUPPORTED (localhost ~0.01s vs external ~0.10s)
+    H4_other_subnets: PARTIAL; owner ISP NEVER-BLOCK
+    H5_static_files: SUPPORTED as missing files; heroes delivered
+  ssh_guard: c2-ssh-guard.service persisted; one /22 DROP; owner ISP never blocked.
+  litellm: Config already at target; SpendLogs about 153k rows/773MB; no prune/restart.
+  squid: tailscaled.service.d/squid-rebind-v52.conf installed; tailscaled not restarted.
+  residuals_carried:
+  - KN1 phantom CPU accounting
+  - single OWUI worker architecture
+  - EU origin latency floor
+  - owner-ISP failed-auth investigation
+  - OWUI exit-137 historical flap
+phase_O_v5_1_evidence:
+  root_cause: C2 pre-auth brute-force plus KVM contention delayed SSH; sshd UseDNS/GSSAPI were clean and were not edited.
+  fix: 102.220.160.0/22 DROP persisted; connects improved to about 1-3s in the measured window.
+  tailscale_dependency: C2 has no LAN route; hub/docs/chart/Qdrant/embeddings/Mac generation depend on tailscaled. Boot-enabled
+    retained.
+  squid: Authenticated ncsa proxies on C2/Contabo1 kept; C2 must retain both listeners.
+maintenance_schedule:
+  daily:
+  - NAS 03:00/03:07/03:14/03:21 stagger
+  - CAT local backup 03:30 ICT, offsite 04:15 ICT after verification
+  - Contabo1 zombie count comparison every 24h
+  - Mac existing cleanup 21:00 and dry-run 04:00 preserved
+  weekly:
+  - C2 existing Sunday 05:00 prune preserved; inspect chart-overlay separately
+  - Sunday 06:00 review TLS/log/version/backup alerts without auto-upgrades
+  - Review C2 Netdata sustained CPU and Mac DERP path
+  monthly:
+  - Isolated DirectAdmin single-account restore drill
+  - Owner review of ESM/Windows/PHP/MariaDB lifecycle and GPU capacity
+  - Review firewall false positives and CSF country lists remain empty
+  restricted_window: LiteLLM restart only 03:00-06:00 ICT after two-minute zero-completion drain; AM4/i9 Ollama use the same
+    conservative inference window.
+verification:
+  analysis_inputs: Five mandated artifacts plus art56456 reconciliation and official vendor documentation
+  live_changes_by_this_task: NONE
+  ssh_by_this_task: NONE
+  script_validation: 38 Bash/Python scripts parsed and syntax-checked locally; fleet execution is deferred
+  acceptance: Every apply has a paired verify/rollback or is explicitly read-only; CAT scripts are OWNER_EXECUTE.
+  residual_evidence_gap: No fleet post-change metrics exist yet; do not mark optimization targets DONE until the owner-authorized
+    scripts produce them.
+artifact_ids:
+  god_config_v10: embedded_in_fleet_optimization_artifact
+  god_blueprint_v6: embedded_in_fleet_optimization_artifact
+  survey: 56483
+  spec: 56488

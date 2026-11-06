@@ -1,4 +1,17 @@
-# GOD CONFIG v9.0
+# GOD CONFIG v10.0
+
+Policy ID: `bomllm.policy/v10.0` · Status: **PRODUCTION** · Source: K3 Fleet Optimization Blueprint (hub art#56543) · GOD CONFIG v10.0 raw: hub art#56564 · Verified fleet-wide 2026-11-06.
+
+## v13.0.0 Update (2026-11-06)
+
+- GOD CONFIG v10.0 released: full v9.0 data retained; v10 deltas explicitly marked in `changes_from_v9`
+- 7/7 locked params re-verified live during the mega implement: C2 bom-thai-chat path, UA bomai-safe, Mac qwen38-uni (temperature 0.6, top_p 0.95, top_k 20, repeat_penalty 1.0, presence_penalty 0.0, num_predict 4096, num_ctx 8192)
+- Ollama fleet target 0.40.14: UA + Mac server done; Mac CLI aligned 2026-11-06; AM4 + i9 scripts staged, deferred by FX28 burn / 03:00-06:00 ICT gates
+- LiteLLM: 1.107.0 remains forbidden fleet-wide; running images are C2 `bomllm/litellm:1.106.5-pil2` and UA `v1.106.5` (deployed by authorized lane job#19713), UA staging remains v1.106.4
+- Live price pipeline added to C2 OWUI (bom_price_pipe / bom_price_router / bom_price_tool) — MT5 real-time source, 5 s cache, max_attempts=2
+
+## Historical updates below (v9.0 and earlier)
+
 
 Policy ID: `bomllm.policy/v9.0` · Status: **PRODUCTION with documented deviations** · Source: BomLLM Mega Tuning Report (art#54324, 2026-10-29) · Verified fleet-wide 2026-11-05.
 

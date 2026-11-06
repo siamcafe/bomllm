@@ -1,15 +1,15 @@
 # BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v12.0.0 Self-Hosted Thai AI — Fleet Audit + Stability, OWUI v0.13.0](images/hero_banner_v11.png)
+![BOM LLM v13.0.0 Self-Hosted Thai AI — Mega Fleet Optimization, OWUI v0.13.0](images/hero_banner_v11.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v12.0.0 — Fleet Audit + Stability: OWUI v0.13.0, Ollama v0.40.14, GOD BLUEPRINT v5.2**
+**BOM LLM v13.0.0 — Mega Fleet Optimization: GOD CONFIG v10.0, GOD BLUEPRINT v6.0, Live XAUUSD Price Pipeline**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
-[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v9.0-blue)]()
+[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v10.0-blue)]()
 [![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.0-blueviolet)]()
 [![IRON Rules](https://img.shields.io/badge/IRON%20Rules-43-red)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
@@ -29,7 +29,17 @@ This is not a demo. This is the exact stack that answers my customers every day.
 
 ## Architecture
 
-Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v5.2 — hardware inventory, role assignment, dependency maps, C2 performance Phase P with measured evidence) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v9.0).
+Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v6.0 — full survey/baseline update from the Nov 6 fleet optimization, priority matrix, evidence contract) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v10.0).
+
+## What's New in v13.0.0 — 🚀 Mega Fleet Optimization (Nov 6, 2026)
+
+- **K3 fleet optimization executed** — 35 actions from the K3 blueprint (hub art#56543) across all 8 machines in 13 phases, spec art#56548
+- **Live price pipeline** — BOM Assistant now answers XAUUSD (and 6 more symbols) from the owner MT5 API in real time (`bom_price_pipe` + `bom_price_router` + `bom_price_tool` on C2 OWUI); the $3,247 hallucination is fixed (answers ~live $4,08x)
+- **GOD CONFIG v10.0** (hub art#56564) + **GOD BLUEPRINT v6.0** (hub art#56565) — v9 data retained, v10 deltas marked
+- **Bind hardening** — UA Netdata + AM4 Netdata republished to loopback/tailnet/LAN only; NAS old node-exporter stopped after Prometheus scrape-free proof
+- **Ollama 0.40.14 alignment** — Mac CLI aligned (server already 0.40.14, qwen38-uni 7/7); AM4 + i9 upgrades staged as scripts, deferred by FX28 burn + 03:00-06:00 ICT gates
+- **Cleanup** — C2 exited containers reclaimed (~3 GB layers) with rollback archives; AM4 kern.log 235 MB rotated under a dedicated rule; agent-hub-v2_prev retired
+- **Known deferred** — UA LiteLLM bind (03:00-06:00 ICT window), C2 OWUI explicit bind (container has no Compose labels → owner migration), Contabo1 chromium zombies (parent is n8n — owner window), i9 ESU decision, NAS swap refresh (needs root)
 
 ## What's New in v12.0.0 — 🔍 Fleet Audit + Stability (Nov 5, 2026)
 
@@ -140,7 +150,7 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - Average: **18.5 tok/s** (range 17–20)
 - Hardware: Apple M4 Pro (Mac Mini), MLX nvfp4
 
-### Recommended Parameters (GOD CONFIG v9.0 locked_params)
+### Recommended Parameters (GOD CONFIG v10.0 locked_params)
 
 ```yaml
 temperature: 0.6
@@ -188,7 +198,7 @@ Promo art (ComfyUI · flux1-dev-fp8 · 1024×1024): [1](images/bomllm_promo_0000
 - **Voice:** SiangTTS (VoxCPM2 LoRA, reference-only mode)
 - **Music:** YuE2-3B instrumental + ACE-Step 1.5 Thai vocal
 
-## GOD CONFIG v9.0
+## GOD CONFIG v10.0
 
 Locked generation parameters for all production models:
 
@@ -375,13 +385,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v12.0.0 — Fleet Audit + Stability**
+**BOM LLM v13.0.0 — Mega Fleet Optimization**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**v12.0.0 ใหม่:**
+**v13.0.0 ใหม่:**
+- ปรับปรุง fleet ทั้ง 8 เครื่องตาม K3 blueprint (35 actions)
+- ราคาทอง XAUUSD เรียลไทม์จาก MT5 API — แก้ hallucination ราคาเก่าถาวร
+- GOD CONFIG v10.0 + GOD BLUEPRINT v6.0
+- ล็อกการเข้าถึง Netdata/Exporter ให้แคบลง ปลอดภัยขึ้น
+- Ollama 0.40.14 (Mac เรียบร้อย, AM4/i9 รอหน้าต่าง)
+
+**v12.0.0 ก่อนหน้า:**
 - ตรวจสอบ fleet ครบทั้ง 8 เครื่อง (Grok 4.7 full audit)
 - ComfyUI ทั้ง fleet เป็น v0.43.0 เหมือนกันหมด (7 instances)
 - Kuma monitoring v2.5.7 บน AM4 + NAS

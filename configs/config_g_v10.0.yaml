@@ -1,0 +1,1509 @@
+# MEGA GOD CONFIG v10.0 — BOMLLM System
+# Date: 2026-11-06
+# Full v9 data retained; v10 changes are explicitly marked in changes_from_v9.
+project: bom-llm
+step: configure_god_docs_v10_v6
+version: '10.0'
+previous: '9.0'
+date: '2026-11-06'
+status: TARGET_DEFINED_LIVE_UNCHANGED
+recommendation: INSPECT
+scope_note: DOCUMENT ONLY. No install, upgrade, container/config/service change was performed. v10.0 records the 2026-11-06
+  live survey beside owner-gated targets; unknown values remain unknown.
+fleet_scope: 8 surveyed production machines; AM5 command station recorded separately
+shared_instance_scope: 'This OWUI instance serves BOTH projects: BOMLLM (bom-llm, main LLM chat) and BOMAI (bomai — own banner,
+  custom buttons, branding). BOMAI-specific UI surface is inventoried in machines.c2.open_webui.bomai_ui.'
+credential_policy: Secrets are never reproduced. Redacted fields retain only the secret reference name. A live secret env
+  var observed during the read-only survey was excluded from every artifact (R3).
+coverage: Production application, model, route, container, network and schedule configuration discovered from the cited baselines
+  and live checks. OS-internal defaults and undocumented owner workloads are not invented.
+source_artifacts:
+  god_config_v8: 55463
+  god_blueprint_v3: 55520
+  howto_v2: 55465
+  grok_survey_owui_v0130_ollama_v04014: 55645
+  stress_test_8of8: 55630
+  execution_spec: 55647
+  god_config_v7: 54324
+  final_blueprint: 54961
+  k3_addendum: 55412
+  music_survey: 55425
+  c2_survey: 55427
+  fleet_survey: 55428
+  god_config_v9: 55651
+  god_blueprint_v5_2: 55907
+  god_howto_v4_2: 55908
+  netdata_tuning_c2: 56352
+  netdata_final_tune: 56456
+  grok_fleet_survey_20261106: 56483
+  execution_spec_v10_v6: 56488
+changes_from_v8:
+- '1. OWUI target version: v0.12.5 -> v0.13.0 (release 2026-11-03, commit c38885a). Live at survey: v0.12.5, image 03443b8de6b6,
+  WEBUI_BUILD_HASH f7ac7ee. Primary driver: unpublished upstream security fixes (''update as soon as possible'').'
+- '2. Ollama target versions: Mac 0.40.10 -> 0.40.14, UA 0.40.13 -> 0.40.14 (commit 9a3e81777672). Live at survey unchanged.
+  AM4 Ollama 0.40.13 is NOT in this upgrade''s scope (spec covers UA then Mac only).'
+- '3. New env vars documented: ENABLE_COMMENTS=false (new, upstream default false, keep off); ENABLE_NOTIFICATIONS=false (new,
+  upstream default TRUE — pin false to keep the inbox off); USER_PERMISSIONS_CHAT_SIDE_CHAT=false (new, upstream default false);
+  KNOWLEDGE_MAX_FILE_COUNT / KNOWLEDGE_MAX_FILE_SIZE / KNOWLEDGE_MAX_UPLOAD_COUNT (new, default unset=None = no cap).'
+- '4. Default change pinned: CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS=256 (old default; new upstream default 1024). Legacy CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES
+  is still read as a fallback. C2 sets neither today.'
+- '5. Drift fix queued: LiteLLM bomai-safe extra_body repeat_penalty 1.05 -> 1.0 to match GOD CONFIG. UA bomai-safe Modelfile
+  verified live at repeat_penalty 1.0 — the drift is in the LiteLLM route, not the model.'
+- '6. Alembic version: 0bd252b206fb -> e42c8f710a36 via 3 new migrations (c41f8d9e2a10, 6f8c2a91d4e7, e42c8f710a36). Linear
+  chain, each file has downgrade(). Rolling two versions at once is unsupported.'
+- '7. New tables: comment, comment_reaction, notification; new column tool.is_active (boolean, default true). function, model,
+  chat, config and user tables are NOT altered. None of the 18 live function rows is affected.'
+- '8. Sub-agent caps documented: SUBAGENTS_MAX_CONCURRENT / SUBAGENTS_MAX_ASYNC / SUBAGENTS_MAX_ITERATIONS / SUBAGENTS_MAX_OUTPUT
+  upstream defaults changed from 20/20/30/30000 to empty (unlimited). ENABLE_SUBAGENTS stays false (default, unset on C2),
+  so the uncapped limits stay latent.'
+- '9. Ollama v0.40.14 sampler fix documented: /v1 chat/completions endpoints no longer force temperature 1.0 / top_p 1.0 when
+  the client omits them — Modelfile defaults now apply. NO fleet impact: the fleet chain is OWUI -> LiteLLM ollama_chat ->
+  Ollama /api/chat, which already used Modelfile defaults; no model_list api_base points at an Ollama /v1 URL.'
+- '10. MLX top-k improvement documented for Mac: chunked selection for vocabularies above 2048 when k < 2048 (mlx/topk.go,
+  mlxrunner/sample/sample.go). Applies to Mac qwen38-uni (mlx runner); no published speed figure. UA llamacpp models do not
+  get this path.'
+- '11. Live function-hash drift observed at 2026-11-03 re-survey (informational; no action taken): music_yue2 md5 49c63f742c6c6132869908df374e6fc8
+  -> 1dfc29042539a09e0d2dc895f80a15d7 (22960 -> 24961 bytes); bom_intent_filter md5 b6484d803eeba9fe1c2ef805e49ec4b2 -> bd079a60e0dd908133874947425c7a94
+  (44387 -> 45623 bytes). Context: art#55630 — the art55602 valve write is gone from function meta, and the ffmpeg 60s transcode
+  cap is confirmed hardcoded in transcode(). The live 2026-11-03 hashes are the v9 baseline (see function_hash_baseline).'
+- '12. BOMAI shared-instance coverage added: banner, custom buttons and branding inventory with a v0.13.0 risk check (Controls
+  move, tabbed workspace, notifications) — see machines.c2.open_webui.bomai_ui. Verdict: no code edit identified for BOMAI
+  UI functions; patched index.html/apikey-button.js/keys.html are version-coupled (MEDIUM) and must be rebased; visual QC
+  on BOTH BOMLLM and BOMAI surfaces is the gate.'
+locked_params:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  repeat_penalty: 1.0
+  presence_penalty: 0.0
+  num_predict: 4096
+  num_ctx: 8192
+  enforcement: UNCHANGED values. Do not normalize protected production tags or llama.cpp deviations. UA gpt-oss-120b is LIVE_NO_TOUCH;
+    UA new placements are frozen on memory pressure. AM4 FX28 and all ComfyUI instances remain untouched.
+model_matrix:
+  mac:
+    compliant_models:
+    - qwen38-uni
+    - bomai-pro
+    - bomai-mini
+    - bomai-gemma3
+    embedding_only:
+    - nomic-embed-text
+    - bge-m3
+    verified_live: qwen38-uni 7/7 locked values re-verified by Grok on 2026-11-06 on server 0.40.14, MLX, 30 GB resident,
+      ctx 8192; CLI remains 0.40.10.
+  ua:
+    compliant_models:
+    - qwen3-vl:2b
+    - bomai-safe
+    - bomai
+    verified_live: bomai-safe 7/7 locked values re-verified by Grok on 2026-11-06 on Ollama 0.40.14; frequency_penalty 0 explicit;
+      gpt-oss-120b is LIVE_NO_TOUCH.
+    protected_deviations:
+      siamcafe_and_r4_prod:
+        num_ctx: 32768
+        num_predict: 16384
+      bomai-v3:
+        sampler: server-default
+        num_ctx: 8192
+        num_predict: 4096
+        parallel: 2
+      gpt-oss-120b:
+        sampler: server-default
+        num_ctx: 32768
+        status: LIVE_NO_TOUCH
+  am4:
+    compliant_models:
+    - bomai-safe
+    protected_deviations:
+      siamcafe_base:
+        num_ctx: 32768
+        num_predict: 16384
+    verified_live: Locked parameters were not re-read in art56483 because the CLI is not on PATH; v9 values remain target,
+      not a new verification claim.
+  i9:
+    bomai-pro:
+      sampler: server-default
+      num_ctx: 8192
+      parallel: 1
+  c2:
+    bom-thai-chat:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: 20
+      repeat_penalty: 1.0
+      presence_penalty: 0.0
+      num_predict: 4096
+      num_ctx: 8192
+      function_calling: legacy
+function_hash_baseline:
+  as_of: 2026-11-03 live C2 Postgres openwebui.function re-survey (18 rows; supersedes v8 music hashes)
+  rows:
+  - id: claude_clone_ui
+    name: Claude Clone UI (BOM LLM)
+    type: event
+    active: true
+    md5: effde04867ac44300052db601bd1e5be
+    bytes: 9329
+  - id: theme_designer_pro
+    name: Theme Designer Pro
+    type: event
+    active: true
+    md5: 40e9a234a5a90874282d99ad122c1bc5
+    bytes: 1217116
+  - id: bomai_live_guard
+    name: BOM AI live guard
+    type: filter
+    active: true
+    md5: 81b24e54612ceadbfa913be96762a6d7
+    bytes: 21822
+  - id: bom_han_guard
+    name: BOM Han Guard
+    type: filter
+    active: true
+    md5: 8a2a07031eddbc4709f0978965213116
+    bytes: 1417
+  - id: bom_intent_filter
+    name: BOM Intent Filter
+    type: filter
+    active: true
+    md5: bd079a60e0dd908133874947425c7a94
+    bytes: 45623
+  - id: bom_ui_polish
+    name: BOM UI Polish
+    type: filter
+    active: true
+    md5: a0ab989e36c54912f95786e297cd4d05
+    bytes: 6182
+  - id: chart_image_resizer
+    name: Chart Image Token-Budget Resizer
+    type: filter
+    active: true
+    md5: 915403c0f39eaf533306de14bd16c230
+    bytes: 3039
+  - id: think_toggle
+    name: Extended Thinking
+    type: filter
+    active: true
+    md5: 92836d96cdfd384506475fa743965be9
+    bytes: 1366
+  - id: fast_no_think
+    name: Fast No Think
+    type: filter
+    active: true
+    md5: ba92b120102f7330e41ec3502c834fbd
+    bytes: 640
+  - id: force_web_search_global
+    name: Force Web Search Global
+    type: filter
+    active: false
+    md5: f84d9cc1e064ffc5a5eac0e9ea33406d
+    bytes: 2145
+  - id: json_guard
+    name: JSON Tool-Leak Guard
+    type: filter
+    active: true
+    md5: c669dc582d55317bdcde8c94dbba2e1c
+    bytes: 2822
+  - id: keyword_template_injector
+    name: Keyword Template Injector (TH)
+    type: filter
+    active: true
+    md5: 5600dd6281a8d38211c011d262eeb199
+    bytes: 4682
+  - id: reasoning_effort_setter
+    name: Reasoning Effort Setter
+    type: filter
+    active: true
+    md5: 677046b806efa55820c5206e5713e528
+    bytes: 1314
+  - id: search_button
+    name: Web Search
+    type: filter
+    active: true
+    md5: 778c2be553ef7996e86a3abf6320ceaf
+    bytes: 2360
+  - id: mql4_api_gate
+    name: mql4_api_gate
+    type: filter
+    active: true
+    md5: 75d6defcadb70b469ebeed3535fa57da
+    bytes: 1926
+  - id: music_yue2
+    name: BOM Music YuE2
+    type: pipe
+    active: true
+    md5: 1dfc29042539a09e0d2dc895f80a15d7
+    bytes: 24961
+  - id: deep_think_pipe
+    name: Deep Think Pipe
+    type: pipe
+    active: true
+    md5: fb30656fd055a13ce893371e7b553364
+    bytes: 10308
+  - id: chart_reason
+    name: chart-reason
+    type: pipe
+    active: true
+    md5: 2fb57bf16d3a3464f3479948b54d0ab8
+    bytes: 6708
+  v0130_contract_note: 'Filter, pipe, Valves and event-emitter interfaces are UNCHANGED v0.12.5 -> v0.13.0 (art#55645: zero
+    non-comment hunks in utils/filter.py; dispatch_event_functions now takes Request instead of app but passes the same symbols).
+    All 18 rows stay compatible. tool.is_active is a tool-table column; the function table is untouched.'
+machines:
+  c2:
+    identity:
+      host: contabo2-bom-llm
+      os: Debian 12
+      cores: 12
+      memory_gib: 47
+      gpu: none
+    addresses:
+      public_ssh: 109.123.233.171:99
+      tailscale: 100.83.20.100
+      ssh_user: bom
+    role: Public Open WebUI and LiteLLM control plane; search, vector DB, embeddings and live router
+    resource_baseline: '2026-11-06: RAM 6.312/48.187 GB used, 41.875 GB available, disk 28%, load 12.54 with vmstat 76-91%
+      idle and steal 0; do not scale from load average.'
+    cron:
+      observer: '* * * * * /bin/bash /home/bom/bom-autonomous-ops/ops_observer_c2.sh (preserved)'
+      staggered:
+        admission_metrics_snap: '*/5 * * * * (minutes 0,5,...)'
+        bomllm_health: 1-56/5 * * * *
+        bomllm_warm_pin: 2-57/5 * * * *
+        bot_probes_c2: 3-58/5 * * * *
+        bomllm_kv_push: 4-59/5 * * * *
+        bomai_health: 5-59/5 * * * * (same minute-5/0 phase; every-five-minute frequency preserved)
+      other_schedules_preserved:
+        bomllm_canary: '*/10 * * * *'
+        imggen_canary: '*/15 * * * * IMG_CANARY_DRY_RUN=1'
+        websearch_check: '*/15 * * * *'
+        bomllm_warmup: '*/15 * * * * plus 02:02 and 16:04 entries'
+        docker_kv_push: '*/15 * * * *'
+        token_residency: '*/10 * * * *'
+        latency_sample: 7,37 * * * *
+        llm_usage_tick: 5 * * * * TZ=Asia/Bangkok
+        llm_usage_digest: 30 7 * * * TZ=Asia/Bangkok
+        zai_budget_guard: 7 * * * *
+        unified_backup: 0 */6 * * *
+        version_monitor: 17 */6 * * *
+        version_watch: 23 */6 * * *
+        daily_cleanup: 0 21 * * *
+        daily_backup: 0 3 * * *
+        weekly_searxng_backup: 0 3 * * 1
+        weekly_qdrant_snapshot: 0 4 * * 0
+        weekly_prune: 0 5 * * 0 (existing owner schedule; not enabled or changed by v8/v9)
+        bomllm_full_backup: 30 4 * * *
+        spend_digest: 55 23 * * *
+        warm_pin_reboot: '@reboot sleep 30 (preserved)'
+      rollback: /home/bom/backups/c2_crontab_before_k3_20261102T180018Z.txt
+    litellm:
+      image: bomllm/litellm:1.106.4-pil2
+      version_pin_note: LiteLLM stays pinned at 1.106.4 for the OWUI v0.13.0 upgrade (art#55645 next_steps).
+      config: /home/bom/bomllm/litellm/config.yaml
+      container_config: /app/config.yaml
+      binds:
+      - 100.83.20.100:4000->4000
+      - 127.0.0.1:4000->4000
+      restart_policy: unless-stopped
+      general_settings:
+        enable_drain_endpoint: true
+        background_health_checks: false
+        budget_duration: 1d
+        database_disable_prepared_statements: true
+        disable_error_logs: true
+        health_check_concurrency: 32
+        health_check_skip_disabled_background_models: true
+        master_key: REDACTED
+        max_budget: 5.0
+        maximum_spend_logs_retention_period: 30d
+        proxy_batch_write_at: 60
+        proxy_config_reload_interval_seconds: 300
+      drift_fixes:
+        bomai_safe_repeat_penalty: 'CLOSED_NO_CHANGE: v5.2 found no route repeat_penalty key and art56483 sampled 1.0; UA
+          Modelfile remains 1.0. No restart.'
+      rollback: /home/bom/backups/c2_litellm_config_before_k3_20261102T181126Z.yaml
+      mac_generation_routes:
+      - qwen38
+      - qwen38-think
+      - qwen38-chat
+      - qwen38-code
+      - qwen38-deep
+      - thai-chat
+      - thai-think
+      - thai-alt
+      - qwen38-vision-alt
+      - qwen38-vision
+      - bom-thai-chat
+      - thai-gate
+      - thai-chat-rt
+      - ragsa-narrate
+      - redhat-mcp-rt
+      - bom-read-image
+      - bom-th-blite
+      - qwen38-uni
+      - bom-writer
+      - flood-runner
+      embedding_routes:
+        nomic-embed-text: Mac Nomic
+        embed-bge: Mac bge-m3
+      external_routes_no_paid_probe:
+      - zai-fallback
+      - zai-brain
+      - glm-4.6v-flash
+      - zai-glm-4.6v
+      db_routes:
+        typhoon25-content: UA bomai-v3 :11466
+        gpt-oss-120b: UA :4100 tier_smart_local
+      fallbacks:
+        qwen38_chat_think: qwen38 -> zai-fallback
+        qwen38_code_deep: zai-brain
+        bom_thai_chat: bom-writer -> zai-fallback
+        thai_chat: qwen38 -> zai-fallback
+        thai_think: thai-chat -> qwen38 -> zai-fallback
+        thai_alt: qwen38-chat -> qwen38 -> zai-fallback
+        thai_gate: qwen38-chat -> qwen38 -> zai-fallback
+        vision: zai-glm-4.6v
+      explicit_param_routes: qwen38-think, qwen38-code, qwen38-deep send temperature 0.6 + top_p 0.95; bomai-safe sends temperature
+        0.6, top_p 0.95, max_tokens 4096, extra_body options num_ctx 8192, top_k 20, repeat_penalty 1.0 (verified clean);
+        bom-th-blite is overwritten by bom_blite to the full locked set. qwen38, qwen38-uni, qwen38-chat, thai-chat set no
+        samplers in litellm_params (Modelfile applies via /api/chat).
+    open_webui:
+      version: 0.13.0
+      version_commit: c38885a
+      live_pre_upgrade:
+        version: 0.12.5
+        running_image_id: 03443b8de6b6
+        build_hash: f7ac7ee10962ddec0017f5c29b6740d9b9c5faca
+        alembic: 0bd252b206fb
+      target_image: ghcr.io/open-webui/open-webui:v0.13.0 (linux/amd64)
+      expected_image_baseline: 'CONFIRMED PRODUCTION 2026-11-06: OWUI 0.13.0, short image ID 549badb7b84d, Alembic e42c8f710a36.
+        v9 live_pre_upgrade fields are historical.'
+      bind: 0.0.0.0:3000->8080
+      restart_policy_live: always
+      websocket_support: true
+      uvicorn_ws_per_message_deflate: false
+      cors_allow_origin: https://webui.siam2r.com;http://192.168.1.254:3000;http://localhost:3000
+      static_mount: /home/bom/bomllm/open-webui/brand/bomai_static_v1 -> /app/build/static/bomai:ro
+      database: Postgres openwebui on bomllm-postgres-1
+      health_note: After a restart, Alembic startup and bounded readiness must complete before health is claimed. Boot->healthy
+        observed 17-80 min under C2 load; v0.13.0 adds 3 migrations.
+      alembic:
+        live: e42c8f710a36
+        target: e42c8f710a36
+        new_migration_files:
+        - c41f8d9e2a10_add_resource_comments.py
+        - 6f8c2a91d4e7_add_tool_is_active.py
+        - e42c8f710a36_add_notification_inbox.py
+        new_tables:
+        - comment
+        - comment_reaction
+        - notification
+        new_columns:
+          tool:
+          - is_active
+        untouched_tables:
+        - function
+        - model
+        - chat
+        - config
+        - user
+        reversible: yes — each file has downgrade(); downgrade() drops the new tables and column
+        hard_rule: Never run 0.12.5 and 0.13.0 against the same database; no rolling/multi-worker update.
+      env_vars_live_20261103:
+        set: CORS_ALLOW_ORIGIN (3 origins), ENABLE_API_KEYS=true, ENABLE_COMMUNITY_SHARING=false, ENABLE_DIRECT_CONNECTIONS=false,
+          ENABLE_EVALUATION_ARENA_MODELS=false, ENABLE_FOLDERS=true, ENABLE_IMAGE_GENERATION=true, ENABLE_MEMORIES=true, ENABLE_MEMORY_SYSTEM_CONTEXT=true,
+          ENABLE_MESSAGE_RATING=false, ENABLE_PASSWORD_VALIDATION=false, ENABLE_PERSISTENT_CONFIG=true, ENABLE_RAG_WEB_SEARCH=true,
+          ENABLE_SIGNUP=true, ENABLE_VERSION_UPDATE_CHECK=false, ENABLE_WEBSOCKET_SUPPORT=true, ENABLE_WEB_SEARCH=true, WEBUI_AUTH=true,
+          WEBUI_BUILD_HASH=f7ac7ee..., WEBUI_NAME=BOM, WEBUI_URL=https://webui.siam2r.com
+        secret_present_redacted: WEBUI_SECRET_KEY is set in the container env — value REDACTED, never reproduced (R3).
+        not_set_today:
+        - ENABLE_NOTIFICATIONS
+        - ENABLE_COMMENTS
+        - USER_PERMISSIONS_CHAT_SIDE_CHAT
+        - CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS
+        - CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES
+        - ENABLE_SUBAGENTS
+        - KNOWLEDGE_MAX_FILE_COUNT
+        - KNOWLEDGE_MAX_FILE_SIZE
+        - KNOWLEDGE_MAX_UPLOAD_COUNT
+      env_vars_v0130:
+        pin_before_start:
+          ENABLE_NOTIFICATIONS: 'false  # NEW in v0.13.0; upstream default TRUE would turn the notification inbox on — pin
+            false'
+          CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS: '256  # upstream default changed 256 -> 1024; pin the old cap'
+        new_defaults_kept_off:
+          ENABLE_COMMENTS: 'false  # NEW; upstream default false; comment threads stay off'
+          USER_PERMISSIONS_CHAT_SIDE_CHAT: 'false  # NEW; upstream default false; /side and /btw side chats stay off'
+        new_unset_no_cap:
+          KNOWLEDGE_MAX_FILE_COUNT: unset (None = no cap)
+          KNOWLEDGE_MAX_FILE_SIZE: unset (None = no cap)
+          KNOWLEDGE_MAX_UPLOAD_COUNT: unset (None = no cap)
+        documented_kept_off:
+          ENABLE_SUBAGENTS: false (default, unset; SUBAGENTS_MAX_CONCURRENT/ASYNC/ITERATIONS/OUTPUT upstream defaults changed
+            20/20/30/30000 -> empty=unlimited, latent while the flag is off; if sub-agents are ever enabled, set 20/20/30/30000
+            explicitly)
+      patch_binds_live_inventory:
+        source_dir: /home/bom/bomllm/open-webui/upgrades/v0.12.5/20261102_144535/patches/
+        backend_routers:
+        - knowledge.py
+        - images.py
+        - chats.py
+        - litellm_keys.py
+        backend_utils:
+        - bom_stress_fixes.py
+        - bom_stream_support.py
+        - middleware.py
+        - models.py
+        - thai_overlay.py
+        backend_main:
+        - main.py
+        backend_tools:
+        - builtin.py
+        frontend:
+        - index.html
+        - keys.html
+        - apikey-button.js
+        version_coupling: All 14 patch files are built against v0.12.5. Phase K must diff each against v0.13.0 upstream before
+          re-mounting; any incompatible patch ships DISABLED and flagged for zcode — never blind-carried onto v0.13.0. index.html
+          / apikey-button.js / keys.html are the most exposed to the tabbed-workspace and Controls-move chrome changes (MEDIUM
+          risk).
+        other_binds:
+        - /home/bom/bomllm/open-webui/data -> /app/backend/data
+        - /home/bom/bomllm/open-webui/brand/bomai/bomai-brand -> /app/build/bomai-brand
+      bomai_ui:
+        scope: BOMAI (bomai project) shares this OWUI instance with BOMLLM and has its own banner, custom buttons and branding
+          — a different UI from BOMLLM. v0.13.0 must not break these elements.
+        static_mount: /home/bom/bomllm/open-webui/brand/bomai_static_v1 -> /app/build/static/bomai:ro
+        static_assets_verified_5of5:
+        - branding.js
+        - web-search-button.js
+        - composer-guard.js
+        - bomai-han-monitor.js
+        - bom-ai-theme.css
+        static_assets_evidence: 'art#55630 t6: webui.siam2r.com 200 + all 5 bomai static assets HTTP 200'
+        brand_dir_mount: brand/bomai/bomai-brand -> /app/build/bomai-brand
+        image_binds: bomai_v3.png -> favicon.ico, favicon.png, favicon.svg, favicon-96x96.png, apple-touch-icon.png, logo.png,
+          splash.png, splash-dark.png, web-app-manifest-512x512.png, static/bomai_v3.png; bomai_v3_192.png -> web-app-manifest-192x192.png
+        frontend_patch_binds:
+        - index.html
+        - keys.html
+        - apikey-button.js
+        related_functions:
+        - theme_designer_pro (event 1.19.0)
+        - claude_clone_ui (event 1.1.0)
+        - bom_ui_polish (global filter)
+        - bomai_live_guard (filter 3.0.0)
+        - bom_han_guard (outlet filter)
+        - music_yue2 (pipe 1.0.0)
+        v0130_risk_check:
+          controls_move: 'Chat files, valves, system prompt and advanced parameters moved from the top Controls panel into
+            Controls in the model menu; the top button now opens the tabbed side panel. theme_designer_pro''s only ''Controls''
+            hit is its sidebar-background valve text, not the chat Controls panel; bom_ui_polish has no Controls/querySelector
+            hit; claude_clone_ui is a CSS/JS skin aimed at 0.11.1 chrome. Action: VISUAL CHECK both BOMLLM and BOMAI surfaces
+            after cutover.'
+          tabbed_workspace: Additive UI (files, terminals, artifacts, previews, voice calls, comments tabs) plus full-width
+            tabs on large screens. No current fleet dependency; LOW risk to banner/buttons/branding.
+          notifications: Notification inbox upstream default ON — pinned ENABLE_NOTIFICATIONS=false keeps BOMLLM/BOMAI chrome
+            unchanged.
+          comments: Comment threads upstream default OFF; ENABLE_COMMENTS stays unset/false — banner/buttons unaffected.
+          version_coupled_frontend_patches: Patched index.html / apikey-button.js / keys.html were built against 0.12.5 markup;
+            the tabbed-workspace and Controls-move chrome changes make these MEDIUM risk. Rebase in Phase K before cutover;
+            if a rebase is not clean, ship without that patch and flag zcode.
+          verdict: No code edit identified for BOMAI banner/buttons/branding functions (filter/pipe/Valves/event contracts
+            unchanged; static mounts are version-agnostic files). The gate is visual QC with screenshot evidence on BOTH BOMLLM
+            and BOMAI UI after upgrade (Phase M, Playwright headless).
+      live_current:
+        version: 0.13.0
+        image_id_short: 549badb7b84d
+        alembic: e42c8f710a36
+        health: HTTP 200, container healthy, restart=always, one uvicorn worker
+        digest_note: Short digest corrected by art56488 as confirmed production; full sha256 not collected.
+      target_bind_v10:
+      - 127.0.0.1:3000->8080
+      - 100.83.20.100:3000->8080
+      exposure_note: Current 0.0.0.0:3000 is a candidate only until DOCKER-USER and direct consumers are checked; Cloudflare/Compose-gated
+        rebind script is OWNER_WINDOW.
+    containers:
+      live-router:
+        image: live-router:v2
+        init: true
+        health: expected-healthy
+        network: host
+      searxng:
+        container: bomllm-searxng-1
+        image: searxng/searxng:2026.11.2
+        ports:
+        - 100.83.20.100:8888->8080
+        - 127.0.0.1:8888->8080
+      qdrant:
+        status: 'offloaded to AM4 in Phase A; C2 keeps alpine/socat relay qdrant-relay-am4 with network alias qdrant -> 100.80.16.53:6333
+          on bomllm_default. CRITICAL: OWUI startup hard-blocks on the qdrant alias resolving — never stop/remove the relay
+          without a verified replacement.'
+      infinity:
+        status: stopped on C2 (infinity_old_c2); OWUI RAG_EMBEDDING_ENGINE=openai sends embeddings through LiteLLM -> Mac
+          (nomic/bge-m3); AM4 Infinity :7997 is the fleet embedding backend
+        image: michaelf34/infinity:latest-cpu
+        command: v2 --engine torch --model-id nomic-ai/nomic-embed-text-v1.5 --model-id BAAI/bge-m3 --model-id BAAI/bge-reranker-v2-m3
+          --batch-size 32 --port 7997
+        environment:
+          OMP_NUM_THREADS: 8
+        decision: Keep existing 8-thread cap; do not raise to 12. Model removal is an owner decision.
+      valkey:
+        container: bomllm-valkey-1
+        image: valkey/valkey:9.1.2-alpine
+        maxmemory: 256mb
+        eviction: allkeys-lru
+        port: 127.0.0.1:6379
+      postgres:
+        container: bomllm-postgres-1
+        image: postgres:16.15-alpine
+        port: 127.0.0.1:5432
+        databases:
+        - openwebui
+        - litellm
+      pgbouncer:
+        container: bomllm-pgbouncer-1
+        image: edoburu/pgbouncer:latest
+        port: 127.0.0.1:6432->5432
+      chart-overlay:
+        status: offloaded to AM4 icafefx-chart :3100 in Phase A; C2 copy renamed chart-overlay_offloaded_to_am4_20261103T0352Z
+        decision: KEEP_PENDING_OWNER_REVIEW
+      beszel:
+        container: beszel-agent
+        image: henrygd/beszel-agent:0.21.1
+      cloudflared:
+        type: systemd
+        role: tunnel
+        not_a_container: true
+    tailscale:
+      version_at_survey: 1.104.4
+      home_derp: sin
+      mac:
+        address: 100.118.133.38
+        path: relay-sin
+        direct: false
+        latency_priority: HIGH_OWNER_NETWORK_ACTION
+      ua:
+        address: 100.82.173.22
+        path: relay-sin
+        direct: false
+      am5:
+        address: 100.110.83.99
+        path: direct
+      nas:
+        address: 100.111.221.102
+        path: direct
+      peer_netcheck: Mac and UA both report UDP=true, stable NAT mapping, no port mapping, no IPv6; each pings C2 only through
+        DERP sin.
+      dns_state: 'Phase A repair holds: tailscaled does not manage system DNS (global resolver 8.8.8.8/1.1.1.1); marked static
+        /etc/hosts block ''# K3-C2-OFFLOAD-20261103'' maps the six tailnet names; rollback /etc/hosts.bak_k3_20261102T220727Z.'
+      required_owner_action: Permit/forward UDP 41641 or equivalent NAT/firewall policy on the affected path, then retest
+        direct CurAddr; no agent firewall change.
+    netdata:
+      current: host systemd; bind 127.0.0.1; global/db/apps 10s; scripts.d/ml/gzip/network-viewer/otel/ebpf/debugfs/go.d/systemd-journal
+        disabled
+      cpu_one_core_pct_10s: 73.9
+      target: sustained <=50% of one core; optional 15s only after two elevated audits; do not touch healthy public services
+      evidence: 'art56352: 190-300% combined baseline, 56-68% after first tune; art56456: 94%; art56483: 73.9%. Spec-supplied
+        42.8% is not the current baseline.'
+    cleanup_targets:
+      exited_remove_after_archive:
+      - qdrant_verify_tmp_done_20261103
+      - open-webui_pre_wsfix_20261102
+      - live-router_pre_init_20261102
+      - bomllm-qdrant-1_offloaded_to_am4
+      keep_pending_owner_review:
+      - chart-overlay_offloaded_to_am4
+      never_remove:
+      - rag-lb-relay-am4
+      - qdrant-relay-am4
+      build_cache: 9.34 GB total, 6.02 GB reclaimable; prune only older than 168h after owner acceptance; no volumes pruned
+  mac:
+    identity:
+      host: macmini-ai
+      hardware: Mac Mini M4 Pro
+      cores: 14
+      memory_gib: 48
+    addresses:
+      lan: 192.168.1.254
+      tailscale: 100.118.133.38
+      ssh: bom@192.168.1.254:22
+    role: Primary qwen38-uni MLX inference and embeddings
+    ollama:
+      version: 0.40.14
+      version_live_pre_upgrade: 0.40.10 (verified 2026-11-03)
+      upgrade_path: Ollama-darwin.zip from GitHub releases, replace app (Phase L, after UA)
+      listen: 127.0.0.1:11437 internally; API :11434
+      no_cloud: true
+      production_model: qwen38-uni:latest
+      mlx_topk_note: v0.40.14 MLX top-k uses chunked selection for vocab>2048 when k<2048 — applies to qwen38-uni (mlx runner,
+        31 GB resident, ctx 8192); no published speed figure; measure after Phase L.
+      server_version_live: 0.40.14
+      cli_version_live: 0.40.10
+      cli_target: 0.40.14
+      resident: qwen38-uni 30 GB, 100% GPU, MLX, ctx 8192, kept 24h
+      cli_upgrade: Official ollama-darwin.tgz v0.40.14, sha256 f3bf9a528e908da0da5a2b3a4ad3252a369d62186501dc4880261e8d9023bff5;
+        no server restart
+    owner_gateway:
+      port: 11435
+      rule: NO_TOUCH
+    services:
+      open_webui: :3000
+      searxng: :8888
+      docker_containers: 0
+    network:
+      c2_path: DERP-sin
+      udp: true
+      nat_mapping: stable
+      port_mapping: none
+      magicsock_receiveipv4: not running
+      required_owner_action: Permit/forward UDP 41641 or equivalent; no DNS or agent NAT change
+    storage_baseline: System 26% used / 667 GB free; two iOS simulator volumes 98% full. Audit only before owner backup/removal.
+    docker_state: Installed 29.7.2, daemon absent; no action because no container workload requires it.
+  ua:
+    identity:
+      host: ubuntu-ai
+      os: Ubuntu 26.04.1 LTS
+      cores: 24
+      memory_gib: 123
+      gpus: RTX 5080 16GB + RTX 5060 Ti 16GB
+    addresses:
+      lan: 192.168.1.248
+      tailscale: 100.82.173.22
+      ssh: bom@192.168.1.248:99
+    role: GPU inference, vision, gpt-oss-120b, LiteLLM, ComfyUI and permanent AI training
+    ollama:
+      version: 0.40.14
+      version_live_pre_upgrade: 0.40.13 (verified 2026-11-03)
+      upgrade_path: curl -fsSL https://ollama.com/install.sh | sh (Phase L, FIRST — before Mac)
+      active_unit: bomai-ollama.service
+      system_unit: disabled-by-design
+      no_cloud: true
+      cli_and_server_live: 0.40.14
+    models:
+      gpt-oss-120b:
+        container: llm-smart
+        image: nvidia/cuda:12.8.1-runtime-ubuntu24.04
+        file: gpt-oss-120b-MXFP4.gguf
+        port: 8380
+        context: 32768
+        rule: LIVE_NO_TOUCH
+      bomai-v3:
+        port: 11466
+        context: 8192
+        predict: 4096
+        parallel: 2
+        startup: manual
+      bomai-safe:
+        parameters: locked
+        verified: true
+        re_verified: '2026-11-03: 7/7 locked + frequency_penalty 0 explicit'
+      vision-light:
+        model: qwen3-vl:2b
+        parameters: locked
+    gateways:
+      main:
+        container: litellm
+        image: ghcr.io/berriai/litellm-non_root:v1.106.4
+        port: 4000
+        bind_current: 0.0.0.0:4000
+        target_bind_v10:
+        - 127.0.0.1:4000
+        - 100.82.173.22:4000
+        - 192.168.1.248:4000
+        restart_constraint: 03:00-06:00 ICT only after two-minute zero-completion drain; image remains v1.106.4
+      staging:
+        container: litellm-staging
+        bind: 100.82.173.22:4100->4000
+        rule: NO_RESTART
+    routes:
+      bomai-uni: Mac qwen38-uni; fallback bomai-pro -> zai-glm (not probed)
+      bomai-pro: i9 :8080; external fallback not probed
+      vision-light: UA qwen3-vl:2b
+      embeddings_and_rerank: AM4 Infinity :7997
+      tier_smart_local: UA gpt-oss-120b
+      tier_frontier: Anthropic and Moonshot; not probed
+    comfyui:
+      gpu0: :8188
+      gpu1: :8189
+      image: yanwk/comfyui-boot:cu130-slim-v2
+      yue_checkpoint_present: false
+    other_containers:
+    - litellm-db
+    - librechat
+    - librechat-mongodb
+    - librechat-meilisearch
+    - librechat-mcpshim
+    - netdata
+    - beszel-agent
+    workload_locks: EA/FX28 quant burn, gpt-oss-120b and both ComfyUI instances untouched; available memory is the placement
+      constraint, not CPU.
+    network:
+      c2_path: DERP-sin
+      udp: true
+      nat_mapping: stable
+      port_mapping: none
+    capacity_admission: FROZEN
+    memory_baseline:
+      ram_total_mb: 126199
+      ram_used_mb: 109894
+      ram_available_mb: 16304
+      swap_total_mb: 327679
+      swap_used_mb: 16513
+      swap_out_observed: true
+      critical: true
+      action: No new models or memory-heavy jobs; no gpt-oss-120b/ComfyUI/FX28 stop or restart in this plan.
+    gpu_baseline:
+    - model: RTX 5080
+      memory_mib: 16303
+      used_mib: 14577
+      util_pct: 0
+    - model: RTX 5060 Ti
+      memory_mib: 16311
+      used_mib: 14023
+      util_pct: 0
+    open_webui_host:
+      version: 0.12.4
+      bind: 127.0.0.1:3000
+      policy: Independent instance; no forced C2 alignment
+    netdata:
+      image: netdata/netdata:stable
+      cpu_pct: 10.05
+      memory_mib: 160
+      bind: 0.0.0.0:19999
+      target_bind:
+      - 127.0.0.1:19999
+      - 100.82.173.22:19999
+    exposure_inventory:
+    - llm-smart:8380 NO_TOUCH
+    - comfy:8188/8189 NO_TOUCH
+    - librechat:3080 OWNER_REVIEW
+    - netdata:19999 REBIND
+    - litellm:4000 REBIND_AFTER_DRAIN
+  am4:
+    identity:
+      host: ubuntu
+      os: Ubuntu 26.04.1 LTS
+      cores: 32
+      memory_gib: 121
+      gpus: 2 x RTX 5060 Ti 16GB
+    addresses:
+      lan: 192.168.1.249
+      tailscale: 100.80.16.53
+      ssh: bom@192.168.1.249:99
+    role: ComfyUI router/workers, embeddings, agent hub, LiteLLM and business services
+    ollama:
+      version: 0.40.13
+      active_unit: bomai-ollama.service
+      binary: /home/bom/.local/share/BOM-AI/ollama-v0.40.13/bin/ollama
+      scope_note: Upgrade is now targeted but BLOCKED until FX28 is fully stopped and owner approves 03:00-06:00 ICT inference
+        window
+      target: 0.40.14
+      cli: NOT_ON_PATH
+      target_binary: /home/bom/.local/share/BOM-AI/ollama-v0.40.14/bin/ollama
+      asset_sha256: 993e83d08c3d13d17c55009a3e2664c8a25445e644aec3a68bef5abb6abce67d
+    models:
+      bomai-safe: locked
+      protected_siamcafe_base: ctx 32768 / predict 16384 retained
+    gateway:
+      container: litellm-gw
+      image: bomllm/litellm:1.106.4-pil2
+      port: 4000
+      route: thai_prod -> Mac qwen38-uni
+    comfyui:
+      gpu0: :8188
+      gpu1: :8189
+      image: yanwk/comfyui-boot:cu130-megapak-pt211
+      router: :8788
+      rule: HTTP_API_ONLY
+    infinity:
+      container: infinity-cpu
+      image: michaelf34/infinity:latest-cpu
+      bind: 192.168.1.249:7997
+      role: fleet embedding backend (post-Phase-A)
+    qdrant:
+      version: v1.20.0
+      storage: /home/bom/qdrant/storage
+      binds: 127.0.0.1 + LAN + TS :6333/:6334
+      collections: 13
+      note: migrated from C2 in Phase A; sha256 digest verified
+    hub:
+      container: agent-hub-v2
+      image: agent-hub:governance-v2-20261029
+      bind: 192.168.1.249:8192->8000
+      rule: LIVE_NO_TOUCH
+    other_services:
+      mcp: :8200
+      qc: :18090
+      bookstack: :6875
+      metube: :8082
+      code_server: :8443
+      kuma: :3002
+      chatwoot: :3500
+      listmonk: :9000
+      matomo: :8050
+      serpbear: :3232 and :3456
+    workload_lock: EA/FX28 quant burn untouched; no process, slot or model retuning.
+    resource_baseline: '2026-11-06: RAM 53.540/124.364 GB used, 70.824 GB available, swap 6.414 GB, load 16.78 from real FX28/Ollama
+      work; do not retune the burn.'
+    open_webui_host:
+      version: 0.11.4
+      bind: 127.0.0.1:3000
+      policy: Independent instance; no forced C2 alignment
+    netdata:
+      cpu_pct: 0.96
+      memory_mib: 188
+      network_mode: host
+      bind: 0.0.0.0:19999
+      config_persistence: container-local; persist /home/bom/netdata/etc before recreate
+      target_bind:
+      - 127.0.0.1
+      - 100.80.16.53
+      - 192.168.1.249
+    log_baseline:
+      kern_log: '>100 MB; dedicated daily/size 100M/rotate 7 candidate'
+      var_log: 1.7 GB
+      tmp: 1.6 GB; no deletion
+    exited_container_cleanup:
+      candidate: agent-hub-v2_prev_20261104_0301
+      gate: live agent-hub-v2 LAN :8192 healthy
+  i9:
+    identity:
+      host: DESKTOP-G3MKH6J
+      os: Windows 10 Pro
+      cpu: i9-13900K
+      logical_cores: 32
+      memory_gb: 128
+      gpus: 2 x RTX 5060 Ti 16GB
+    addresses:
+      lan: 192.168.1.20
+      tailscale: 100.85.255.14
+      ssh: bomi9@192.168.1.20:22
+    role: YuE2 and ComfyUI GPU host, bomai-pro llama.cpp, owner-managed voice/GPU services
+    bomai_pro:
+      service: llamacpp-gpu1
+      startup: Automatic
+      bind: 127.0.0.1:8080
+      context: 8192
+      parallel: 1
+    comfyui:
+      version: 0.43.0
+      python: 3.13.14
+      pytorch: 2.14.0+cu130
+      listen: 192.168.1.20:8188
+      additional_endpoints:
+      - 8189
+      - 8190
+      pulid_8190: NO_TOUCH
+      user_directory: E:\ComfyUI\user_gpu0
+      output_directory: E:\ComfyUI\output_gpu0
+      serve_endpoint: http://desktop-g3mkh6j.tailf5814f.ts.net:18188
+      second_gpu_note: ComfyUI reports cuda:0 only; nvidia-smi shows memory on both. Do not kill processes or move the LAN
+        bind.
+    yue2:
+      checkpoint: E:\comfy_models\models\checkpoints\yue2_3b_bf16.safetensors
+      bytes: 7799983228
+      quantization: bf16
+      runtime_gpu: GPU0
+    thai_text:
+      nodes:
+      - TextOverlay
+      - WASImageDrawText
+      - CreateTextMask
+      node_font_limit: Current WAS and KJ dropdowns do not list a Thai font.
+      system_fonts_with_complete_tested_codepoints:
+      - Sarabun-Regular.ttf
+      - leelawad.ttf
+      - tahoma.ttf
+      pillow_raqm_system_python: false
+      pillow_raqm_comfy_embedded_python: false
+      recommendation: Reuse the maintained post-VAE overlay integration; add Thai font/shaping assets only in a separately
+        authorized zcode change.
+    os_support:
+      status: Windows 10 Pro 22H2 end of support 2025-10-14
+      esu: UNVERIFIED
+      action: Owner chooses ESU or separate supported-OS migration; no in-place upgrade in this artifact
+    ollama:
+      version: 0.40.13
+      target: 0.40.14
+      resident_models: []
+      upgrade: Signed official installer only after GPU attribution and owner window; rollback installer pinned
+    gpu_residency:
+    - gpu: 0
+      used_mib: 12361
+    - gpu: 1
+      used_mib: 11066
+    model_admission: DENY_UNTIL_BOTH_GPU_RESIDENT_SETS_ARE_ATTRIBUTED
+    wide_bind_inventory:
+    - 22 RDP-related SSH
+    - 3389 RDP
+    - 445 SMB
+    - '8190'
+    - '9182'
+    - '9200'
+    - '9400'
+    - '9401'
+    firewall_note: Domain/Private/Public enabled with default inbound Block; allow-rules not surveyed. No listener disable
+      without owner review.
+  nas:
+    identity:
+      host: DS725_PLUS
+      os: Synology DSM
+      cores: 4
+      memory_gib: 19
+      volume: 5.3TiB
+    addresses:
+      lan: 192.168.1.253
+      tailscale: 100.111.221.102
+      ssh: siamcafe@192.168.1.253
+    role: Storage, backups, Cloudflare tunnel, hub/service relays, monitoring and owner-held n8n
+    cloudflared:
+      container: nas-hub
+      image: cloudflare/cloudflared:2026.10.3
+      restart: unless-stopped
+    n8n:
+      image: n8nio/n8n:2.31.2
+      bind: 192.168.1.253:5678
+      rule: OWNER_HOLD_NO_RESTART_OR_UPGRADE
+    relays:
+      hub: :8191
+      router: :8788
+      postgres: :5432/:5433/:13306
+      redis: :6379
+      docs_and_business: existing socat matrix preserved
+    database:
+      container: agent-hub-db
+      image: mariadb:11.4.13
+      role: live-hub-data
+    monitoring:
+      kuma: :3001
+      netdata: stable; scripts.d and go.d running; disable scripts.d only in owner window
+      beszel: installed
+      node_exporter: node_exporter_old_20261023 on 0.0.0.0:9100; stop after scrape-free proof; keep container for rollback
+    resource_baseline:
+      ram_available_mb: 13817
+      swap_used_mb: 781
+      swap_pct: 38
+      raid: md0/md1/md2/md3 [UU] healthy
+      volume1_pct: 30
+      usb_pct: 65
+      load_cause: 03:00 Task Scheduler herd on 4 threads
+    schedule_targets:
+      apply_watermark_server.py: 03:00
+      tier2_daily.py: 03:07
+      grav_content_writer.py: 03:14
+      noncritical_monitors: 03:21
+      mode: OWNER_DSM_TASK_SCHEDULER
+    ssh_access_note: bom publickey denied; survey used siamcafe. Inventory only; no sshd/authentication recommendation.
+  contabo1:
+    identity:
+      host: vmi3108393
+      os: Debian 12
+      cores: 8
+      memory_gib: 23
+    addresses:
+      public: 109.205.176.7
+      ssh: root@109.205.176.7:99
+      tailscale: false
+    role: Monitoring, alerting, n8n and exporters; separate from C2
+    n8n:
+      image: n8nio/n8n:2.10.3
+      bind: 127.0.0.1:5678
+      rule: OWNER_HOLD_NO_FORCED_ALIGNMENT_OR_RESTART
+    monitoring:
+      grafana: :3001
+      kuma: :3002
+      prometheus: :9090
+      alertmanager: :9093
+      exporters: :9100/:9101/:9102/:9119/:9120
+    residual: 79 defunct Chromium/chrome_crashpad children parented by n8n-browserless; planned Browserless-only recycle,
+      then 24h recurrence check.
+    resource_baseline: '2026-11-06: RAM 3.342/24.044 GB used, 20.701 GB available, disk 15%, load 1.94 on 8 vCPU; Kuma is
+      hot on one core but host is idle.'
+    mariadb:
+      image: 10.4.13
+      support: EOL
+      action: Separate blue/green application-aware migration; original container/volume retained for rollback
+    netdata:
+      binary: v2.12.0-405-nightly
+      running: false
+      current_config: update every 2, memory mode ram, bind 0.0.0.0:19999
+      preventive_target: 10s, ML off, bind 127.0.0.1, scripts.d/ebpf/debugfs off; leave stopped
+    prometheus_exposure: Host iptables allows tcp/9090 from anywhere while container publishes 127.0.0.1 only; audit, do not
+      widen.
+  cat:
+    identity:
+      host: server-122-155-168-7.da.direct
+      os: Ubuntu 20.04.6 LTS
+      cores: 12
+      memory_gib: 62
+    addresses:
+      public: 122.155.168.7
+      ssh: bom@122.155.168.7:99
+      tailscale: false
+    role: DirectAdmin production hosting; read-only
+    directadmin:
+      version: '1.713'
+      php_slots:
+        php1: 7.4 php-fpm
+        php2: '8.2'
+        php3: '8.3'
+      secure_php: true
+      web: nginx 1.29.4 running; Apache 2.4.66 installed
+      rule: OWNER_EXECUTE only after backup and evidence gates
+    services:
+    - httpd
+    - nginx
+    - mysqld
+    - php-fpm
+    rule: READ_ONLY_SURVEY; every supplied script is OWNER_EXECUTE; no production config was touched.
+    resource_baseline: '2026-11-06: RAM 11.726/64.021 GB used, 50.647 GB available, load 1.23, root 11% and /home 15% used;
+      mysqld RSS 5.5 GB, Netdata RSS 1.0 GB.'
+    php:
+      cli: 8.3.33
+      other_binaries:
+      - '5.6'
+      - '7.4'
+      - '8.1'
+      - '8.2'
+      opcache: enabled; utilization unknown
+      retirement_gate: zero live/user php56/php74 references and owner smoke tests
+    mariadb:
+      version: 10.6.22
+      rss: 5.5 GB
+      access: passwordless root socket denied; buffer pool/concurrency unknown
+      target: Metric-driven 6-8 GiB pool ceiling and max_connections <=200; query cache off unless measured beneficial; no
+        credential-file reads
+    csf:
+      version: '15.05'
+      testing: '0'
+      synflood: ON 75/s burst 25 — keep
+      country_blocking: KEEP_EMPTY
+      hardening_gate: Attack evidence plus owner out-of-band access; CT<=300 on 80/443 and temporary port-scan rules only
+    backup:
+      survey_checked: /home/admin/backups absent
+      official_default: /home/admin/admin_backups
+      status: ABSENCE_NOT_PROVEN
+      target: Daily local + offsite NAS, archive validation <26h and monthly isolated restore drill
+    ssl:
+      manager: DirectAdmin ACME ec256
+      certbot: not required
+      audit: All domain/hostname certs; warning <14d, critical <7d; never read private keys in audit
+    failed_units:
+    - cloud-init local/config/final
+    - iptables-restore.service (CSF is active policy)
+    - maldet.service (cause unknown)
+    - snap canonical-livepatch/cups/snapd.seeded
+    os_support:
+      release: Ubuntu 20.04.6 LTS
+      standard_support: ended 2025-05
+      esm: UNVERIFIED
+      action: Verify pro status; owner chooses Pro or separate rehearsed migration
+    modsecurity: Spec path lacks SecRuleEngine but BFM deny entries prove blocking; locate effective includes; do not switch
+      to DetectionOnly globally.
+    ssh_inventory: PermitRootLogin yes and PasswordAuthentication yes observed. Inventory only; no sshd/authentication recommendation
+      under IRON 38.
+  am5_command_station:
+    identity:
+      host: DESKTOP-PE1B0VH
+      os: Windows 10 Pro
+      cpu: Ryzen 9 9950X3D
+      memory_gb: 128
+      gpu: RTX 4060 8GB
+    addresses:
+      lan: 192.168.1.22
+      tailscale: 100.110.83.99
+    role: Command station and lightweight local inference; not counted among the eight surveyed production machines
+    rule: No fleet model or firewall changes in this task.
+music_pipe:
+  id: music_yue2
+  exposed_model_id: music_yue2.music-yue2
+  active: true
+  global: true
+  endpoint: http://desktop-g3mkh6j.tailf5814f.ts.net:18188
+  storage: C2 Postgres openwebui.function
+  updated_at_unix: 1793644430
+  content_md5: 1dfc29042539a09e0d2dc895f80a15d7
+  content_bytes: 24961
+  hash_note: v8 recorded md5 49c63f742c6c6132869908df374e6fc8 / 22960 bytes; live re-survey 2026-11-03 shows 1dfc29042539a09e0d2dc895f80a15d7
+    / 24961 bytes. Drift documented in changes_from_v8 item 11; the live values are the v9 baseline.
+  rollback: /home/bom/backups/bom_music_functions_before_k3_20261102T183318Z/music_yue2.py
+  v0130_compatibility: Pipe interface unchanged v0.12.5 -> v0.13.0 (art#55645). required_open_webui_version 0.11.3 satisfied.
+    Its music-graph temperature 0.8 and top_k 50 are internal to YuE2, not GOD CONFIG chat.
+  valves:
+    ENABLED: true
+    MAX_DURATION_S: 30
+    MAX_CALLS_PER_DAY: 5
+    LOCAL_TIMEOUT_S: 600
+    ffmpeg_timeout_s: '60 (HARDCODED in transcode(): asyncio.wait_for(proc.wait(), 60) — confirmed by art#55630; there is
+      NO ffmpeg_timeout_s valve in deployed code; the art55602 meta valve write is gone)'
+    ALLOWED_USER_IDS_count: 21
+    STATE_DIR: /app/backend/data/music_yue2
+  sampling:
+    mode: full
+    temperature: 0.8
+    top_p: 0.95
+    top_k: 50
+    repetition_penalty: 1.1
+    cfg_scale: 4.0
+    max_duration: requested_seconds * 1.2, rounded
+    ksampler:
+      cfg: 1.0
+      steps: 32
+      sampler: dpm_2
+      scheduler: sgm_uniform
+      denoise: 1.0
+    lyrics: 'empty unless เนื้อร้อง: or lyrics: is supplied'
+  style_presets:
+    calm: instrumental, no vocals, calm lo-fi ambient pop, soft electric piano lead, warm pad, gentle brushed drums, round
+      bass, 80 BPM
+    acoustic: instrumental, no vocals, acoustic folk, fingerpicked steel-string guitar, light shaker, upright bass, 96 BPM
+    piano: instrumental, no vocals, solo felt piano, gentle arpeggios, spacious reverb, 66 BPM
+    ambient: instrumental, no vocals, ambient drone, evolving analog pads, no drums, 60 BPM
+    upbeat: instrumental, no vocals, bright ukulele pop, cheerful whistle lead, hand claps, glockenspiel, 110 BPM
+    jazz: instrumental, no vocals, smooth jazz trio, brushed drums, walking upright bass, mellow piano voicings, 110 BPM
+    cinematic: instrumental, no vocals, cinematic trailer hybrid, soaring strings, french horns, taiko percussion, 100 BPM
+    lofi: instrumental, no vocals, lo-fi hip hop, dusty Rhodes chords, vinyl crackle, lazy boom-bap drums, warm bass, 72 BPM
+    electronic: instrumental, no vocals, melodic deep house, warm analog synth lead, four-on-the-floor kick, 122 BPM
+    bossa: instrumental, no vocals, bossa nova, nylon guitar comping, soft brushed drums, upright bass, gentle flute, 130
+      BPM
+    thai_lk: Thai language, luk krung pop, warm female vocal, clear diction, acoustic guitar, soft drums, 92 BPM
+    thai_lt: Thai language, luk thung, emotive female vocal with vibrato, khaen accents, phin lead, 128 BPM
+    thai_tpop: Thai language, modern T-pop, bright female vocal, glossy synths, punchy electronic drums, 106 BPM
+  aliases:
+    electronic:
+    - electronic
+    - deep house
+    - edm
+    - house
+    - 90s
+    - 90’
+    - trance
+    - techno
+    - rave
+    - อิเล็กทรอนิกส์
+    - เฮาส์
+    - เทคโน
+    - ดิสโก้
+    other: Existing Thai, lo-fi, acoustic, piano, ambient, upbeat, jazz, cinematic, bossa and calm aliases preserved.
+  residual:
+    ascii_90s: The existing duration regex still interprets ASCII '90s' as 90 seconds and rejects it above MAX_DURATION_S=30.
+      Curly '90’' works. A targeted parser decision is assigned to zcode; no broader rewrite was made.
+    busy_check: bom_intent_filter still uses the old raw Tailscale :8188 queue URL and fails open. Move to magicDNS :18188
+      in the assigned zcode source task.
+    ffmpeg_stage: The 60-second ffmpeg transcode hardcap (hardcoded, no valve) and GPU wait message still need separate stage-specific
+      handling. T4 passed in art#55630 only because that run's transcode finished under 60s; recurrence is possible under
+      C2 iowait. Dedicated source-fix lane recommended (60->240 or read LOCAL_TIMEOUT_S).
+music_intent_filter:
+  id: bom_intent_filter
+  content_md5: bd079a60e0dd908133874947425c7a94
+  content_bytes: 45623
+  hash_note: v8 recorded md5 b6484d803eeba9fe1c2ef805e49ec4b2 / 44387 bytes; live re-survey 2026-11-03 shows bd079a60e0dd908133874947425c7a94
+    / 45623 bytes. The live values are the v9 baseline.
+  updated_at_unix: 1793644430
+  rollback: /home/bom/backups/bom_music_functions_before_k3_20261102T183318Z/bom_intent_filter.py
+  music_model_id: music_yue2.music-yue2
+  music_keywords_added:
+  - สร้าง เพลง
+  - edm
+  - house
+  - เพลง edm
+  existing_keywords_preserved:
+  - สร้างเพลง
+  - แต่งเพลง
+  - ทำเพลง
+  - เขียนเพลง
+  - ขอเพลง
+  - เพลงประกอบ
+  - เสียงประกอบ
+  - compose a song
+  - compose music
+  - make music
+  - make a song
+  - create a song
+  - create music
+  - generate music
+  - generate a song
+  - background music
+  - bgm
+  negative_guards: MUSIC_NEG, refusal and explanation filters preserved and tested.
+  v0130_compatibility: Filter interface unchanged; inlet, outlet, Valves, __event_emitter__ contract preserved (art#55645).
+comfyui_thai_poster:
+  available_nodes:
+    TextOverlay: IMAGE input, multiline text, relative font size, color, top/bottom, alignment, outline; no font selector.
+    WASImageDrawText: Wrapping, alignment, outline, background panel and mask; current font dropdown lacks Thai.
+    CreateTextMask: Text image/mask with animation; current KJ font list lacks Thai.
+  tested_font_coverage: Sarabun, Leelawadee and Tahoma contain every codepoint in สร้างเพลงไทย 90’.
+  shaping_gap: Pillow 12.3.0 in ComfyUI embedded Python reports raqm=False; system Python also reports raqm=False.
+  recommended_workflow: Generate the image text-free -> VAEDecode -> maintained Pillow overlay/postprocessor with a Thai font
+    and working raqm shaping -> upload through the existing OWUI image response. Extend the existing image pipe rather than
+    create a parallel pipe. Do not ask the diffusion model to render Thai glyphs.
+  implementation_owner: zcode
+  config_task_action: research-only
+ollama_v04014_notes:
+  sampler_fix: 'OpenAI-compatible /v1 chat/completions endpoints no longer force temperature 1.0 / top_p 1.0 when the client
+    omits them; omitted values now resolve to the packaged Modelfile, matching /api/chat behavior. FLEET IMPACT: NONE — OWUI
+    -> LiteLLM (ollama_chat) -> Ollama /api/chat already used Modelfile defaults; no model_list api_base points at an Ollama
+    /v1 URL; LiteLLM 1.106.4 copies temperature/top_p only when present and never injects 1.0 (drop_params=true).'
+  mlx_topk: Chunked top-k selection for vocab>2048 when k<2048 (mlx/topk.go, mlxrunner/sample/sample.go). Applies to Mac qwen38-uni
+    only; UA runs llamacpp and is unaffected. No published speed figure.
+  other_changes_no_fleet_impact:
+  - ollama launch claude output token limit (not used)
+  - cloud web search decode fix (fleet uses SearXNG via OWUI, not Ollama cloud)
+  - /v1/responses input content (no fleet client)
+  - Ollama app ChatGPT retry (desktop only)
+  - ollama launch codex routing check (not used)
+  intermediate_releases: 0.40.11 macOS speech + d3 classifiers; 0.40.12 LFM3 + MLX/llama.cpp updates + Apple prompt-processing
+    speedups for Gemma 4/Flint/Laguna (not qwen38-uni); 0.40.13 LFM3 on Linux/Windows. None change sampler defaults.
+  release_asset_integrity:
+    linux_amd64_tar_zst_sha256: 993e83d08c3d13d17c55009a3e2664c8a25445e644aec3a68bef5abb6abce67d
+    darwin_tgz_sha256: f3bf9a528e908da0da5a2b3a4ad3252a369d62186501dc4880261e8d9023bff5
+    windows_setup_sha256: e069c7cc7d4808f77684e81efa0b1f853a5190b4b8f070bc8fd63041180e3eba
+    windows_rollback_04013_sha256: 9e3c76e54e7184c68e88a2378b909bf59bbe454f83c076cb4f4a717e946ae719
+verification:
+  v8_historical:
+    cron:
+      result: PASS
+      evidence: Installed crontab equals validated candidate; all other entries preserved.
+    litellm_config:
+      result: PASS
+      evidence: YAML reload interval=300; authenticated /health and /model/info returned 200 after recovery.
+    litellm_scheduler_logs:
+      result: PASS_NO_NEW_OVERLAP
+      evidence: No new 30-second add_deployment overlap lines after the recovered process.
+    tailscale:
+      result: DOCUMENTED
+      evidence: Mac/UA direct=false, relay=sin; UDP netcheck succeeded. Firewall/NAT remains owner-controlled.
+    infinity:
+      result: REVIEWED_NO_CHANGE
+      evidence: OMP_NUM_THREADS=8 already below the proposed 12; three-model command retained.
+    chart_overlay:
+      result: DOCUMENTED_KEEP
+      evidence: Image, command, host network and restart policy captured; no removal without owner decision.
+    music_candidates:
+      result: PASS
+      evidence: RED checks failed on live baseline; GREEN checks passed for aliases, cfg_scale, spaced intent and negative
+        guards.
+    music_database:
+      result: SUPERSEDED
+      evidence: v8 hashes were verified at v8 time; 2026-11-03 re-survey shows new live hashes — see function_hash_baseline.
+    mac_locked_params:
+      result: PASS
+      evidence: qwen38-uni all seven values match.
+    ua_locked_params:
+      result: PASS
+      evidence: bomai-safe all seven values match.
+    c2_locked_params:
+      result: PASS
+      evidence: bom-thai-chat all seven values match.
+    container_versions:
+      result: PASS
+      evidence: C2 live inventory matches OWUI 0.12.5, LiteLLM 1.106.4-pil2, Qdrant 1.20.0 and recorded support images.
+    open_webui_health_v8:
+      result: FAIL_AT_V8_TIME
+      evidence: 'Post-restart readiness failure at v8 close; RESOLVED same day in Phase A (art#55520 §6 Phase A item 8: HTTP
+        200 local+public, WS 101 local+public).'
+    real_completion:
+      result: PASS
+      evidence: qwen38-uni with enable_thinking=false returned HTTP 200, finish_reason=stop, visible content 'OK'; no paid
+        fallback used.
+    thai_poster_research:
+      result: PASS_RESEARCH_ONLY
+      evidence: object_info, font codepoints and raqm support inspected; no generation or installation performed.
+  v9_live_resurvey_20261103:
+    owui_version:
+      result: PASS
+      evidence: GET http://localhost:3000/api/version -> {"version":"0.12.5"} — live system unchanged; v0.13.0 is target-only.
+    alembic:
+      result: PASS
+      evidence: SELECT version_num FROM alembic_version -> 0bd252b206fb (parent of c41f8d9e2a10; linear chain to e42c8f710a36).
+    functions_18:
+      result: PASS
+      evidence: 18 function rows enumerated with md5+bytes; recorded in function_hash_baseline; 17 active, force_web_search_global
+        inactive (leave it inactive).
+    bomai_mods:
+      result: PASS
+      evidence: 'BOMAI-surface functions present and active: theme_designer_pro, bomai_live_guard, bom_ui_polish, music_yue2
+        (content match), plus claude_clone_ui/bom_han_guard in full table; static brand dir listing captured (bomai/, bomai_static_v1/,
+        bomai_v3*.png, index_patched_v*.html).'
+    env_vars:
+      result: PASS_REDACTED
+      evidence: Container env captured and filtered; WEBUI_SECRET_KEY present but REDACTED everywhere (R3); no ENABLE_NOTIFICATIONS
+        / CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS set today — both pins required before v0.13.0 start.
+    docker_image_binds:
+      result: PASS
+      evidence: Image sha256:03443b8de6b6..., RestartPolicy=always, 30 binds enumerated (14 patch files + brand assets + data
+        + bomai-brand + bomai_static_v1:ro).
+    mac_locked_params:
+      result: PASS
+      evidence: Ollama 0.40.10; qwen38-uni Modelfile 7/7 locked values (temperature 0.6, top_p 0.95, top_k 20, repeat_penalty
+        1, presence_penalty 0, num_predict 4096, num_ctx 8192).
+    ua_locked_params:
+      result: PASS
+      evidence: Ollama 0.40.13; bomai-safe Modelfile 7/7 locked values + frequency_penalty 0 explicit.
+    stress_test_context:
+      result: PASS_8OF8
+      evidence: 'art#55630: T1 Thai chat, T1B thinking, T2 web search, T3 RAG, T4 music (audio/mp4 payload), T5 image, T6
+        browser webui + 5/5 bomai static assets, T7 hub — all PASS on 2026-11-03.'
+    no_changes_made:
+      result: PASS
+      evidence: All survey commands read-only (curl GET, psql SELECT, docker inspect, ls, ollama show). Zero installs, zero
+        restarts, zero config writes.
+  v10_survey_20261106:
+    source: art56483 read-only Grok survey plus art56456/56352 reconciliation
+    machines: 8/8 reachable at survey; this optimization task performed no SSH and no live verification
+    c2_owui: 0.13.0 healthy, Alembic e42c8f710a36, production short digest 549badb7b84d
+    locked_params: UA bomai-safe 7/7; Mac qwen38-uni 7/7; AM4 not re-read and therefore not newly claimed
+    litellm: C2/UA/AM4 1.106.4 healthy; C2 config keys present and sampled repeat_penalty 1.0
+    document_validation: 38 embedded scripts syntax-checked locally; no script was executed on a fleet machine
+artifact_ids:
+  mega_god_config_v9_previous: 55651
+  god_blueprint_v5_2_previous: 55907
+  fleet_survey: 56483
+  execution_spec: 56488
+  mega_god_config_v10: embedded_in_fleet_optimization_artifact
+  god_blueprint_v6: embedded_in_fleet_optimization_artifact
+changes_from_v9:
+- '[CHANGED v10] C2 OWUI 0.13.0 is now live and healthy with Alembic e42c8f710a36; the v9 pre-upgrade state is historical.'
+- '[CHANGED v10] Corrected C2 production image short digest: 549badb7b84d. The full image digest was not surveyed and is not
+  invented.'
+- '[CHANGED v10] UA memory is the only critical finding: 16.304 GB available, 16.513 GB swap used and swap-out observed. New
+  placements are FROZEN; gpt-oss-120b and ComfyUI remain LIVE_NO_TOUCH.'
+- '[CHANGED v10] C2 load about 12 is not CPU saturation (76-91% idle, steal 0). Netdata is 73.9% of one core; no resize recommendation.'
+- '[CHANGED v10] C2 OWUI 0.0.0.0:3000, UA/AM4 Netdata, UA/AM4 LiteLLM and other wide binds are exposure candidates requiring
+  consumer/firewall proof before rebind.'
+- '[CHANGED v10] Ollama: UA 0.40.14; Mac server 0.40.14 / CLI 0.40.10; AM4 0.40.13 / CLI absent from PATH; i9 0.40.13 with
+  no resident model. Target is 0.40.14.'
+- '[CHANGED v10] OWUI instances are independent: C2 0.13.0, UA 0.12.4, AM4 0.11.4. No forced alignment is authorized.'
+- '[CHANGED v10] AM4 Netdata CPU is healthy at 0.96%; its remaining defects are container-local configuration and host-network
+  exposure. FX28 burn remains untouched and blocks Ollama upgrade.'
+- '[CHANGED v10] NAS has a 03:00 Task Scheduler herd, 38% residual swap, scripts.d enabled and node_exporter_old_20261023
+  on 0.0.0.0:9100. NAS n8n 2.31.2 remains OWNER_HOLD_NO_RESTART.'
+- '[CHANGED v10] Mac-C2 remains DERP sin and MagicSock ReceiveIPv4 is down; owner-controlled UDP/NAT work is required. Simulator
+  volumes are 98% full while the system disk is healthy.'
+- '[CHANGED v10] i9 Windows 10 22H2 support ended 2025-10-14; ESU is unverified. Both GPUs retain 12.361/11.066 GB with Ollama
+  empty; new model admission is denied pending attribution.'
+- '[CHANGED v10] CAT is OWNER_EXECUTE: Ubuntu ESM unverified, PHP 7.4 slot/binaries remain, DB metrics inaccessible, failed
+  iptables-restore/maldet units, and backup presence unproven.'
+- '[CHANGED v10] CAT backup correction: /home/admin/backups is not DirectAdmin default; audit/use /home/admin/admin_backups
+  and prove local plus offsite restore coverage.'
+- '[CHANGED v10] Contabo1 has 79 Chromium zombies; Browserless-only recycle is proposed. MariaDB 10.4.13 needs a separate
+  migration; n8n 2.10.3 is not force-aligned with NAS 2.31.2.'
+- '[CHANGED v10] C2 LiteLLM bomai-safe repeat_penalty drift is not present in v5.2 and sampled values are 1.0 in art56483;
+  the v9 queued-drift note is closed without a restart.'
+- '[CHANGED v10] New alert contract covers UA memory/swap, C2 Netdata, Contabo1 zombies, Mac DERP, NAS disk/exporter, CAT
+  backups/TLS, kern.log and version drift.'
+- '[LOCKED v10] Seven model parameters, 18 function hashes, music pipeline, protected model deviations and all live route
+  constraints are retained from v9.'
+- '[LOCKED v10] LiteLLM 1.107.0 remains COMPROMISED — pin v1.106.4 ONLY. Any LiteLLM restart is 03:00-06:00 ICT after a two-minute
+  drain.'
+- '[LOCKED v10] No sshd, PasswordAuthentication, PermitRootLogin, DNS or resolv.conf recommendation or edit; no n8n restart/upgrade;
+  no CAT production execution.'
+alert_contract:
+  ua_memory_available:
+    warning: <20 GiB
+    critical: <16 GiB or any swap-out over 10s
+  c2_netdata_cpu:
+    warning: '>50% one core for 15m'
+    critical: '>75% one core for 15m'
+  contabo1_chromium_zombies:
+    warning: '>20'
+    critical: '>50'
+  mac_c2_path:
+    warning: DERP for 24h
+    critical: generation health failure
+  nas_usb_usage:
+    warning: '>75%'
+    critical: '>85%'
+  nas_old_exporter:
+    warning: running after scrape-free proof
+    critical: unintended public metrics
+  cat_backup_age:
+    warning: '>26h'
+    critical: '>48h or offsite missing'
+  cat_tls_expiry:
+    warning: <14d
+    critical: <7d, expired or mismatch
+  kern_log:
+    warning: '>100 MiB'
+    critical: logrotate syntax/restart failure
+  ollama_version:
+    warning: not 0.40.14 after approved window
+    critical: health or locked-parameter regression
+security_audit_summary:
+  confirmed:
+  - UA critical memory pressure
+  - Contabo1 Browserless zombies
+  - Mac DERP primary route
+  - AM4/i9/Mac CLI Ollama skew
+  - EOL Windows/PHP/MariaDB lifecycles
+  unverified_until_tested:
+  - Docker wide-bind public reachability
+  - i9 ESU
+  - CAT ESM
+  - CAT backup coverage
+  - CAT effective ModSecurity engine
+  - i9 second GPU owner
+  no_change_inventory:
+  - PasswordAuthentication/PermitRootLogin observations
+  - healthy NAS/Contabo1 n8n versions
+  - AM4 busy load
+  - C2 load average
+  - working CSF SYNFLOOD/LF settings
+  iron_constraints:
+  - No sshd/DNS edits or recommendations
+  - No IRON exemption
+  - No healthy-system changes without evidence
+  - No CAT execution
+  - No NAS n8n restart/upgrade
+  - LiteLLM 1.106.4 only
+maintenance_schedule_recommendations:
+  daily:
+  - NAS 03:00/03:07/03:14/03:21 stagger
+  - CAT local backup 03:30 ICT, offsite 04:15 ICT after verification
+  - Contabo1 zombie count comparison every 24h
+  - Mac existing cleanup 21:00 and dry-run 04:00 preserved
+  weekly:
+  - C2 existing Sunday 05:00 prune preserved; inspect chart-overlay separately
+  - Sunday 06:00 review TLS/log/version/backup alerts without auto-upgrades
+  - Review C2 Netdata sustained CPU and Mac DERP path
+  monthly:
+  - Isolated DirectAdmin single-account restore drill
+  - Owner review of ESM/Windows/PHP/MariaDB lifecycle and GPU capacity
+  - Review firewall false positives and CSF country lists remain empty
+  restricted_window: LiteLLM restart only 03:00-06:00 ICT after two-minute zero-completion drain; AM4/i9 Ollama use the same
+    conservative inference window.
+historical_residuals_v9:
+- 'Patch-bind rebase workload: 14 patch files built for v0.12.5 must be diffed against v0.13.0 before Phase K cutover; index.html/apikey-button.js/keys.html
+  are the most exposed to tabbed-workspace/Controls-move chrome changes. Blind carry-over is forbidden.'
+- If ENABLE_NOTIFICATIONS=false is not pinned before first v0.13.0 start, the notification inbox turns ON by upstream default
+  for BOMLLM and BOMAI users.
+- If CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS=256 is not pinned, native function-calling rounds rise to 1024.
+- LiteLLM bomai-safe repeat_penalty drift (1.05) remains until the authorized fix window; Modelfile side is already 1.0.
+- music_yue2 ffmpeg 60s transcode hardcap is hardcoded (no valve); T4 recurrence possible under C2 iowait — dedicated source-fix
+  lane recommended.
+- Function-hash drift between v8 and live (music_yue2, bom_intent_filter) is documented but its edit history was not audited
+  in this task.
+- OWUI exit-137 chronic flap risk unchanged (art#55602/art#55630 notes); restart=always is the live mitigation; boot->healthy
+  25-80 min under load.
+- Open WebUI v0.13.0 forbids rolling two versions against one DB — cutover is single-container replace only, after a verified
+  Postgres backup.
+- ASCII 90s duration ambiguity, stale music busy-check URL and ffmpeg stage messaging remain source tasks for zcode.
+- Mac and UA cannot form a direct Tailscale path until owner-controlled NAT/firewall changes are made.
+- chart-overlay remains offloaded under KEEP_PENDING_OWNER_REVIEW.
+- No paid z.ai, Anthropic or Moonshot calls were made.
+residual_risks:
+- UA memory relief is blocked on owner workload/capacity selection; alert-only does not create headroom.
+- C2 Netdata remains above 50% of one core; deeper dbengine/stream changes need separate evidence, not a generic collector
+  purge.
+- C2 OWUI bind change requires Cloudflare/Compose proof and may have 17-80 minute startup time; public direct-consumer inventory
+  is incomplete.
+- Mac-C2 DERP requires owner NAT/firewall work; CLI update does not improve network latency.
+- AM4 Ollama remains 0.40.13 until FX28 stops; Netdata persistence must precede any recreate.
+- NAS scheduler mutation is owner-only in DSM; old exporter cannot be stopped until every scraper is excluded.
+- i9 ESU and second-GPU ownership are unresolved; no new model placement is allowed.
+- CAT backup presence, ESM, live PHP usage, DB metrics and maldet failure cause remain unverified; all scripts are OWNER_EXECUTE.
+- Contabo1 zombies can recur; MariaDB migration is not implemented by this document and n8n versions remain independent.
+- Spec-supplied Netdata 42.8% lacks raw evidence in the supplied artifacts; current baseline is 73.9% from art56483.
+- No paid z.ai, Anthropic or Moonshot calls and no fleet changes were made.

@@ -11,6 +11,31 @@ versioning follows [SemVer](https://semver.org/).
 - 90-second walkthrough video link.
 - Filled benchmark CSVs from the reproducible harness (`benchmarks/`).
 
+## [13.0.0] - 2026-11-06
+
+### Added
+- Mega fleet implement: 35 K3 actions across 8 machines in 13 phases (spec art#56548)
+- Live price pipeline on C2 OWUI: `bom_price_pipe` + `bom_price_router` + `bom_price_tool` (MT5 real-time source; fixes the $3,247 XAUUSD hallucination — answers track live ~$4,08x, ±$5 vs public quotes)
+- GOD CONFIG v10.0 (hub art#56564) and GOD BLUEPRINT v6.0 (hub art#56565); raw copies in `configs/config_g_v10.0.yaml` and `BLUEPRINT.md`
+- 11 OWNER_EXECUTE audit/apply scripts deployed to CAT `/root/bomllm-scripts/`
+- Fleet audit evidence set: bind audit (8 hosts), log audit, zombie matrix, version matrix, Netdata streaming test (C2/UA/AM4 -> CAT :19999 all reachable)
+
+### Changed
+- UA Netdata republished to 127.0.0.1 + 100.82.173.22 only; AM4 Netdata explicit binds via persisted config volume; NAS `scripts.d = no`
+- Mac Ollama CLI symlinked to staged 0.40.14 (server untouched, qwen38-uni 7/7 params verified)
+- AM4 kern.log under dedicated logrotate rule (daily / 100M / rotate 7)
+
+### Removed
+- C2: 3 exited rollback containers (archived with create payloads first) + build cache older than 168 h
+- AM4: `agent-hub-v2_prev_20261104_0301` retired; NAS `node_exporter_old_20261023_001640` stopped (restart policy no, container retained)
+
+### Known Deferred / Owner Items
+- UA LiteLLM explicit bind (03:00-06:00 ICT window + 2-min drain gate)
+- C2 OWUI explicit bind — container has no Compose labels; needs owner migration to Compose first
+- Contabo1 chromium zombies — parent is n8n main (node server.js); n8n restart is owner-gated
+- AM4 Ollama 0.40.14 (FX28 burn running) and i9 Ollama 0.40.14 (window + attribution) — scripts staged
+- NAS swap refresh (needs root), NAS 03:00 DSM task stagger (owner DSM edit), i9 ESU/OS decision, CAT production applies (11 scripts staged OWNER_EXECUTE)
+
 ## [12.0.0] - 2026-11-05
 
 ### Added

@@ -1,18 +1,18 @@
 # BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v16.0.0](images/hero_banner_v16.png)
+![BOM LLM v17.0.0](images/hero_banner_v17.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v16.0.0 — Atom Fleet Optimization: GOD CONFIG v11.0, GOD BLUEPRINT v7.0, IRON 44 Rules**
+**BOM LLM v17.0.0 — Infrastructure & Reliability Update: OWUI v0.13.2, LiteLLM v1.108.3 LTS, Valkey 9.1.3, IRON 44 Rules**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
 [![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v11.0-blue)]()
-[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.0-blueviolet)]()
+[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.2-blueviolet)]()
 [![IRON Rules](https://img.shields.io/badge/IRON%20Rules-44-red)]()
-[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.106.5-9cf)]()
+[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.108.3-9cf)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
 [![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-Model%20Card-yellow)](https://huggingface.co/bomllm/turbo-thai-config)
@@ -31,6 +31,22 @@ This is not a demo. This is the exact stack that answers my customers every day.
 ## Architecture
 
 Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v7.0 — atom-level fleet survey update from the Nov 6-7 fleet optimization, priority matrix, evidence contract) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v11.0).
+
+## What's New in v17.0.0 — 🛡️ Infrastructure & Reliability Update (Nov 8, 2026)
+
+![Benchmark v17](images/benchmark_v17_stats.png)
+
+- **Open WebUI v0.13.0 → v0.13.2** — coding agents, saved side chats, comments, notifications, plain-HTTP fix
+- **LiteLLM v1.106.5 → v1.108.3 LTS** — cosign signature verified on upgrade, Postgres restart fix
+- **Valkey v9.1.2 → v9.1.3** — heap overflow security fix; Docker DNS alias persisted via recreate script + compose
+- **Ollama i9 v0.40.13 → v0.40.15** · **Cloudflared Mac v2026.8.2 → v2026.10.7**
+- **Contabo C2 live-migrated** — disk latency 133ms → 4ms (90% improvement)
+- **bom_price_pipe** — blocking time.sleep → async asyncio.sleep (event loop unblocked)
+- **bom-writer** — num_ctx 16384 pin added to LiteLLM route
+- **Deep fleet audit** — 8 machines, 25 findings, 3 critical fixes applied
+- **Chat 500 fixed** — Valkey alias root cause resolved (incident #31)
+- **2 config files hardened 664 → 600** · **LiteLLM cosign verification on every upgrade**
+- **GOD CONFIG v11.0 + GOD BLUEPRINT unchanged** — hero banner v17 + benchmark card via ComfyUI FLUX (dark blue & gold)
 
 ## What's New in v16.0.0 — ⚡ Atom Fleet Optimization Complete (Nov 7, 2026)
 
@@ -252,8 +268,8 @@ flowchart TB
     CF["Cloudflare Tunnel<br/>(HTTPS, key-gated)"]
 
     subgraph VPS["VPS — Singapore (Debian 12, Docker)"]
-        OW["Open WebUI v0.13.0"]
-        LL["LiteLLM proxy 1.106.5<br/>(routing, virtual keys, budgets, fallback)"]
+        OW["Open WebUI v0.13.2"]
+        LL["LiteLLM proxy 1.108.3<br/>(routing, virtual keys, budgets, fallback)"]
         PG[("Postgres 16")]
         QD[("Qdrant 1.20.0")]
         VY[("Valkey 8")]
@@ -345,7 +361,7 @@ cd bomllm
 | Machine | Role | Key Specs |
 |---------|------|-----------|
 | Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.14, TURBO-Fable + MiMo Q4, MLX nvfp4 |
-| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.0, LiteLLM 1.106.5, SearXNG |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.2, LiteLLM 1.108.3, Valkey 9.1.3, SearXNG |
 | UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM staging |
 | AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, 2x RTX 5060 Ti 16GB, Ollama 0.40.13, ComfyUI x2, hub services |
 | i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI, TTS, Music, EA |
@@ -366,7 +382,7 @@ cd bomllm
 | NAS | Hub relay + n8n | — | ✅ |
 | CAT | Web hosting (DirectAdmin) | — | ✅ |
 
-Production pipeline: OWUI v0.13.0 → LiteLLM v1.106.5 → llm-smart → gpt-oss-120b
+Production pipeline: OWUI v0.13.2 → LiteLLM v1.108.3 → llm-smart → gpt-oss-120b
 
 ## QC System (AM4)
 
@@ -378,12 +394,14 @@ Deployed Oct 31 — 10/10 PASS:
 
 ## Pinned Versions
 
-- OWUI: v0.13.0
-- LiteLLM: v1.106.5 (⛔ v1.107.0 COMPROMISED)
-- Ollama: 0.40.14 (Mac server + UA), 0.40.13 (AM4)
+- OWUI: v0.13.2
+- LiteLLM: v1.108.3 LTS (⛔ v1.107.0 COMPROMISED)
+- Valkey: 9.1.3
+- Ollama: 0.40.15 (i9), 0.40.14 (Mac server + UA), 0.40.13 (AM4)
 - Qdrant: v1.20.0
 - ComfyUI: v0.43.0 (fleet-wide)
-- BOM AI: v2.0.3
+- Cloudflared (Mac): v2026.10.7
+- BOM AI: v2.0.5
 - IRON Rules: 44
 
 ## License
@@ -404,13 +422,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v16.0.0 — Atom Fleet Optimization**
+**BOM LLM v17.0.0 — Infrastructure & Reliability Update**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 
-**v16.0.0 ใหม่:**
+**v17.0.0 ใหม่:**
+- Open WebUI v0.13.2 + LiteLLM v1.108.3 LTS + Valkey 9.1.3 (แก้ช่องโหว่ security และ error 500)
+- ย้ายเซิร์ฟเวอร์ Contabo C2 — disk latency จาก 133ms เหลือ 4ms (เร็วขึ้น 90%)
+- bom_price_pipe ปรับเป็น async ไม่บล็อก event loop + bom-writer ล็อก num_ctx 16384
+- ตรวจสอบ fleet เชิงลึก 8 เครื่อง — 25 findings แก้จุดวิกฤต 3 จุด
+- GOD CONFIG v11.0 คงเดิม + แบนเนอร์ใหม่ธีมน้ำเงินเข้ม-ทอง
+
+**v16.0.0 ก่อนหน้า:**
 - สำรวจระดับ atom ครบ 8 เครื่อง (225 ไฟล์ / 54,600 บรรทัด) + ออกแบบ 23 optimization actions
 - GOD CONFIG v11.0 + GOD BLUEPRINT v7.0
 - Price Router v2 + แก้ live-router เป็น qwen38-uni

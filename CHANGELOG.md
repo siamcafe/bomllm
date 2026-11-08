@@ -1,3 +1,27 @@
+## [17.0.0] - 2026-11-08
+
+### Infrastructure
+- Open WebUI v0.13.0 → v0.13.2 (coding agents, saved side chats, comments, notifications)
+- LiteLLM v1.106.5 → v1.108.3 LTS (cosign verified, Postgres restart fix)
+- Valkey v9.1.2 → v9.1.3 (heap overflow security fix)
+- Ollama i9 v0.40.13 → v0.40.15
+- Cloudflared Mac v2026.8.2 → v2026.10.7
+
+### Performance
+- Contabo C2 VPS live-migrated: disk latency 133ms → 4ms (90% improvement)
+- bom_price_pipe: blocking time.sleep → async asyncio.sleep
+- bom-writer: num_ctx 16384 pin added to LiteLLM route
+
+### Reliability
+- Valkey Docker DNS alias persisted via recreate script + compose
+- Deep fleet audit: 8 machines, 25 findings, 3 critical fixes applied
+- Chat 500 error resolved (Valkey alias root cause, incident #31)
+
+### Security
+- 2 config files hardened 664 → 600
+- Valkey 9.1.3 heap overflow fix
+- LiteLLM cosign signature verification on every upgrade
+
 ## v16.0.0 — 2026-11-07
 
 ### Changes

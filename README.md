@@ -1,21 +1,23 @@
 # BOM LLM — Self-Hosted Thai AI Infrastructure
 
-![BOM LLM v17.0.0](images/hero_banner_v17.png)
+![BOM LLM v18.0.0](images/poster_v18.png)
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v17.0.0 — Infrastructure & Reliability Update: OWUI v0.13.2, LiteLLM v1.108.3 LTS, Valkey 9.1.3, IRON 44 Rules**
+**BOM LLM v18.0.0 — Fleet Sync & Documentation Release: GOD CONFIG v12, GOD BLUEPRINT v8, LiteLLM v1.108.8 LTS, BOM AI Pro GGUF, Gateway rc3, IRON 57+ Rules**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
-[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v11.0-blue)]()
-[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.2-blueviolet)]()
-[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-44-red)]()
-[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.108.3-9cf)]()
+[![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v12.0-blue)]()
+[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.3-blueviolet)]()
+[![IRON Rules](https://img.shields.io/badge/IRON%20Rules-57%2B-red)]()
+[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.108.8-9cf)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
 [![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-Model%20Card-yellow)](https://huggingface.co/bomllm/turbo-thai-config)
+
+**The fleet today (Nov 14, 2026): 8 machines · RAM 1,200+ GB · 8 GPUs · Tailscale-meshed · 34 incidents survived · 57+ IRON rules.**
 
 I replaced $50/day of cloud LLM bills with a Mac Mini on my desk running at $0.54/day measured electricity.
 It now does **inference, coding, image generation, voice synthesis, music, and live streaming** — all self-hosted.
@@ -30,7 +32,30 @@ This is not a demo. This is the exact stack that answers my customers every day.
 
 ## Architecture
 
-Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v7.0 — atom-level fleet survey update from the Nov 6-7 fleet optimization, priority matrix, evidence contract) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v4.2 — daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v11.0).
+Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD BLUEPRINT v8.0 — full fleet survey, priority matrix, evidence contract + v8.1 addendum: Pro GGUF tier, gateway rc3 stream resume, web search default OFF) and [HOWTO.md](HOWTO.md) (GOD HOW-TO v5.0 — install/deploy steps, Ollama pull commands, daily sweeps, incident recipes §3.8-§3.17). Locked generation parameters: [GOD_CONFIG.md](GOD_CONFIG.md) (v12.0 — keep_alive "24h" everywhere, never -1).
+
+## What's New in v18.0.0 — 📦 Fleet Sync & Documentation Release (Nov 14, 2026)
+
+![BOM LLM v18 poster](images/poster_v18.png)
+
+- **GOD CONFIG v12** (hub art#60163) + **GOD BLUEPRINT v8** (hub art#57374) fully synced into this repo — keep_alive `"24h"` rule fleet-wide (NEVER `-1`)
+- **Grok deep scan: 8 machines / 462 files** (art#60726) — **8 findings fixed** (art#60745): bomai-safe keep_alive, typhoon25-content, admission_lanes, chart_reason, intent filter port, UA swap, UA LiteLLM restart policy, CB1 zombies
+- **typhoon25-content permanently killed** from LiteLLM DB (art#60808); LiteLLM + OWUI restarted with all fixes live (art#60753)
+- **LiteLLM v1.108.5 → v1.108.8 LTS** applied on C2/UA/AM4 · **ComfyUI v0.45.0** fleet · **Ollama 0.40.16** unification target (fleet survey art#60843)
+- **BOM AI v2.1.8** — Pro tier now **GGUF Q4_K_M on all platforms** (was MLX-only)
+- **Gateway rc3 stream resume** — Han-cut rate **0/272** (was 13.97% on v2.1.6)
+- **Web search default OFF** — 3 layers fixed (model preset, admin default, builtin tools)
+- **Workflow guide** published (art#60694, 11 chapters) · **IRON 38 → ABSOLUTE** · incidents #33/#34 closed · 7 CAT nginx CVEs handed to project web
+- **Fleet specs**: RAM 1,200+ GB · 8 GPUs · 8 machines · Mac Studio M5 Ultra 512GB on order (Jan-Feb 2027)
+
+### BOM AI Model Tiers (v2.1.8 — Pro GGUF)
+
+| Tier | Model | Format | Size | Ollama Tag |
+|------|-------|--------|------|------------|
+| Light | 4B | GGUF | ~3 GB | `siamcafe/bom-ai:light-v2.1.8` |
+| Pro | 709-L 27B (DavidAU) | GGUF Q4_K_M | 16.5 GB + 518 MB mmproj | `siamcafe/bom-ai:pro-v2.1.8` |
+
+keep_alive policy: `"24h"` on every route — models stay warm; `-1` is FORBIDDEN (incident #33).
 
 ## What's New in v17.0.0 — 🛡️ Infrastructure & Reliability Update (Nov 8, 2026)
 
@@ -360,20 +385,20 @@ cd bomllm
 
 | Machine | Role | Key Specs |
 |---------|------|-----------|
-| Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.14, TURBO-Fable + MiMo Q4, MLX nvfp4 |
-| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.2, LiteLLM 1.108.3, Valkey 9.1.3, SearXNG |
-| UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM staging |
-| AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, 2x RTX 5060 Ti 16GB, Ollama 0.40.13, ComfyUI x2, hub services |
-| i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI, TTS, Music, EA |
+| Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.16 fleet daemon, TURBO-Fable + MiMo Q4, MLX nvfp4; M5 Ultra 512GB on order |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.3, LiteLLM 1.108.8 LTS, Valkey 9.1.3, SearXNG |
+| UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM 1.108.8 |
+| AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, RTX 5080 + iGPU, Ollama 0.40.13, ComfyUI v0.45.0 x2, LiteLLM 1.108.8, hub services |
+| i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI v0.45.0 (8188/8189/8190), TTS, Music, EA |
 | AM5 Windows | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
 | NAS DS725+ | Infra | comfy-router, monitoring, n8n, backups |
 | CAT Server | Web Hosting | DirectAdmin, 5 WordPress sites, MySQL |
 
-## Fleet Status (Nov 4, 2026)
+## Fleet Status (Nov 14, 2026)
 
 | Machine | Role | Ollama | Status |
 |---------|------|--------|--------|
-| Mac Mini M4 Pro | Production qwen38-uni | 0.40.14 | ✅ LIVE |
+| Mac Mini M4 Pro | Production qwen38-uni | 0.40.16 | ✅ LIVE |
 | Ubuntu AI (UA) | gpt-oss-120b + ComfyUI | 0.40.14 | ✅ |
 | AM4 | QC Stack + Hub | 0.40.13 | ✅ |
 | C2 (Contabo) | OWUI + LiteLLM | — | ✅ |
@@ -382,7 +407,7 @@ cd bomllm
 | NAS | Hub relay + n8n | — | ✅ |
 | CAT | Web hosting (DirectAdmin) | — | ✅ |
 
-Production pipeline: OWUI v0.13.2 → LiteLLM v1.108.3 → llm-smart → gpt-oss-120b
+Production pipeline: OWUI v0.13.3 → LiteLLM v1.108.8 LTS → llm-smart → gpt-oss-120b
 
 ## QC System (AM4)
 
@@ -394,15 +419,17 @@ Deployed Oct 31 — 10/10 PASS:
 
 ## Pinned Versions
 
-- OWUI: v0.13.2
-- LiteLLM: v1.108.3 LTS (⛔ v1.107.0 COMPROMISED)
+- OWUI: v0.13.3
+- LiteLLM: v1.108.8 LTS (⛔ v1.107.0 COMPROMISED; 1.109.x forbidden line)
 - Valkey: 9.1.3
-- Ollama: 0.40.15 (i9), 0.40.14 (Mac server + UA), 0.40.13 (AM4)
+- Ollama: 0.40.16 (Mac fleet daemon), 0.40.15 (i9), 0.40.14 (UA), 0.40.13 (AM4) — unifying on 0.40.16
 - Qdrant: v1.20.0
-- ComfyUI: v0.43.0 (fleet-wide)
+- ComfyUI: v0.45.0 (fleet-wide, incl. i9:8189)
 - Cloudflared (Mac): v2026.10.7
-- BOM AI: v2.0.5
-- IRON Rules: 44
+- BOM AI: v2.1.8 (Pro = GGUF Q4_K_M)
+- Gateway: rc3 (stream resume 0/272)
+- keep_alive: "24h" (NEVER "-1")
+- IRON Rules: 57+
 
 ## License
 
@@ -418,13 +445,21 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Keywords
 
-`Thai LLM` `self-hosted AI` `Mac Mini M4 Pro` `local inference` `TURBO-Fable` `BOM LLM` `Thai NLP` `fleet management` `ComfyUI` `FLUX` `open-source AI` `MLX` `Ollama` `LiteLLM` `Open WebUI` `GOD CONFIG` `production AI` `self-hosted ChatGPT alternative` `Thai language model` `low-cost AI inference` `IRON rules` `AI operations` `fleet automation`
+`Thai LLM` `self-hosted AI` `Mac Mini M4 Pro` `BOM AI v2.1.8` `GGUF Q4_K_M` `gateway rc3` `local inference` `TURBO-Fable` `BOM LLM` `Thai NLP` `fleet management` `ComfyUI` `FLUX` `open-source AI` `MLX` `Ollama` `LiteLLM` `Open WebUI` `GOD CONFIG` `production AI` `self-hosted ChatGPT alternative` `Thai language model` `low-cost AI inference` `IRON rules` `AI operations` `fleet automation`
 
 ## 🇹🇭 ภาษาไทย
 
-**BOM LLM v17.0.0 — Infrastructure & Reliability Update**
+**BOM LLM v18.0.0 — Fleet Sync & Documentation Release**
 
 แทนที่ค่า API คลาวด์ \$50/วัน ด้วย Mac Mini บนโต๊ะ \$0.54/วัน (ค่าไฟจริง)
+
+**v18.0.0 ใหม่:**
+- ซิงก์ GOD CONFIG v12 + GOD BLUEPRINT v8 เข้า repo — keep_alive "24h" ทุกเส้นทาง (ห้าม -1)
+- สแกนลึก Grok 8 เครื่อง / 462 ไฟล์ แก้ 8 จุด — ลบ typhoon25-content ถาวร
+- LiteLLM 1.108.8 LTS + ComfyUI v0.45.0 + Ollama 0.40.16
+- BOM AI v2.1.8 — ระดับ Pro เป็น GGUF Q4_K_M ทุกแพลตฟอร์ม (เดิม MLX เฉพาะ Mac)
+- Gateway rc3 แก้ตัดคำตัวอักษรจีน 0/272 + ปิดค้นหาเว็บเป็นค่าเริ่มต้น
+- Fleet: RAM 1,200+ GB · GPU 8 · เครื่อง 8 · อุบัติเหตุ 34 · IRON Rules 57+
 
 ตอนนี้ทำได้ครบ: ตอบแชท, เขียนโค้ด, สร้างรูป, สร้างเสียง, สร้างเพลง, ถ่ายทอดสด — ทั้งหมดรันเครื่องตัวเอง
 

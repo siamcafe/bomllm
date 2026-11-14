@@ -1,29 +1,20 @@
-# GOD CONFIG v11.0
+<!-- GOD CONFIG v12.0 — full sync from hub art#60163 into BOM LLM release v18.0.0 (2026-11-14). keep_alive "24h" rule (never -1) + 7/7 locked params unchanged. DOC_ONLY_RECONCILED_LIVE_R11_R13. -->
 
-Policy ID: `bomllm.policy/v11.0` · Status: **TARGET_DEFINED_LIVE_UNCHANGED** · Source: atom survey (hub art#56608) + mega implement report (art#56578) · GOD CONFIG v11.0 raw: hub art#56686 · Document-only reconciliation, no live change · Adopted by BOM LLM release **v16.0.0** (2026-11-07).
-
-## v16.0.0 Update (2026-11-07)
-
-- GOD CONFIG v11.0 published to GitHub in release v16.0.0; full v10 data retained, v11 deltas marked in `changes_from_v10`
-- LiteLLM pin reconciled UP to the live fleet: **v1.106.5** (C2/AM4 `bomllm/litellm:1.106.5-pil2`, UA prod `v1.106.5`); 1.107.0 remains **COMPROMISED/BANNED**
-- Locked params unchanged 7/7: temperature 0.6, top_p 0.95, top_k 20, repeat_penalty 1.0, presence_penalty 0.0, num_predict 4096, num_ctx 8192
-- zcode Wave 1+2 implemented 11/11 actions (hub art#56649); Wave 3 published GOD v11/v7 (hub art#56683)
-
-## Historical updates below (v10.0 and earlier)
-
-# MEGA GOD CONFIG v11.0 — BOMLLM System
-# Date: 2026-11-06
-# Full v10 data retained and updated against atom survey art#56608 + implement report art#56578.
+# MEGA GOD CONFIG v12.0 — BOMLLM System
+# Date: 2026-11-13
+# Full v11 data retained and reconciled against live state: R11 (art#59888), R12 (art#59917),
+# R13 (art#59929) + this task's read-only live survey (evidence logs in god_v12_report).
 project: bom-llm
-step: configure_god_docs_v11_v7
-version: '11.0'
-previous: '10.0'
-date: '2026-11-06'
-status: TARGET_DEFINED_LIVE_UNCHANGED
+step: fix_god_config_v12_thai_e2e
+version: '12.0'
+previous: '11.0'
+date: '2026-11-13'
+status: DOC_ONLY_RECONCILED_LIVE_R11_R13
 recommendation: INSPECT
-scope_note: DOCUMENT ONLY. No install, upgrade, container/config/service change was performed.
-  v11.0 reconciles the document with the post-implementation live state and stages fixes for
-  the 23 atom-survey findings. Unknown values remain unknown.
+scope_note: DOCUMENT ONLY. No install, upgrade, container/config/service change was performed
+  by v11 or by v12. v12.0 reconciles the document with the live fleet after R11-R13 changes
+  (Mac queue fix, AM4 thai_prod re-route, key renewals) and records the first Thai E2E
+  measurement set plus the OLLAMA_NUM_PARALLEL decision. Unknown values remain unknown.
 fleet_scope: 8 surveyed production machines; AM5 command station recorded separately
 shared_instance_scope: 'This OWUI instance serves BOTH projects: BOMLLM (bom-llm) and BOMAI
   (bomai — own banner, custom buttons, branding).'
@@ -38,6 +29,38 @@ source_artifacts:
   grok_fleet_survey_20261106: 56483
   god_config_v9: 55651
   god_blueprint_v5_2: 55907
+  god_config_v11: 56686
+  r11_report: 59888
+  r12_report: 59917
+  r13_report: 59929
+changes_from_v11:
+- '[CHANGED v12] C2 global num_retries is now zero (R11). Three routes carry per-route retry
+  overrides above the global zero (thai-chat-rt, redhat-mcp-rt, bomai-safe) — live, untouched.'
+- '[CHANGED v12] All six Mac-to-Mac fallback chains were removed by R11 from BOTH
+  litellm_settings and router_settings; vision pairs now fall back to zai-glm-4.6v only;
+  routing_strategy simple-shuffle. Mac-to-Mac fallback count live = zero.'
+- '[CHANGED v12] C2 warm_pin cron is now warm_pin_v13_ps_only: GET /api/ps every 5 min against
+  http://100.118.133.38:11434 (R11); /api/generate pinning is gone.'
+- '[CHANGED v12] AM4 thai_prod upstream is http://100.118.133.38:11434 (R12; was LAN
+  192.168.1.254). Live config path /data/migrated/litellm/config.yaml; timeout 300;
+  keep_alive 24h; num_ctx 8192.'
+- '[CHANGED v12] LiteLLM key expiries: kw-engine-nas and cctv_runner_flood_runner_p044
+  renewed to 2027-02-10 21:39:04.426 (R13). cctv_runner_flood_runner_vision_p048 still
+  expires 2026-11-11 (expired, zero presentations per R12, left in place).'
+- '[CHANGED v12] AM4 hub image is agent-hub:webstats-v1-20261104_0301 (verified by live
+  docker inspect this task; v11 recorded governance-v2-20261029).'
+- '[CHANGED v12] Fleet LiteLLM moved to the 1.108.4 line: C2 bomllm/litellm:1.108.4-pil2,
+  UA ghcr.io/berriai/litellm-non_root:v1.108.4, AM4 bomllm/litellm:1.108.4-pil2 (R13 D3).
+  C2 Open WebUI 0.13.3 (was 0.13.0); C2 valkey 9.1.3-alpine (was 9.1.2).'
+- '[NEW v12] Mac runs THREE ollama serve processes; fleet traffic 100.118.133.38:11434 is
+  served by the BOM-AI binary v0.40.14 with qwen38-uni resident (31.02GB MLX nvfp4);
+  loopback 127.0.0.1:11434 is the desktop app v0.40.16 idle. See mac.ollama_v12_topology.'
+- '[NEW v12] First Thai E2E measurement set: three fresh probes median 83.45s / p90 87.98s,
+  all answered in Thai, zero English contamination; identical prompts inside the valkey
+  cache ttl 300 return cached copies in ~0.08s. See thai_e2e_probe_20261113.'
+- '[NEW v12] OLLAMA_NUM_PARALLEL decision recorded: KEEP 1. See ollama_num_parallel_v12.'
+- '[LOCKED v12] All v11 locked parameters, function hashes, protected deviations, production
+  locks and never-touch rules carry over unchanged. v12 changed DOCUMENTS ONLY.'
 changes_from_v10:
 - '[CHANGED v11] LiteLLM pin reconciled UP to the live fleet: 1.106.5 (C2/AM4 bomllm/litellm:1.106.5-pil2,
   UA prod ghcr.io/berriai/litellm-non_root:v1.106.5, authorized prior lane). Written floor stays
@@ -86,9 +109,11 @@ model_matrix:
   mac:
     compliant_models: [qwen38-uni, bomai-pro, bomai-mini, bomai-gemma3]
     embedding_only: [nomic-embed-text, bge-m3]
-    verified_live: qwen38-uni 7/7 on server 0.40.14, MLX, 30GB resident, ctx 8192, id 549badb7b84d;
-      CLI 0.40.14 (aligned 2026-11-06). NEW: 10-token localhost generate timed out at 70s while
-      resident — path/MagicSock issue, not a parameter issue (ACTION-06).
+    verified_live: '[v12] qwen38-uni resident on the FLEET instance 100.118.133.38:11434
+      (v0.40.14, MLX nvfp4, 31.02GB, ctx 8192, digest 549badb7b84d..., observed 2026-11-13;
+      residency is DYNAMIC — /api/ps was empty before the first Thai probe, model reloads on
+      demand). v11 record: 7/7 params on server 0.40.14, CLI 0.40.14 aligned 2026-11-06, 70s
+      localhost generate timeout ACTION-06 (that hit the loopback instance).'
   ua:
     compliant_models: [qwen3-vl:2b, bomai-safe, bomai]
     verified_live: bomai-safe 7/7 + frequency_penalty 0 explicit on Ollama 0.40.14; gpt-oss-120b
@@ -151,14 +176,17 @@ machines:
     role: Public Open WebUI and LiteLLM control plane; search, relays, live router, price pipeline
     resource_baseline: 'atom 2026-11-06: load 9.52/9.83/9.55, vmstat idle 79-90%, steal 0,
       mem_available 43655MB, swap 0, disk 28% — load is not saturation.'
-    cron: preserved from v10 (observer every minute; staggered 5-minute herd on phases 0-5;
-      canaries/warm-pin/kv-push/backups/budget-guard/version-watch unchanged). Rollback crontab
-      backup: /home/bom/backups/c2_crontab_before_k3_20261102T180018Z.txt
+    cron: observer every minute; staggered 5-minute herd on phases 0-5; canaries/kv-push/
+      backups/budget-guard/version-watch unchanged from v10. '[CHANGED v12] warm_pin is now
+      warm_pin_v13_ps_only (R11): */5 * * * * curl -s --max-time 10 -o /dev/null
+      http://100.118.133.38:11434/api/ps — GET /api/ps only, no /api/generate pinning.'
+      Rollback crontab backup: /home/bom/backups/c2_crontab_before_k3_20261102T180018Z.txt
     litellm:
-      image: bomllm/litellm:1.106.5-pil2
-      version_pin_note: 'v11 PIN = 1.106.5 (live, healthy, authorized prior lane; reconcile
-        documented in ACTION-09). Written floor 1.106.4; 1.107.0 BANNED. old container
-        litellm_old_20261105_223945 exited 137 kept as rollback asset.'
+      image: bomllm/litellm:1.108.4-pil2  # [CHANGED v12] live per R13 D3
+      version_pin_note: 'v12 PIN = 1.108.4 line (live healthy per R13 D3; fleet-wide
+        authorized bump after v11). v11 pin was 1.106.5 (ACTION-09 history); written floor
+        1.106.4; 1.107.0 BANNED. old container litellm_old_20261105_223945 exited 137 kept
+        as rollback asset (v11 record).'
       binds: [100.83.20.100:4000->4000, 127.0.0.1:4000->4000]
       health: liveliness 200 in 0.072s; readiness 200 in 0.175s
       general_settings: {enable_drain_endpoint: true, background_health_checks: false,
@@ -171,12 +199,21 @@ machines:
         bomai-safe route sets temperature 0.6/repeat_penalty 1.0/num_ctx 8192 -> AM4 :11434;
         bomai-pro -> http://100.85.255.14:8080/v1; zai-fallback/zai-brain/glm-4.6v-flash/
         zai-glm-4.6v -> api.z.ai (no paid probes).
-      fallbacks: {qwen38_chat_think: qwen38 -> zai-fallback, qwen38_code_deep: zai-brain,
-        bom_thai_chat: bom-writer -> zai-fallback, thai_chat: qwen38 -> zai-fallback,
-        thai_think: thai-chat -> qwen38 -> zai-fallback, thai_alt: qwen38-chat -> qwen38 -> zai-fallback,
-        thai_gate: qwen38-chat -> qwen38 -> zai-fallback, vision: zai-glm-4.6v}
+      num_retries: 0  # [CHANGED v12] global, R11; three routes keep per-route retry overrides above the global zero (thai-chat-rt, redhat-mcp-rt, bomai-safe)
+      fallbacks_live_v12:
+        litellm_settings: {qwen38: none, qwen38-chat: none, qwen38-code: none, qwen38-deep: none,
+          bom-writer: none, qwen38-vision-alt: zai-glm-4.6v, qwen38-vision: zai-glm-4.6v}
+        router_settings: {typhoon25-content: qwen38-chat, flood-runner: none, qwen38: none,
+          qwen38-chat: none, qwen38-code: none, qwen38-deep: none, bom-writer: none,
+          qwen38-vision-alt: zai-glm-4.6v, qwen38-vision: zai-glm-4.6v, thai-chat-rt: none,
+          ragsa-narrate: none, redhat-mcp-rt: none}
+        context_window_fallbacks: {flood-runner: none, bomai-safe: qwen38-chat,
+          typhoon25-content: qwen38-chat}
+        content_policy_fallbacks: {flood-runner: none}
+        mac_to_mac_fallbacks: 0  # [CHANGED v12] R11 removed all 6+6
+        routing_strategy: simple-shuffle
     open_webui:
-      version: 0.13.0
+      version: 0.13.3  # [CHANGED v12] live per R13 D3
       alembic: e42c8f710a36
       image_id_short: 549badb7b84d
       bind_live: 127.0.0.1:3000->8080 (compose migration DONE; cloudflared is the only public path)
@@ -231,7 +268,8 @@ machines:
         chart-overlay_offloaded_to_am4_20261103T0352Z (KEEP_PENDING_OWNER_REVIEW)]
       never_remove: [rag-lb-relay-am4, qdrant-relay-am4]
       searxng: {image: searxng/searxng:2026.11.2, binds: [100.83.20.100:8888, 127.0.0.1:8888]}
-      valkey: {image: valkey/valkey:9.1.2-alpine, maxmemory: 256mb, eviction: allkeys-lru, port: 127.0.0.1:6379}
+      valkey: {image: valkey/valkey:9.1.3-alpine [CHANGED v12 per R13 D3], maxmemory: 256mb,
+        eviction: allkeys-lru, port: 127.0.0.1:6379, cache_ttl_s: 300 on litellm namespace}
       postgres: {image: postgres:16.15-alpine, port: 127.0.0.1:5432, databases: [openwebui, litellm],
         new_tables: [comment, comment_reaction, notification]}
       pgbouncer: {image: edoburu/pgbouncer:latest, port: 127.0.0.1:6432->5432}
@@ -281,7 +319,8 @@ machines:
     - {model: RTX 5080, used_mib: 15345, total_mib: 16303, util_pct: 100, temp_c: 64}
     - {model: RTX 5060 Ti, used_mib: 14567, total_mib: 16311, util_pct: 0, temp_c: 38}
     gateways:
-      main: {container: litellm, image: ghcr.io/berriai/litellm-non_root:v1.106.5, port: 4000,
+      main: {container: litellm, image: ghcr.io/berriai/litellm-non_root:v1.108.4 [CHANGED v12
+        per R13 D3], port: 4000,
         bind_current: 0.0.0.0:4000, restart_constraint: 03:00-06:00 ICT after 2-min drain;
         bind script /usr/local/sbin/ua_litellm_bind.sh deployed (UA-3 DEFERRED_WINDOW) —
         NOTE: script pins 1.106.4, image is v1.106.5; reconcile per ACTION-09 before use}
@@ -315,9 +354,11 @@ machines:
       blocked_by: FX28 + 03:00-06:00 ICT window; script /usr/local/sbin/am4_ollama_04014.sh deployed}
     models: {bomai-safe: locked 7/7 (re-verified atom), system_text_contradiction: ACTION-13,
       typhoon: 30.5B Q4_K_M}
-    gateway: {container: litellm-gw, image: bomllm/litellm:1.106.5-pil2, bind: 0.0.0.0:4000,
-      store_model_in_db: true, yaml_route: thai_prod -> ollama_chat/qwen38-uni at
-        http://192.168.1.254:11434 think false keep_alive 24h num_ctx 8192}
+    gateway: {container: litellm-gw, image: bomllm/litellm:1.108.4-pil2 [CHANGED v12 per
+      R13 D3], bind: 0.0.0.0:4000, store_model_in_db: true, yaml_route: thai_prod ->
+      ollama_chat/qwen38-uni at http://100.118.133.38:11434 [CHANGED v12=R12, was LAN
+      192.168.1.254] think false keep_alive 24h num_ctx 8192 timeout 300,
+      config_path: /data/migrated/litellm/config.yaml}
     exposure:
       ufw: INACTIVE (defect — ACTION-05)
       wide_publish: [litellm-gw:4000, llm-postgres:5432 (REBIND staged), comfy-gpu0:8188,
@@ -328,8 +369,9 @@ machines:
     infinity: {container: infinity-cpu, bind: 192.168.1.249:7997, role: fleet embedding backend}
     qdrant: {version: v1.20.0, storage: /home/bom/qdrant/storage, binds: 127.0.0.1+LAN+TS
         :6333/:6334, collections: 13}
-    hub: {container: agent-hub-v2, image: agent-hub:governance-v2-20261029, bind:
-        192.168.1.249:8192->8000, restart_policy: no (noted), rule: LIVE_NO_TOUCH}
+    hub: {container: agent-hub-v2, image: agent-hub:webstats-v1-20261104_0301 [CHANGED v12 —
+        verified by live docker inspect 2026-11-13; v11 recorded governance-v2-20261029],
+        bind: 192.168.1.249:8192->8000, restart_policy: no (noted), rule: LIVE_NO_TOUCH}
     netdata: {host network, binds: [127.0.0.1, 100.80.16.53, 192.168.1.249] (DONE persisted to
         host volume), update_every 5, cpu 0.96%}
     logs: {kern_log: rotated 2026-11-06 (DONE, su syslog syslog fix applied), syslog: 261MB NEW
@@ -356,8 +398,18 @@ machines:
     identity: {host: macmini-ai, hardware: Mac Mini M4 Pro, cores: 14, memory_gib: 48}
     addresses: {lan: 192.168.1.254, tailscale: 100.118.133.38, ssh: bom@192.168.1.254:22}
     role: Primary qwen38-uni MLX inference and embeddings
-    ollama: {server: 0.40.14, cli: 0.40.14 (aligned), resident: qwen38-uni 30GB 100% GPU MLX
-        ctx 8192 keep-alive 24h id 549badb7b84d, models_total: 14, no_cloud: true}
+    ollama_v12_topology: '[NEW v12] THREE ollama serve processes observed 2026-11-13.
+        (a) FLEET instance: /Users/bom/.local/share/BOM-AI/bin/ollama listening on
+        100.118.133.38:11434, version 0.40.14 (GET /api/version), serves ALL C2+AM4 traffic;
+        qwen38-uni resident 31.02GB size_vram, runner mlx, quantization nvfp4, digest
+        549badb7b84d..., context_length 8192, residency DYNAMIC (empty before first probe,
+        reloads on demand, observed keep-alive expiry +2h). (b) DESKTOP app:
+        /Applications/Ollama.app on 127.0.0.1:11434, version 0.40.16, idle/no models —
+        R13 D3 measured THIS loopback instance. (c) ROOT system:
+        /usr/local/lib/ollama-v0.40.14/ollama serve since Thursday, listener unconfirmed.
+        Config pin location: ~/Library/LaunchAgents/com.bomai.ollama.plist (binary path there
+        differs from the live fleet process — see ollama_num_parallel_v12). v11 record:
+        server 0.40.14, cli 0.40.14 aligned, models_total 14, no_cloud true, keep-alive 24h.'
     defect_new: 10-token localhost generate TimeoutError at 70s while resident (ACTION-06)
     network: {c2_path: DERP-sin, udp: true, nat_mapping: stable, port_mapping: none,
       magicsock_receiveipv4: NOT RUNNING, required_owner_action: UDP 41641/NAT}
@@ -573,3 +625,96 @@ residual_risks:
 - CB1 zombies will grow until the owner recycles n8n
 - i9 admission gate and ESU decision remain owner-blocked
 - NAS swap clear remains root-blocked (margin healthy, no urgency)
+
+thai_e2e_probe_20261113:
+  when_utc: '2026-11-13T02:15-02:19'
+  path: 'C2 LiteLLM localhost:4000 /v1/chat/completions -> bom-thai-chat -> Mac
+    100.118.133.38:11434 qwen38-uni (route: keep_alive 24h, num_ctx 8192, think false,
+    timeout 180)'
+  auth: 'master key from container env LITELLM_MASTER_KEY on C2 (key loaded, length 51,
+    never printed, never left C2)'
+  probes:
+    p1_cold: {http: 200, time_total_s: 83.45, regime: 'cold — Mac /api/ps empty before probe,
+      includes model load', thai_chars: 18, latin_chars: 0, content_len: 22, total_tokens: 427,
+      answer: 'ประเทศไทยมี 77 จังหวัด'}
+    p2_warm: {http: 200, time_total_s: 23.90, regime: warm, thai_chars: 5, latin_chars: 0,
+      content_len: 8, total_tokens: 423, answer: '50 อำเภอ'}
+    p3_warm: {http: 200, time_total_s: 87.98, regime: warm, thai_chars: 15, latin_chars: 0,
+      content_len: 15, total_tokens: 428, answer: 'แม่น้ำเจ้าพระยา'}
+  stats: {probes: 3, median_s: 83.45, p90_s: 87.98, p90_method: nearest-rank n=3,
+    thai_chars_median: 15, english_contamination: none, timeouts: 0}
+  cache_observation: 'identical Thai prompt repeated within the cache ttl returned a cached
+    copy in 0.08s with the SAME response id (litellm_settings.cache on valkey, ttl 300,
+    completion cached) — E2E freshness requires prompt variation while probing.'
+  history: 'R11 Thai probe (queue full): 85s, 111 Thai chars. R13 EN probe (hello): 4s,
+    0 Thai chars, PROBE_FAIL recorded. v12 = first post-fix Thai measurement set: Thai output
+    confirmed healthy.'
+ollama_num_parallel_v12:
+  current: 1
+  current_evidence: '~/Library/LaunchAgents/com.bomai.ollama.plist EnvironmentVariables pins
+    OLLAMA_NUM_PARALLEL=1 plus OLLAMA_HOST=127.0.0.1:11434, OLLAMA_MODELS=/Users/bom/BOM-AI/models,
+    OLLAMA_MAX_LOADED_MODELS=1, OLLAMA_KEEP_ALIVE=-1, OLLAMA_CONTEXT_LENGTH=8192,
+    OLLAMA_MAX_QUEUE=512, OLLAMA_LOAD_TIMEOUT=5m, OLLAMA_FLASH_ATTENTION=1,
+    OLLAMA_KV_CACHE_TYPE=f16, OLLAMA_GPU_OVERHEAD=0. No /Users/bom/.ollama/env file; no system
+    launchctl parallel key; the RUNNING fleet process env was not introspectable (NOT_COVERED).'
+  recommendation: KEEP_AT_1
+  reason: 'gate for raising to 2 requires ALL Mac-bound routes num_ctx <= 16384 AND free
+    memory > 10GB. Live gate FAILS on context: C2 routes qwen38-think num_ctx 24576 and
+    qwen38-deep num_ctx 32768 both target 100.118.133.38:11434 (verified in live config.yaml).
+    Mac hw.memsize 48GB with qwen38-uni 31.02GB resident leaves free+inactive ~13.6GB;
+    doubling KV at 32768 ctx with f16 KV cache risks pressure while OLLAMA_MAX_LOADED_MODELS=1,
+    and a second slot would halve per-slot throughput on the DERP-relayed C2<->Mac path.
+    Opus estimate "2 is safe if num_ctx <= 16384" is NOT met. NO SETTING WAS CHANGED.'
+  revisit_when: 'if qwen38-think/qwen38-deep are re-pinned to <= 16384 or retired AND free
+    memory stays > 10GB, revisit raising to 2.'
+key_expiry_registry_v12:
+  source: 'C2 bomllm-postgres-1, db litellm, table LiteLLM_VerificationToken (read 2026-11-13)'
+  kw-engine-nas: '2027-02-10 21:39:04.426 (R13 renewal)'
+  cctv_runner_flood_runner_p044: '2027-02-10 21:39:04.426 (R13 renewal)'
+  cctv_runner_flood_runner_vision_p048: '2026-11-11 05:23:18.433 — EXPIRED, zero presentations
+    per R12, left in place'
+  empty_alias_dashboard_keys: '3 rows expired 2026-09 (R12 record, left in place)'
+  next_expiry_wave: '2026-11-28..12-05: bom-bom-wave1-test, bom-bom-litellm,
+    bom-siamlancard-apitest, n8n_content_pipe, bom-siamlancard-chat, bom-fagoodlala-chat'
+janitor_v2_fleet_and_hub_brain:
+  fleet_live: '8 production machines (c2, ua, am4, nas, mac, i9, cat, contabo1) plus am5
+    command station; roles per machines section above; c2/am4/mac surveyed live by this task,
+    ua/nas/i9/cat/contabo1 carry v11+R13 records (NOT re-verified this round).'
+  hub_brain_v2: 'agent-hub-v2 on AM4 (image agent-hub:webstats-v1-20261104_0301, bind
+    192.168.1.249:8192->8000, restart_policy no, rule LIVE_NO_TOUCH); NAS relays hub 8191 ->
+    AM4; public hub.siam2r.com flows cloudflared -> 100.111.221.102:8191.'
+  note: 'summary only; no janitor or hub process/config change by this task.'
+extra_drift_v12:
+- 'C2 config.yaml model_list = 24 entries; R11 health reported 27 models (DB-added models
+  make up the difference).'
+- 'litellm_settings also pins: request_timeout 60, retry_after 2, allowed_fails 3,
+  cooldown_time 60, drop_params true, enable_pre_call_checks true.'
+- 'bom-thai-chat route live: keep_alive 24h, num_ctx 8192, think false, timeout/stream_timeout
+  180 — matches locked v11 params.'
+- 'C2 ufw/netdata/disk states from v11 NOT re-verified this round (NOT_COVERED).'
+- 'AM4 ollama version 0.40.13 from v11 NOT re-verified this round (NOT_COVERED).'
+verification_v12:
+  live_changes_by_this_task: NONE
+  live_changes_note: 'documents only — no restart, no config write, no service touch on any host'
+  ssh_read_only_hosts: ['c2 bom@109.123.233.171:99', 'am4 bom@192.168.1.249:99',
+    'mac bom@192.168.1.254:22']
+  litellm_probe_budget: '5 of 10 used (1 auth-test 401 + 3 fresh Thai probes + 1 cache-hit
+    repeat)'
+  evidence_logs: [p1_c2_config.log, p1_c2_cron.log, p1_c2_keys.log, p1_c2_keys2.log,
+    p1_am4_thaiprod.log, p1_am4_thaiprod_full.log, p1_am4_hubimg.log, p1_mac_ps.log,
+    p1_mac_env.log, p3_mac_ps.log, p3_mac_mem.log, p3_mac_multi.log, p3_mac_procinfo.log,
+    p3_mac_launchagents.log, p2_probe_1.log, p2_probe_2.log, p2_probe_2b.log, p2_probe_3.log]
+artifact_ids_v12:
+  god_config_v11: 56686
+  r11_report: 59888
+  r12_report: 59917
+  r13_report: 59929
+  god_config_v12: THIS_ARTIFACT
+residual_risks_v12:
+- 'Thai E2E warm latency spans 23.9-88.0s for tiny answers on the DERP-relayed single-serialized
+  slot path; direct-path work (v11 ACTION-06) or a slot increase after ctx re-pin would help.'
+- 'The Mac FLEET ollama process runs a binary whose path differs from com.bomai.ollama.plist;
+  which config source actually governs it is NOT_COVERED.'
+- 'cctv_runner_flood_runner_vision_p048 expired key remains in the LiteLLM DB.'
+- 'Identical prompts within ttl 300s serve cached copies — any latency SLO check must vary
+  prompts.'

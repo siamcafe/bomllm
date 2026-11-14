@@ -1,15 +1,20 @@
-# HOW-TO v4.2 — BOMLLM System Operations
+# HOW-TO v5.0 — BOMLLM System Operations
 
 project: bom-llm
 recommendation: INSPECT
 step: fix_c2_perf_survey_fix_release
-version: "4.2"
-previous: "4.1"
-date: "2026-11-04"
-configuration: MEGA GOD CONFIG v9.0 (unchanged — 7/7 locked params untouched)
-architecture: GOD BLUEPRINT v5.2
+version: "5.0"
+previous: "4.2"
+date: "2026-11-14"
+configuration: MEGA GOD CONFIG v12.0 (7/7 locked params untouched; keep_alive "24h")
+architecture: GOD BLUEPRINT v8.0
 
 This guide is for routine operations and bounded incident handling. It does not authorize a change outside the owner's live-chat scope. Never print credentials; load them only into the process that needs them.
+
+v5.0 updates (from the mega repo update v18, spec art#60851):
+1. **NEW §0: Install + Deploy** — bootstrap, docker compose, Ollama pull commands for BOM AI v2.1.8 tiers, OWUI v0.13.3.
+2. Pinned versions refreshed: LiteLLM 1.108.8 LTS, OWUI v0.13.3, ComfyUI v0.45.0, Ollama 0.40.16 (unifying).
+3. keep_alive policy recorded: "24h" on every route, NEVER "-1" (incident #33).
 
 v4.2 updates (from the C2 performance survey/fix/release task, spec art#55876, blueprint v5.2):
 1. **NEW §3.13: SSH guard list maintenance** — how to add/remove blocked CIDRs safely, NEVER-BLOCK rules.
@@ -28,6 +33,40 @@ v4.1 updates (from the C2 SSH-slowness task):
 
 SHARED INSTANCE: this OWUI serves BOTH BOMLLM and BOMAI (own banner, custom buttons, branding). Every UI check below means BOTH surfaces.
 
+## 0. Install + Deploy (NEW v5.0)
+
+### 0.1 Fresh install (gateway host)
+
+```bash
+git clone https://github.com/siamcafe/bomllm.git
+cd bomllm
+./scripts/bootstrap.sh          # base checks + secrets prompt (never commit them)
+docker compose up -d            # OWUI v0.13.3 + LiteLLM 1.108.8 LTS + Postgres 16 + Qdrant 1.20.0 + Valkey 9.1.3
+curl -fsS http://127.0.0.1:3000/api/version    # expect 0.13.3
+curl -fsS http://127.0.0.1:4000/health/liveliness
+```
+
+### 0.2 Ollama models (BOM AI v2.1.8 tiers — Pro is GGUF Q4_K_M on all platforms)
+
+```bash
+# Light tier (4B, ~3 GB)
+ollama pull siamcafe/bom-ai:light-v2.1.8
+
+# Pro tier (709-L 27B DavidAU, GGUF Q4_K_M: text 16.5 GB + mmproj 518 MB)
+ollama pull siamcafe/bom-ai:pro-v2.1.8
+
+# keep models warm on every route (incident #33: "-1" caused the regression)
+# LiteLLM route config: keep_alive: "24h"   <- NEVER -1
+```
+
+### 0.3 Deploy checklist
+
+1. `docker compose ps` — all Up (healthy)
+2. OWUI `/api/version` = 0.13.3; LiteLLM `/health/liveliness` + `/health/readiness` = 200
+3. GOD CONFIG locked params 7/7 (§1.2); keep_alive "24h" on every route
+4. Web search default OFF (3 layers: model preset, admin default_interface, builtinTools.web_search=false)
+5. Gateway rc3 runtime deployed (bom_runtime.py sha cd1d5f14...)
+
 ## 1. Daily operations
 
 ### 1.1 Quick health sweep
@@ -37,7 +76,7 @@ SHARED INSTANCE: this OWUI serves BOTH BOMLLM and BOMAI (own banner, custom butt
 ssh -p 99 bom@100.83.20.100
 uptime
 docker ps --format '{{.Names}}|{{.Image}}|{{.Status}}'
-curl -fsS --max-time 20 http://127.0.0.1:3000/api/version      # expect 0.13.0
+curl -fsS --max-time 20 http://127.0.0.1:3000/api/version      # expect 0.13.3
 curl -fsS --max-time 20 http://127.0.0.1:4000/health/liveliness
 
 # Alembic version must be e42c8f710a36 (v0.13.0 live)
@@ -218,7 +257,7 @@ Checklist: landing HTTP 200; 0 broken images (`complete && naturalWidth > 0`); b
 Update the Mac Ollama app (GUI or brew) so the CLI matches the server. Read-only verification from AM5: `ssh bom@192.168.1.254 "ollama --version"`.
 
 ## 6. Standing checklist (post-incident close-out)
-1. `curl -s https://webui.siam2r.com/api/version` -> 200, version 0.13.0, external TTFB median <0.5 s from AM5 (§3.16).
+1. `curl -s https://webui.siam2r.com/api/version` -> 200, version 0.13.3, external TTFB median <0.5 s from AM5 (§3.16).
 2. `ssh -p 99 bom@109.123.233.171 "uptime"` connects in <5 s (guard active) and load < 12.
 3. LiteLLM liveliness + readiness both 200.
 4. `tailscale status` on C2 lists 8 peers; ds725-plus and macmini-ai paths known (direct / relay-sin respectively).

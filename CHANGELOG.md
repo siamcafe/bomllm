@@ -1,3 +1,31 @@
+# Changelog
+
+## v18.0.0 (2026-11-14)
+
+### Infrastructure
+- Grok deep scan 462 files across 8 machines (art#60726)
+- Fixed 8 findings: bomai-safe keep_alive, typhoon25-content removed, admission_lanes cleaned, chart_reason disabled, intent filter port fixed, UA swap restored, UA litellm restart policy, CB1 zombies reaped (art#60745)
+- typhoon25-content permanently killed from LiteLLM DB (art#60808)
+- LiteLLM + OWUI restarted with all fixes live (art#60753)
+- Fleet software update survey (art#60843): LiteLLM 1.108.8 LTS, ComfyUI v0.45.0, Ollama 0.40.16
+
+### Model
+- BOM AI v2.1.8: Pro tier now GGUF Q4_K_M all platforms (was MLX-only)
+- Gateway rc3: stream resume 0/272 cut rate
+- Web search default OFF (3 layers fixed)
+
+### Documentation
+- Workflow guide published (art#60694, 16.7KB, 11 chapters)
+- GOD CONFIG v12 synced (art#60163)
+- GOD BLUEPRINT v8 synced (art#57374)
+- K3 Gateway Blueprint synced (art#60117)
+
+### Security
+- IRON 38 upgraded to ABSOLUTE (SSH forbidden even under owner override)
+- Incident #33: keep_alive regression fixed
+- Incident #34: SSH lockout CB1+CAT rolled back
+- 7 nginx CVEs identified on CAT (handed off to project web)
+
 ## [17.0.0] - 2026-11-08
 
 ### Infrastructure
@@ -92,8 +120,6 @@
 - Config backup: NAS git tag config-snapshot-2026-11-06
 - Junk survey: art#56706 (28.8GB reclaimable found)
 - BOM AI handoff: art#56812 (v2.0.3)
-
-# Changelog
 
 All notable changes to the BOMLLM release kit are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

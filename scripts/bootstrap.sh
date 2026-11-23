@@ -41,7 +41,8 @@ if grep -qE 'CHANGE_ME' .env; then
   [[ $DRY_RUN -eq 1 ]] || die "Replace all CHANGE_ME values first."
 fi
 # Never allow a real config to be committed: confirm gitignore covers it.
-grep -q '^litellm.yaml$' .gitignore || die ".gitignore missing litellm.yaml rule."
+# The published ignore rule is `litellm.yaml` plus a trailing comment.
+grep -qE '^litellm.yaml([[:space:]]|$)' .gitignore || die ".gitignore missing litellm.yaml rule."
 
 # --- 3. Real LiteLLM config ---------------------------------------------------
 if [[ ! -f configs/litellm.yaml ]]; then

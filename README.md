@@ -12,7 +12,7 @@
 [![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v12.0-blue)]()
 [![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.3-blueviolet)]()
 [![IRON Rules](https://img.shields.io/badge/IRON%20Rules-57%2B-red)]()
-[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.108.8-9cf)]()
+[![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.108.13-9cf)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-%240.54%2Fday-orange)]()
 [![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97-Model%20Card-yellow)](https://huggingface.co/bomllm/turbo-thai-config)
@@ -48,12 +48,12 @@ Full fleet architecture and policies live in [BLUEPRINT.md](BLUEPRINT.md) (GOD B
 - **Workflow guide** published (art#60694, 11 chapters) · **IRON 38 → ABSOLUTE** · incidents #33/#34 closed · 7 CAT nginx CVEs handed to project web
 - **Fleet specs**: RAM 1,200+ GB · 8 GPUs · 8 machines · Mac Studio M5 Ultra 512GB on order (Jan-Feb 2027)
 
-### BOM AI Model Tiers (v2.1.8 — Pro GGUF)
+### BOM AI Model Tiers (v2.1.9 — Pro GGUF)
 
 | Tier | Model | Format | Size | Ollama Tag |
 |------|-------|--------|------|------------|
-| Light | 4B | GGUF | ~3 GB | `siamcafe/bom-ai:light-v2.1.8` |
-| Pro | 709-L 27B (DavidAU) | GGUF Q4_K_M | 16.5 GB + 518 MB mmproj | `siamcafe/bom-ai:pro-v2.1.8` |
+| Light | 4B | GGUF | ~3 GB | `siamcafe/bom-ai:light-v2.1.9` |
+| Pro | 709-L 27B (DavidAU) | GGUF Q4_K_M | 16.5 GB + 518 MB mmproj | `siamcafe/bom-ai:pro-v2.1.9` |
 
 keep_alive policy: `"24h"` on every route — models stay warm; `-1` is FORBIDDEN (incident #33).
 
@@ -386,9 +386,9 @@ cd bomllm
 | Machine | Role | Key Specs |
 |---------|------|-----------|
 | Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.16 fleet daemon, TURBO-Fable + MiMo Q4, MLX nvfp4; M5 Ultra 512GB on order |
-| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.3, LiteLLM 1.108.8 LTS, Valkey 9.1.3, SearXNG |
-| UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM 1.108.8 |
-| AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, RTX 5080 + iGPU, Ollama 0.40.13, ComfyUI v0.45.0 x2, LiteLLM 1.108.8, hub services |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.3, LiteLLM 1.108.13 LTS, Valkey 9.1.3, SearXNG |
+| UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM 1.108.13 |
+| AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, RTX 5080 + iGPU, Ollama 0.40.13, ComfyUI v0.45.0 x2, LiteLLM 1.108.13, hub services |
 | i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI v0.45.0 (8188/8189/8190), TTS, Music, EA |
 | AM5 Windows | Coding + Render | zcode GLM-5.3, ComfyUI 3rd worker |
 | NAS DS725+ | Infra | comfy-router, monitoring, n8n, backups |
@@ -407,7 +407,7 @@ cd bomllm
 | NAS | Hub relay + n8n | — | ✅ |
 | CAT | Web hosting (DirectAdmin) | — | ✅ |
 
-Production pipeline: OWUI v0.13.3 → LiteLLM v1.108.8 LTS → llm-smart → gpt-oss-120b
+Production pipeline: OWUI v0.13.3 → LiteLLM v1.108.13 LTS → llm-smart → gpt-oss-120b
 
 ## QC System (AM4)
 
@@ -420,13 +420,13 @@ Deployed Oct 31 — 10/10 PASS:
 ## Pinned Versions
 
 - OWUI: v0.13.3
-- LiteLLM: v1.108.8 LTS (⛔ v1.107.0 COMPROMISED; 1.109.x forbidden line)
+- LiteLLM: v1.108.13 LTS (⛔ v1.107.0 COMPROMISED; 1.109.x forbidden line)
 - Valkey: 9.1.3
 - Ollama: 0.40.16 (Mac fleet daemon), 0.40.15 (i9), 0.40.14 (UA), 0.40.13 (AM4) — unifying on 0.40.16
 - Qdrant: v1.20.0
 - ComfyUI: v0.45.0 (fleet-wide, incl. i9:8189)
 - Cloudflared (Mac): v2026.10.7
-- BOM AI: v2.1.8 (Pro = GGUF Q4_K_M)
+- BOM AI: v2.1.9 (Pro = GGUF Q4_K_M)
 - Gateway: rc3 (stream resume 0/272)
 - keep_alive: "24h" (NEVER "-1")
 - IRON Rules: 57+
@@ -445,7 +445,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Keywords
 
-`Thai LLM` `self-hosted AI` `Mac Mini M4 Pro` `BOM AI v2.1.8` `GGUF Q4_K_M` `gateway rc3` `local inference` `TURBO-Fable` `BOM LLM` `Thai NLP` `fleet management` `ComfyUI` `FLUX` `open-source AI` `MLX` `Ollama` `LiteLLM` `Open WebUI` `GOD CONFIG` `production AI` `self-hosted ChatGPT alternative` `Thai language model` `low-cost AI inference` `IRON rules` `AI operations` `fleet automation`
+`Thai LLM` `self-hosted AI` `Mac Mini M4 Pro` `BOM AI v2.1.9` `GGUF Q4_K_M` `gateway rc3` `local inference` `TURBO-Fable` `BOM LLM` `Thai NLP` `fleet management` `ComfyUI` `FLUX` `open-source AI` `MLX` `Ollama` `LiteLLM` `Open WebUI` `GOD CONFIG` `production AI` `self-hosted ChatGPT alternative` `Thai language model` `low-cost AI inference` `IRON rules` `AI operations` `fleet automation`
 
 ## 🇹🇭 ภาษาไทย
 

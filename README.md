@@ -4,13 +4,13 @@
 
 ![BOM LLM](images/bomllm_promo_00001_.png)
 
-**BOM LLM v18.0.0 — Fleet Sync & Documentation Release: GOD CONFIG v12, GOD BLUEPRINT v8, LiteLLM v1.108.8 LTS, BOM AI Pro GGUF, Gateway rc3, IRON 57+ Rules**
+**BOM LLM v18.0.0 — Fleet Sync & Documentation Release: GOD CONFIG v12, GOD BLUEPRINT v8, LiteLLM v1.108.13 LTS, BOM AI Pro GGUF, Gateway rc3, IRON 57+ Rules**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Fleet Status](https://img.shields.io/badge/Fleet-8%2F8%20Verified-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/Pipeline-E2E%20PASS-brightgreen)]()
 [![GOD CONFIG](https://img.shields.io/badge/GOD%20CONFIG-v12.0-blue)]()
-[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.3-blueviolet)]()
+[![Open WebUI](https://img.shields.io/badge/Open%20WebUI-v0.13.5-blueviolet)]()
 [![IRON Rules](https://img.shields.io/badge/IRON%20Rules-57%2B-red)]()
 [![LiteLLM](https://img.shields.io/badge/LiteLLM-v1.108.13-9cf)]()
 [![Thai NLP](https://img.shields.io/badge/Thai%20NLP-Gate%2020%2F20-green)]()
@@ -293,7 +293,7 @@ flowchart TB
     CF["Cloudflare Tunnel<br/>(HTTPS, key-gated)"]
 
     subgraph VPS["VPS — Singapore (Debian 12, Docker)"]
-        OW["Open WebUI v0.13.2"]
+        OW["Open WebUI v0.13.5"]
         LL["LiteLLM proxy 1.108.3<br/>(routing, virtual keys, budgets, fallback)"]
         PG[("Postgres 16")]
         QD[("Qdrant 1.20.0")]
@@ -386,7 +386,7 @@ cd bomllm
 | Machine | Role | Key Specs |
 |---------|------|-----------|
 | Mac Mini M4 Pro | Brain (Primary Inference) | 48GB, Ollama 0.40.16 fleet daemon, TURBO-Fable + MiMo Q4, MLX nvfp4; M5 Ultra 512GB on order |
-| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.3, LiteLLM 1.108.13 LTS, Valkey 9.1.3, SearXNG |
+| C2 VPS Singapore | Gateway (Frontend) | Docker, OWUI v0.13.5, LiteLLM 1.108.13 LTS, Valkey 9.1.3, SearXNG |
 | UA Ubuntu | Primary Inference + Staging | 123Gi, RTX 5080 16GB + RTX 5060 Ti 16GB, Ollama 0.40.14, gpt-oss-120b, LiteLLM 1.108.13 |
 | AM4 Ubuntu | ComfyUI Primary + Hub | 121Gi, RTX 5080 + iGPU, Ollama 0.40.13, ComfyUI v0.45.0 x2, LiteLLM 1.108.13, hub services |
 | i9 Windows | GPU Worker | 128GB, 2x RTX 5060 Ti, ComfyUI v0.45.0 (8188/8189/8190), TTS, Music, EA |
@@ -407,7 +407,7 @@ cd bomllm
 | NAS | Hub relay + n8n | — | ✅ |
 | CAT | Web hosting (DirectAdmin) | — | ✅ |
 
-Production pipeline: OWUI v0.13.3 → LiteLLM v1.108.13 LTS → llm-smart → gpt-oss-120b
+Production pipeline: OWUI v0.13.5 → LiteLLM v1.108.13 LTS → llm-smart → gpt-oss-120b
 
 ## QC System (AM4)
 
@@ -419,7 +419,7 @@ Deployed Oct 31 — 10/10 PASS:
 
 ## Pinned Versions
 
-- OWUI: v0.13.3
+- OWUI: v0.13.5
 - LiteLLM: v1.108.13 LTS (⛔ v1.107.0 COMPROMISED; 1.109.x forbidden line)
 - Valkey: 9.1.3
 - Ollama: 0.40.16 (Mac fleet daemon), 0.40.15 (i9), 0.40.14 (UA), 0.40.13 (AM4) — unifying on 0.40.16
